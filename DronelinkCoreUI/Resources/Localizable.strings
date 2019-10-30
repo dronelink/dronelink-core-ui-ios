@@ -1,0 +1,17 @@
+//
+//  Localizable.strings
+//  DronelinkUI
+//
+//  Created by Jim McAndrew on 1/21/19.
+//  Copyright © 2019 Dronelink. All rights reserved.
+//
+"dismiss" = "Dismiss";
+
+"MissionDisengageReason.user.disengaged" = "Mission Paused";
+
+"MissionViewController.timeElapsed.empty" = "--:--";
+"MissionViewController.start.countdown" = "Starting in %d";
+"MissionViewController.start.engaging" = "Preparing to execute...";
+"MissionViewController.start.cancelled" = "Countdown Stopped";
+"MissionViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
+"MissionViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
