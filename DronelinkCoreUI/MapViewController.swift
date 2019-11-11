@@ -69,6 +69,7 @@ public class MapViewController: UIViewController {
         updateTimer = nil
         Dronelink.shared.remove(delegate: self)
         droneSessionManager.remove(delegate: self)
+        missionExecutor?.remove(delegate: self)
     }
     
     @objc func update() {

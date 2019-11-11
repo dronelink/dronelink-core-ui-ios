@@ -3,7 +3,7 @@ inhibit_all_warnings!
 use_frameworks!
 
 target 'DronelinkCoreUI' do
-  pod 'DronelinkCore', '~> 1.0.0'
+  pod 'DronelinkCore', '~> 1.0.2'
   pod 'SnapKit', '~> 5.0.0'
   pod 'Mapbox-iOS-SDK', '~> 5.4.0'
   pod 'MaterialComponents/Palettes', '~> 92.5.0'

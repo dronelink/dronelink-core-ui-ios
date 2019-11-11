@@ -252,8 +252,12 @@ public class MissionViewController: UIViewController {
                 }
                 catch MissionExecutorError.droneSerialNumberUnavailable {
                     DronelinkUI.shared.showDialog(title: "MissionViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "MissionViewController.start.engage.droneSerialNumberUnavailable.message".localized)
+                    self.engaging = false
+                    self.update()
                 }
                 catch {
+                    self.engaging = false
+                    self.update()
                 }
             }
             else {
@@ -389,6 +393,16 @@ extension MissionViewController: MissionExecutorDelegate {
     
     public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {
         engaging = false
+        if (reason.title != "MissionDisengageReason.user.disengaged".localized) {
+            DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
+        }
+        
+        if let status = executor.status {
+            if status.completed {
+                Dronelink.shared.unloadMission()
+            }
+        }
+        
         DispatchQueue.main.async {
             self.update()
         }
