@@ -1,12 +1,8 @@
-# DronelinkCoreUI
+# DronelinkCoreUI - iOS
 
 [![Version](https://img.shields.io/cocoapods/v/DronelinkCoreUI.svg?style=flat)](https://cocoapods.org/pods/DronelinkCoreUI)
 [![License](https://img.shields.io/cocoapods/l/DronelinkCoreUI.svg?style=flat)](https://cocoapods.org/pods/DronelinkCoreUI)
 [![Platform](https://img.shields.io/cocoapods/p/DronelinkCoreUI.svg?style=flat)](https://cocoapods.org/pods/DronelinkCoreUI)
-
-## Example
-
-## Requirements
 
 ## Installation
 
