@@ -75,25 +75,16 @@ public class MapViewController: UIViewController {
     @objc func update() {
         if let state = session?.state?.value, let droneHomeLocation = state.homeLocation {
             droneHomeAnnotation.coordinate = droneHomeLocation.coordinate
-            if let droneHomeAnnotationView = droneHomeAnnotationView {
-                droneHomeAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat(mapView.camera.heading * Double.pi/180))
-            }
             droneHomeAnnotationView?.isHidden = false
         }
         else {
             droneHomeAnnotationView?.isHidden = true
-            
-            droneHomeAnnotationView?.isHidden = false
-            droneAnnotationView?.isHidden = false
-            droneHomeAnnotation.coordinate = CLLocationCoordinate2D(latitude: 30.180713, longitude: -97.908254)
-            droneAnnotation.coordinate = CLLocationCoordinate2D(latitude: 30.180713, longitude: -97.908254)
-            return
         }
         
         if let state = session?.state?.value, let droneLocation = state.location {
             droneAnnotation.coordinate = droneLocation.coordinate
             if let droneAnnotationView = droneAnnotationView {
-                droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.missionOrientation.yaw.convertRadiansToDegrees - mapView.camera.heading) * Double.pi/180))
+                droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.missionOrientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
             }
             droneAnnotationView?.isHidden = false
         }

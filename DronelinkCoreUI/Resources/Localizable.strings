@@ -15,3 +15,14 @@
 "MissionViewController.start.cancelled" = "Countdown Stopped";
 "MissionViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
 "MissionViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
+
+"TelemetryViewController.distance.prefix" = "D";
+"TelemetryViewController.altitude.prefix" = "A";
+"TelemetryViewController.horizontalSpeed.prefix" = "H/S";
+"TelemetryViewController.verticalSpeed.prefix" = "V/S";
+"TelemetryViewController.unit.distance.metric" = "m";
+"TelemetryViewController.unit.distance.imperial" = "ft";
+"TelemetryViewController.unit.horizontalSpeed.metric" = "km/h";
+"TelemetryViewController.unit.horizontalSpeed.imperial" = "mph";
+"TelemetryViewController.unit.verticalSpeed.metric" = "m/s";
+"TelemetryViewController.unit.verticalSpeed.imperial" = "fps";

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "DronelinkCoreUI"
-  s.version = "1.0.2"
+  s.version = "1.0.3"
   s.summary = "Dronelink core UI components"
   s.homepage = "https://dronelink.com/"
   s.license = { :type => "MIT", :file => "LICENSE" }
