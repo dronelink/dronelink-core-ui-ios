@@ -219,14 +219,39 @@ public class MissionViewController: UIViewController {
             if let engageDisallowedReasons = missionExecutor.engageDisallowedReasons(droneSession: session), engageDisallowedReasons.count > 0 {
                 let reason = engageDisallowedReasons.first!
                 DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
+                return
             }
-            else {
-                DispatchQueue.main.async {
-                    self.startCountdown()
+
+            missionExecutor.droneTakeoffAltitudeAlternate = nil
+            if missionExecutor.requiredTakeoffArea == nil,
+                let actualTakeoffLocation = session.state?.value.takeoffLocation,
+                let suggestedTakeoffLocation = missionExecutor.takeoffCoordinate?.location,
+                actualTakeoffLocation.distance(from: suggestedTakeoffLocation) > 10 {
+                if let deviceLocation = Dronelink.shared.locationManager.location, deviceLocation.verticalAccuracy >= 0 {
+                    missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
                 }
+                
+                let distance = missionExecutor.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation), defaultValue: "")
+                let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : missionExecutor.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!, defaultValue: "")
+                DronelinkUI.shared.showDialog(
+                    title: "MissionViewController.start.takeoffLocationWarning.title".localized,
+                    details: altitude == nil
+                        ? String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable".localized, distance)
+                        : String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.available".localized, distance, altitude!),
+                    actions: [
+                        MDCAlertAction(title: "continue".localized, emphasis: .high, handler: { action in
+                            self.startCountdown()
+                        }),
+                        MDCAlertAction(title: "cancel".localized, emphasis: .low, handler: { action in
+                        })
+                    ])
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.startCountdown()
             }
         }
-        
     }
     
     private func startCountdown() {

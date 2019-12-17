@@ -53,7 +53,7 @@ public class DronelinkUI: NSObject {
         background = true
     }
 
-    public func showDialog(title: String, details: String? = nil, emphasis: MDCActionEmphasis = .medium) {
+    public func showDialog(title: String, details: String? = nil, actions: [MDCAlertAction]? = nil, emphasis: MDCActionEmphasis = .medium) {
         if background {
             showNotification(title: title, details: details)
             return
@@ -62,9 +62,16 @@ public class DronelinkUI: NSObject {
         DispatchQueue.main.async {
             let scheme = MDCContainerScheme()
             let alert = MDCAlertController(title: title, message: details)
-            alert.addAction(MDCAlertAction(title: "dismiss".localized, emphasis: emphasis, handler: { action in
-                
-            }))
+            if let actions = actions {
+                actions.forEach { action in
+                    alert.addAction(action)
+                }
+            }
+            else {
+                alert.addAction(MDCAlertAction(title: "dismiss".localized, emphasis: emphasis, handler: { action in
+                    
+                }))
+            }
             alert.applyTheme(withScheme: scheme)
             UIApplication.shared.currentViewController?.present(alert, animated: true, completion: nil)
         }

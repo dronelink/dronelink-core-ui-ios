@@ -1,8 +1,8 @@
 PODS:
-  - DronelinkCore (1.1.0)
-  - Mapbox-iOS-SDK (5.4.0)
-  - MaterialComponents/AnimationTiming (92.5.0)
-  - MaterialComponents/Buttons (92.5.0):
+  - DronelinkCore (1.1.1)
+  - Mapbox-iOS-SDK (5.5.0)
+  - MaterialComponents/AnimationTiming (97.0.1)
+  - MaterialComponents/Buttons (97.0.1):
     - MaterialComponents/Elevation
     - MaterialComponents/Ink
     - MaterialComponents/private/Math
@@ -13,23 +13,23 @@ PODS:
     - MaterialComponents/Typography
     - MDFInternationalization
     - MDFTextAccessibility
-  - "MaterialComponents/Buttons+ColorThemer (92.5.0)":
+  - "MaterialComponents/Buttons+ColorThemer (97.0.1)":
     - MaterialComponents/Buttons
     - MaterialComponents/schemes/Color
-  - "MaterialComponents/Buttons+ShapeThemer (92.5.0)":
+  - "MaterialComponents/Buttons+ShapeThemer (97.0.1)":
     - MaterialComponents/Buttons
     - MaterialComponents/schemes/Shape
-  - "MaterialComponents/Buttons+Theming (92.5.0)":
+  - "MaterialComponents/Buttons+Theming (97.0.1)":
     - MaterialComponents/Buttons
     - "MaterialComponents/Buttons+ColorThemer"
     - "MaterialComponents/Buttons+ShapeThemer"
     - "MaterialComponents/Buttons+TypographyThemer"
     - MaterialComponents/schemes/Container
     - MaterialComponents/ShadowElevations
-  - "MaterialComponents/Buttons+TypographyThemer (92.5.0)":
+  - "MaterialComponents/Buttons+TypographyThemer (97.0.1)":
     - MaterialComponents/Buttons
     - MaterialComponents/schemes/Typography
-  - MaterialComponents/Dialogs (92.5.0):
+  - MaterialComponents/Dialogs (97.0.1):
     - MaterialComponents/Buttons
     - MaterialComponents/Elevation
     - MaterialComponents/private/KeyboardWatcher
@@ -38,69 +38,71 @@ PODS:
     - MaterialComponents/ShadowLayer
     - MaterialComponents/Typography
     - MDFInternationalization
-  - "MaterialComponents/Dialogs+ColorThemer (92.5.0)":
+  - "MaterialComponents/Dialogs+ColorThemer (97.0.1)":
     - "MaterialComponents/Buttons+ColorThemer"
     - MaterialComponents/Dialogs
     - MaterialComponents/Themes
-  - "MaterialComponents/Dialogs+Theming (92.5.0)":
+  - "MaterialComponents/Dialogs+Theming (97.0.1)":
     - "MaterialComponents/Buttons+Theming"
     - MaterialComponents/Dialogs
     - "MaterialComponents/Dialogs+ColorThemer"
     - "MaterialComponents/Dialogs+TypographyThemer"
     - MaterialComponents/schemes/Container
     - MaterialComponents/ShadowElevations
-  - "MaterialComponents/Dialogs+TypographyThemer (92.5.0)":
+  - "MaterialComponents/Dialogs+TypographyThemer (97.0.1)":
     - "MaterialComponents/Buttons+TypographyThemer"
     - MaterialComponents/Dialogs
     - MaterialComponents/schemes/Typography
-  - MaterialComponents/Elevation (92.5.0):
+  - MaterialComponents/Elevation (97.0.1):
     - MaterialComponents/private/Color
     - MaterialComponents/private/Math
-  - MaterialComponents/Ink (92.5.0):
+  - MaterialComponents/Ink (97.0.1):
     - MaterialComponents/private/Color
     - MaterialComponents/private/Math
-  - MaterialComponents/OverlayWindow (92.5.0):
+  - MaterialComponents/OverlayWindow (97.0.1):
     - MaterialComponents/private/Application
-  - MaterialComponents/Palettes (92.5.0)
-  - MaterialComponents/private/Application (92.5.0)
-  - MaterialComponents/private/Color (92.5.0)
-  - MaterialComponents/private/KeyboardWatcher (92.5.0):
+  - MaterialComponents/Palettes (97.0.1)
+  - MaterialComponents/private/Application (97.0.1)
+  - MaterialComponents/private/Color (97.0.1)
+  - MaterialComponents/private/KeyboardWatcher (97.0.1):
     - MaterialComponents/private/Application
-  - MaterialComponents/private/Math (92.5.0)
-  - MaterialComponents/private/Overlay (92.5.0)
-  - MaterialComponents/ProgressView (92.5.0):
+  - MaterialComponents/private/Math (97.0.1)
+  - MaterialComponents/private/Overlay (97.0.1)
+  - MaterialComponents/ProgressView (97.0.1):
     - MaterialComponents/Palettes
     - MaterialComponents/private/Math
     - MDFInternationalization
     - MotionAnimator (~> 2.1)
-  - MaterialComponents/Ripple (92.5.0):
+  - MaterialComponents/Ripple (97.0.1):
     - MaterialComponents/AnimationTiming
     - MaterialComponents/private/Color
     - MaterialComponents/private/Math
-  - MaterialComponents/schemes/Color (92.5.0):
+  - MaterialComponents/schemes/Color (97.0.1):
     - MaterialComponents/private/Color
-  - MaterialComponents/schemes/Container (92.5.0):
+  - MaterialComponents/schemes/Container (97.0.1):
     - MaterialComponents/schemes/Color
     - MaterialComponents/schemes/Shape
     - MaterialComponents/schemes/Typography
-  - MaterialComponents/schemes/Shape (92.5.0):
+  - MaterialComponents/schemes/Shape (97.0.1):
     - MaterialComponents/ShapeLibrary
     - MaterialComponents/Shapes
-  - MaterialComponents/schemes/Typography (92.5.0):
+  - MaterialComponents/schemes/Typography (97.0.1):
     - "MaterialComponents/schemes/Typography+BasicFontScheme"
+    - "MaterialComponents/schemes/Typography+Scheming"
     - MaterialComponents/Typography
-  - "MaterialComponents/schemes/Typography+BasicFontScheme (92.5.0)"
-  - MaterialComponents/ShadowElevations (92.5.0)
-  - MaterialComponents/ShadowLayer (92.5.0):
+  - "MaterialComponents/schemes/Typography+BasicFontScheme (97.0.1)"
+  - "MaterialComponents/schemes/Typography+Scheming (97.0.1)"
+  - MaterialComponents/ShadowElevations (97.0.1)
+  - MaterialComponents/ShadowLayer (97.0.1):
     - MaterialComponents/ShadowElevations
-  - MaterialComponents/ShapeLibrary (92.5.0):
+  - MaterialComponents/ShapeLibrary (97.0.1):
     - MaterialComponents/private/Math
     - MaterialComponents/Shapes
-  - MaterialComponents/Shapes (92.5.0):
+  - MaterialComponents/Shapes (97.0.1):
     - MaterialComponents/private/Color
     - MaterialComponents/private/Math
     - MaterialComponents/ShadowLayer
-  - MaterialComponents/Snackbar (92.5.0):
+  - MaterialComponents/Snackbar (97.0.1):
     - MaterialComponents/AnimationTiming
     - MaterialComponents/Buttons
     - MaterialComponents/Elevation
@@ -112,10 +114,10 @@ PODS:
     - MaterialComponents/ShadowElevations
     - MaterialComponents/ShadowLayer
     - MaterialComponents/Typography
-  - MaterialComponents/Themes (92.5.0):
+  - MaterialComponents/Themes (97.0.1):
     - MaterialComponents/schemes/Color
     - MaterialComponents/schemes/Typography
-  - MaterialComponents/Typography (92.5.0):
+  - MaterialComponents/Typography (97.0.1):
     - MaterialComponents/private/Application
     - MaterialComponents/private/Math
   - MDFInternationalization (2.0.0)
@@ -126,14 +128,14 @@ PODS:
   - SnapKit (5.0.1)
 
 DEPENDENCIES:
-  - DronelinkCore (~> 1.1.0)
-  - Mapbox-iOS-SDK (~> 5.4.0)
-  - MaterialComponents/Buttons (~> 92.5.0)
-  - MaterialComponents/Dialogs (~> 92.5.0)
-  - "MaterialComponents/Dialogs+Theming (~> 92.5.0)"
-  - MaterialComponents/Palettes (~> 92.5.0)
-  - MaterialComponents/ProgressView (~> 92.5.0)
-  - MaterialComponents/Snackbar (~> 92.5.0)
+  - DronelinkCore (~> 1.1.1)
+  - Mapbox-iOS-SDK (~> 5.5.0)
+  - MaterialComponents/Buttons (~> 97.0.1)
+  - MaterialComponents/Dialogs (~> 97.0.1)
+  - "MaterialComponents/Dialogs+Theming (~> 97.0.1)"
+  - MaterialComponents/Palettes (~> 97.0.1)
+  - MaterialComponents/ProgressView (~> 97.0.1)
+  - MaterialComponents/Snackbar (~> 97.0.1)
   - SnapKit (~> 5.0.0)
 
 SPEC REPOS:
@@ -148,15 +150,15 @@ SPEC REPOS:
     - SnapKit
 
 SPEC CHECKSUMS:
-  DronelinkCore: 5461997e64482c0074b82ba86bc766b097a2fc9b
-  Mapbox-iOS-SDK: 2b58f752d94e57e95b8e54f3b52569199f6efdba
-  MaterialComponents: 268edb7e34f1277b79d20f701b6ae30c7cd0179a
+  DronelinkCore: 98b1c615d8204414a4676111a609a211c64911fe
+  Mapbox-iOS-SDK: 7fa66a27e586acb14c7f32ec5a487343e3994451
+  MaterialComponents: f0663c214cc879861da6a7f8add330c3c0ec017d
   MDFInternationalization: 010097556d6b09d2c4ea38e0820ea6d37be6a314
   MDFTextAccessibility: 85c09a1bd9c321f494348e632a25063bcda35a53
   MotionAnimator: ee16aa30567c5bae0fb2750c132915829cfaaf8a
   MotionInterchange: ead0e3ae1f3a5fb539e289debbc7ae036160a10d
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: 83391ffddf9e6e5d99bb977abb4e9c79611fb61d
+PODFILE CHECKSUM: 2567e9d1ac837edc3d3800ac5625a8984112803d
 
 COCOAPODS: 1.8.4

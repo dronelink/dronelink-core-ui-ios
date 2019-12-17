@@ -3,13 +3,13 @@ inhibit_all_warnings!
 use_frameworks!
 
 target 'DronelinkCoreUI' do
-  pod 'DronelinkCore', '~> 1.1.0'
+  pod 'DronelinkCore', '~> 1.1.1'
   pod 'SnapKit', '~> 5.0.0'
-  pod 'Mapbox-iOS-SDK', '~> 5.4.0'
-  pod 'MaterialComponents/Palettes', '~> 92.5.0'
-  pod 'MaterialComponents/Buttons', '~> 92.5.0'
-  pod 'MaterialComponents/ProgressView', '~> 92.5.0'
-  pod 'MaterialComponents/Dialogs', '~> 92.5.0'
-  pod 'MaterialComponents/Dialogs+Theming', '~> 92.5.0'
-  pod 'MaterialComponents/Snackbar', '~> 92.5.0'
+  pod 'Mapbox-iOS-SDK', '~> 5.5.0'
+  pod 'MaterialComponents/Palettes', '~> 97.0.1'
+  pod 'MaterialComponents/Buttons', '~> 97.0.1'
+  pod 'MaterialComponents/ProgressView', '~> 97.0.1'
+  pod 'MaterialComponents/Dialogs', '~> 97.0.1'
+  pod 'MaterialComponents/Dialogs+Theming', '~> 97.0.1'
+  pod 'MaterialComponents/Snackbar', '~> 97.0.1'
 end
