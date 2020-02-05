@@ -370,6 +370,12 @@ extension MissionViewController: DronelinkDelegate {
             self.view.setNeedsUpdateConstraints()
         }
     }
+    
+    public func onFuncLoaded(executor: FuncExecutor) {
+    }
+    
+    public func onFuncUnloaded(executor: FuncExecutor) {
+    }
 }
 
 extension MissionViewController: DroneSessionManagerDelegate {

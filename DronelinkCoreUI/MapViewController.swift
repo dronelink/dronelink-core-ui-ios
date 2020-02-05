@@ -163,6 +163,12 @@ extension MapViewController: DronelinkDelegate {
             self.updateMissionEstimate()
         }
     }
+    
+    public func onFuncLoaded(executor: FuncExecutor) {
+    }
+    
+    public func onFuncUnloaded(executor: FuncExecutor) {
+    }
 }
 
 extension MapViewController: DroneSessionManagerDelegate {

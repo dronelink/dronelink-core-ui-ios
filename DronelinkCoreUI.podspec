@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "DronelinkCoreUI"
-  s.version = "1.0.4"
+  s.version = "1.1.0"
   s.summary = "Dronelink core UI components"
   s.homepage = "https://dronelink.com/"
   s.license = { :type => "MIT", :file => "LICENSE" }
@@ -12,13 +12,15 @@ Pod::Spec.new do |s|
   s.source_files  = "DronelinkCoreUI/**/*.swift"
   s.resources = "DronelinkCoreUI/**/*.{strings,xcassets}"
 
-  s.dependency "DronelinkCore", "~> 1.1.1"
+  s.dependency "DronelinkCore", "~> 1.2.0"
   s.dependency "SnapKit", "~> 5.0.0"
   s.dependency "Mapbox-iOS-SDK", "~> 5.5.0"
-  s.dependency "MaterialComponents/Palettes", "~> 97.0.1"
-  s.dependency "MaterialComponents/Buttons", "~> 97.0.1"
-  s.dependency "MaterialComponents/ProgressView", "~> 97.0.1"
-  s.dependency "MaterialComponents/Dialogs", "~> 97.0.1"
-  s.dependency "MaterialComponents/Dialogs+Theming", "~> 97.0.1"
-  s.dependency "MaterialComponents/Snackbar", "~> 97.0.1"
+  s.dependency "MaterialComponents/Palettes", "~> 103.1.0"
+  s.dependency "MaterialComponents/Buttons", "~> 103.1.0"
+  s.dependency "MaterialComponents/Buttons+Theming", "~> 103.1.0"
+  s.dependency "MaterialComponents/TextFields", "~> 103.1.0"
+  s.dependency "MaterialComponents/ProgressView", "~> 103.1.0"
+  s.dependency "MaterialComponents/Dialogs", "~> 103.1.0"
+  s.dependency "MaterialComponents/Dialogs+Theming", "~> 103.1.0"
+  s.dependency "MaterialComponents/Snackbar", "~> 103.1.0"
 end

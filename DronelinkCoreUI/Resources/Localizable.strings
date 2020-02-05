@@ -5,11 +5,22 @@
 //  Created by Jim McAndrew on 1/21/19.
 //  Copyright © 2019 Dronelink. All rights reserved.
 //
+"yes" = "Yes";
+"no" = "No";
 "dismiss" = "Dismiss";
 "continue" = "Continue";
 "cancel" = "Cancel";
+"back" = "Back";
+"next" = "Next";
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
+
+"FuncViewController.primary.intro" = "Get Started";
+"FuncViewController.primary.execute" = "Generate Mission";
+"FuncViewController.primary.executing" = "Generating...";
+"FuncViewController.input.required" = "This input is required.";
+"FuncViewController.input.drone" = "Mark";
+"FuncViewController.input.drone.unavailable" = "Please connect a drone";
 
 "MissionViewController.timeElapsed.empty" = "--:--";
 "MissionViewController.start.countdown" = "Starting in %d";

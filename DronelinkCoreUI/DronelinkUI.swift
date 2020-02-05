@@ -77,6 +77,20 @@ public class DronelinkUI: NSObject {
         }
     }
     
+    public func showSnackbar(text: String) {
+        DispatchQueue.main.async {
+            let message = MDCSnackbarMessage()
+            message.text = text
+            let action = MDCSnackbarMessageAction()
+            action.handler = {() in
+                
+            }
+            action.title = "dismiss".localized
+            message.action = action
+            MDCSnackbarManager.show(message)
+        }
+    }
+    
     public func showNotification(title: String, details: String? = nil) {
         let content = UNMutableNotificationContent()
         content.title = title
