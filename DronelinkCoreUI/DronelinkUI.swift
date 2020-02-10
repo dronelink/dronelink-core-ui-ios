@@ -10,6 +10,7 @@ import UIKit
 import UserNotifications
 import MaterialComponents.MaterialDialogs
 import MaterialComponents.MaterialSnackbar
+import DronelinkCore
 
 extension DronelinkUI {
     public static let shared = DronelinkUI()

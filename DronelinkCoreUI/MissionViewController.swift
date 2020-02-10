@@ -231,8 +231,8 @@ public class MissionViewController: UIViewController {
                     missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
                 }
                 
-                let distance = missionExecutor.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation), defaultValue: "")
-                let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : missionExecutor.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!, defaultValue: "")
+                let distance = Dronelink.shared.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation)) ?? ""
+                let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : Dronelink.shared.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!) ?? ""
                 DronelinkUI.shared.showDialog(
                     title: "MissionViewController.start.takeoffLocationWarning.title".localized,
                     details: altitude == nil
@@ -336,8 +336,8 @@ public class MissionViewController: UIViewController {
         let totalTime = missionExecutor?.estimateTotalTime() ?? 0
         let timeElapsed = missionExecutor?.componentExecutionDuration() ?? 0
         let timeRemaining = max(totalTime - timeElapsed, 0)
-        timeElapsedLabel.text = missionExecutor?.format(formatter: "timeElapsed", value: timeElapsed, defaultValue: "MissionViewController.timeElapsed.empty".localized)
-        timeRemainingLabel.text = missionExecutor?.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "MissionViewController.timeElapsed.empty".localized)
+        timeElapsedLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeElapsed, defaultValue: "MissionViewController.timeElapsed.empty".localized)
+        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "MissionViewController.timeElapsed.empty".localized)
         progressView.setProgress(Float(min(totalTime == 0 ? 0 : timeElapsed / totalTime, 1)), animated: true)
         progressView.progressTintColor = engaged ? progressEngagedColor: progressDisengagedColor
         messagesTextView.text = missionExecutor?.engaged ?? false ? missionExecutor?.executingMessageGroups.map({
@@ -385,9 +385,11 @@ extension MissionViewController: DroneSessionManagerDelegate {
             self.view.setNeedsUpdateConstraints()
         }
         
-        //delay to give the aircraft time to report location
-        DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
-            self.missionExecutor?.estimate(droneSession: session)
+        if let missionExecutor = missionExecutor {
+            //delay to give the aircraft time to report location
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
+                missionExecutor.estimate(droneSession: session)
+            }
         }
     }
     

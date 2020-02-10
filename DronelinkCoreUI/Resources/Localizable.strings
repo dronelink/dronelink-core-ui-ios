@@ -33,6 +33,9 @@
 "MissionViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
 "MissionViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
 
+"MissionExecutorOffsetsViewController.altitudeYaw" = "ALT/YAW";
+"MissionExecutorOffsetsViewController.position" = "POSITION";
+
 "TelemetryViewController.distance.prefix" = "D";
 "TelemetryViewController.altitude.prefix" = "A";
 "TelemetryViewController.horizontalSpeed.prefix" = "H/S";

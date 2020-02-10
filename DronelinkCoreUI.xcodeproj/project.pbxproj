@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2418ACA323ECC18A0099D44C /* MissionExecutorOffsetsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2418ACA223ECC18A0099D44C /* MissionExecutorOffsetsViewController.swift */; };
 		242AC08623870D4C00438D26 /* TelemetryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242AC08523870D4C00438D26 /* TelemetryViewController.swift */; };
 		2446AF98236A0153001A1C4F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2446AF96236A0153001A1C4F /* Localizable.strings */; };
 		2446AF99236A0153001A1C4F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2446AF97236A0153001A1C4F /* Images.xcassets */; };
@@ -20,6 +21,7 @@
 
 /* Begin PBXFileReference section */
 		240F3EE12369C84500B067C9 /* DronelinkCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DronelinkCore.framework; path = "../../../Library/Developer/Xcode/DerivedData/DronelinkCore-axedavwqiblhelaoasdodvirayyu/Build/Intermediates.noindex/ArchiveIntermediates/DronelinkCore-Universal/IntermediateBuildFilesPath/UninstalledProducts/iphoneos/DronelinkCore.framework"; sourceTree = "<group>"; };
+		2418ACA223ECC18A0099D44C /* MissionExecutorOffsetsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MissionExecutorOffsetsViewController.swift; sourceTree = "<group>"; };
 		242AC08523870D4C00438D26 /* TelemetryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryViewController.swift; sourceTree = "<group>"; };
 		2446AF96236A0153001A1C4F /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		2446AF97236A0153001A1C4F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -82,6 +84,7 @@
 				24B92C7823E314A2007A42DD /* FuncViewController.swift */,
 				2459752E2367A22D008CAB6B /* MapViewController.swift */,
 				2459751723679DCB008CAB6B /* MissionViewController.swift */,
+				2418ACA223ECC18A0099D44C /* MissionExecutorOffsetsViewController.swift */,
 				242AC08523870D4C00438D26 /* TelemetryViewController.swift */,
 				2459750323679A9D008CAB6B /* Info.plist */,
 				2446AF95236A0153001A1C4F /* Resources */,
@@ -214,6 +217,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2418ACA323ECC18A0099D44C /* MissionExecutorOffsetsViewController.swift in Sources */,
 				2459751823679DCB008CAB6B /* MissionViewController.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapViewController.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,

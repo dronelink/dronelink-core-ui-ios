@@ -52,6 +52,10 @@ public class FuncViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        if #available(iOS 13.0, *) {
+            overrideUserInterfaceStyle = .dark
+        }
+        
         blurEffectView.frame = view.bounds
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         blurEffectView.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
