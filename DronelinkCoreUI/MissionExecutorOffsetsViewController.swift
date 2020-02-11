@@ -37,7 +37,7 @@ public class MissionExecutorOffsetsViewController: UIViewController {
     private let evLabel = UILabel()
     private let updateInterval: TimeInterval = 1.0
     private var updateTimer: Timer?
-    private var exposureCommand: Mission.ExposureCompensationCameraCommand?
+    private var exposureCommand: Mission.ExposureCompensationStepCameraCommand?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -293,7 +293,7 @@ public class MissionExecutorOffsetsViewController: UIViewController {
             return
         }
         
-        onEV(exposureCompensation: exposureCompensation.previous)
+        onEV(steps: -1)
     }
     
     @objc func onEVPos(sender: Any) {
@@ -301,13 +301,18 @@ public class MissionExecutorOffsetsViewController: UIViewController {
             return
         }
         
-        onEV(exposureCompensation: exposureCompensation.next)
+        onEV(steps: 1)
     }
     
-    private func onEV(exposureCompensation: Mission.CameraExposureCompensation) {
+    private func onEV(steps: Int) {
+        guard let session = session else {
+            return
+        }
+        
         do {
-            let exposureCommand = Mission.ExposureCompensationCameraCommand(exposureCompensation: exposureCompensation)
-            try? session?.add(command: exposureCommand)
+            let exposureCommand = Mission.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
+            try? session.add(command: exposureCommand)
+            session.offsets.cameraExposureCompensationSteps += steps
             self.exposureCommand = exposureCommand
             update()
         }
@@ -319,7 +324,7 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
             var details: [String] = []
             if offsets.droneYaw != 0 {
-                details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw))
+                details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw, extraParams: [false]))
             }
             
             if offsets.droneAltitude != 0 {

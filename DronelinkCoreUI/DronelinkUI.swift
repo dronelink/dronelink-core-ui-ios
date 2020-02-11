@@ -61,7 +61,6 @@ public class DronelinkUI: NSObject {
         }
         
         DispatchQueue.main.async {
-            let scheme = MDCContainerScheme()
             let alert = MDCAlertController(title: title, message: details)
             if let actions = actions {
                 actions.forEach { action in
@@ -73,6 +72,7 @@ public class DronelinkUI: NSObject {
                     
                 }))
             }
+            let scheme = MDCContainerScheme()
             alert.applyTheme(withScheme: scheme)
             UIApplication.shared.currentViewController?.present(alert, animated: true, completion: nil)
         }
