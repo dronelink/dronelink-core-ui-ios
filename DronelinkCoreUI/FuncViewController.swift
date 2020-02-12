@@ -33,8 +33,9 @@ public class FuncViewController: UIViewController {
     private let variableSegmentedControl = UISegmentedControl()
     private let variableTextField = MDCTextField()
     private let variablePickerView = UIPickerView()
-    private let variableDroneButton = MDCButton()
-    private let variableDroneLabel = UILabel()
+    private let variableDroneMarkButton = MDCButton()
+    private let variableDroneTextView = UITextView()
+    private let variableDroneClearButton = UIButton(type: .custom)
     private let progressLabel = UILabel()
     private let dismissButton = UIButton(type: .custom)
     private let primaryColor = MDCPalette.deepPurple.tint800
@@ -48,6 +49,7 @@ public class FuncViewController: UIViewController {
     private var hasInputs: Bool { funcExecutor?._func.inputs?.count ?? 0 > 0 }
     private var input: Mission.FuncInput? { hasInputs ? funcExecutor?._func.inputs?[safeIndex: step] : nil }
     private var executing = false
+    private var value: Any?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -103,19 +105,27 @@ public class FuncViewController: UIViewController {
         let scheme = MDCContainerScheme()
         scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
         scheme.colorScheme.primaryColor = .white
-        variableDroneButton.applyOutlinedTheme(withScheme: scheme)
-        variableDroneButton.translatesAutoresizingMaskIntoConstraints = false
-        variableDroneButton.setImage(droneImage?.withRenderingMode(.alwaysTemplate), for: .normal)
-        variableDroneButton.imageView?.contentMode = .scaleAspectFit
-        variableDroneButton.tintColor = UIColor.white
-        variableDroneButton.setTitle("FuncViewController.input.drone".localized, for: .normal)
-        variableDroneButton.addTarget(self, action: #selector(onDrone(sender:)), for: .touchUpInside)
-        view.addSubview(variableDroneButton)
+        variableDroneMarkButton.applyOutlinedTheme(withScheme: scheme)
+        variableDroneMarkButton.translatesAutoresizingMaskIntoConstraints = false
+        variableDroneMarkButton.setImage(droneImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+        variableDroneMarkButton.imageView?.contentMode = .scaleAspectFit
+        variableDroneMarkButton.tintColor = UIColor.white
+        variableDroneMarkButton.setTitle("FuncViewController.input.drone".localized, for: .normal)
+        variableDroneMarkButton.addTarget(self, action: #selector(onDroneMark(sender:)), for: .touchUpInside)
+        view.addSubview(variableDroneMarkButton)
         
-        variableDroneLabel.numberOfLines = 2
-        variableDroneLabel.font = UIFont.boldSystemFont(ofSize: 12)
-        variableDroneLabel.textColor = UIColor.white.withAlphaComponent(0.85)
-        view.addSubview(variableDroneLabel)
+        variableDroneTextView.textContainerInset = .zero
+        variableDroneTextView.backgroundColor = UIColor.clear
+        variableDroneTextView.font = UIFont.boldSystemFont(ofSize: 10)
+        variableDroneTextView.textColor = UIColor.white.withAlphaComponent(0.85)
+        variableDroneTextView.isScrollEnabled = true
+        variableDroneTextView.isEditable = false
+        view.addSubview(variableDroneTextView)
+        
+        variableDroneClearButton.tintColor = UIColor.white.withAlphaComponent(0.85)
+        variableDroneClearButton.setImage(DronelinkUI.loadImage(named: "baseline_cancel_white_36pt"), for: .normal)
+        variableDroneClearButton.addTarget(self, action: #selector(onDroneClear), for: .touchUpInside)
+        view.addSubview(variableDroneClearButton)
         
         progressLabel.font = UIFont.boldSystemFont(ofSize: 12)
         progressLabel.textColor = UIColor.white
@@ -233,18 +243,25 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(80)
         }
         
-        variableDroneButton.snp.remakeConstraints { make in
+        variableDroneMarkButton.snp.remakeConstraints { make in
             make.left.equalTo(variableControl.snp.left)
             make.width.equalTo(110)
             make.top.equalTo(variableControl.snp.bottom).offset(5)
             make.height.equalTo(40)
         }
         
-        variableDroneLabel.snp.remakeConstraints { make in
-            make.left.equalTo(variableDroneButton.snp.right).offset(defaultPadding)
+        variableDroneClearButton.snp.remakeConstraints { make in
+            make.height.equalTo(25)
+            make.width.equalTo(variableDroneClearButton.snp.height)
             make.right.equalTo(variableControl.snp.right)
-            make.top.equalTo(variableDroneButton)
-            make.bottom.equalTo(variableDroneButton)
+            make.top.equalTo(variableDroneMarkButton)
+        }
+        
+        variableDroneTextView.snp.remakeConstraints { make in
+            make.left.equalTo(variableDroneMarkButton.snp.right).offset(defaultPadding)
+            make.right.equalTo(variableDroneClearButton.snp.left).offset(5)
+            make.top.equalTo(variableDroneMarkButton)
+            make.bottom.equalTo(variableDroneMarkButton)
         }
         
         backButton.snp.remakeConstraints { make in
@@ -333,13 +350,18 @@ public class FuncViewController: UIViewController {
         view.setNeedsUpdateConstraints()
     }
     
-    @objc func onDrone(sender: Any) {
+    @objc func onDroneMark(sender: Any) {
         if session == nil {
             DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.drone.unavailable".localized)
             return
         }
         
         writeValue()
+        readValue()
+    }
+    
+    @objc func onDroneClear(sender: Any) {
+        funcExecutor?.clearValue(index: step)
         readValue()
     }
     
@@ -405,19 +427,30 @@ public class FuncViewController: UIViewController {
         variableTextField.text = ""
         variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
         variablePickerView.reloadAllComponents()
-        variableDroneLabel.text = ""
+        variableDroneTextView.text = ""
         
-        guard let value = funcExecutor?.readValue(index: step) else { return }
+        guard let value = funcExecutor?.readValue(index: step) else {
+            self.value = nil
+            update()
+            return
+        }
+        self.value = value
+        update()
         
         if input?.variable.valueType == .drone {
             if let valueString = value as? String {
-                variableDroneLabel.text = valueString
+                variableDroneTextView.text = valueString
             }
             
             if let valueArray = value as? [Any] {
-                if let valueString = valueArray.first as? String {
-                    variableDroneLabel.text = "(\(valueArray.count)) \(valueString)"
+                let valueArrayStrings = valueArray.reversed().enumerated().map { value -> String in
+                    if let valueString = value.element as? String {
+                        return "\(valueArray.count - value.offset)\t\(valueString.replacingOccurrences(of: "\n", with: "\n\t"))"
+                    }
+                    return ""
                 }
+                
+                variableDroneTextView.text = valueArrayStrings.joined(separator: "\n")
             }
             return
         }
@@ -452,8 +485,9 @@ public class FuncViewController: UIViewController {
         variableSegmentedControl.isHidden = true
         variableTextField.isHidden = true
         variablePickerView.isHidden = true
-        variableDroneButton.isHidden = true
-        variableDroneLabel.isHidden = true
+        variableDroneMarkButton.isHidden = true
+        variableDroneClearButton.isHidden = true
+        variableDroneTextView.isHidden = true
         
         if intro {
             variableDescriptionTextView.isHidden = false
@@ -469,9 +503,9 @@ public class FuncViewController: UIViewController {
             backButton.isHidden = false
             backButton.isEnabled = step > 0
             nextButton.isHidden = false
+            nextButton.setTitle((lastStep ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
             progressLabel.isHidden = lastStep
             progressLabel.text = "\(step + 1) / \(funcExecutor._func.inputs?.count ?? 0)"
-            nextButton.setTitle((lastStep ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
 
             if let input = input {
                 variableNameLabel.isHidden = false
@@ -502,8 +536,9 @@ public class FuncViewController: UIViewController {
                     break
                     
                 case .drone:
-                    variableDroneButton.isHidden = false
-                    variableDroneLabel.isHidden = false
+                    variableDroneMarkButton.isHidden = false
+                    variableDroneTextView.isHidden = false
+                    variableDroneClearButton.isHidden = value == nil
                     break
                 }
             }
