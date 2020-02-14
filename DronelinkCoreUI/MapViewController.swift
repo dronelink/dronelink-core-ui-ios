@@ -33,6 +33,7 @@ public class MapViewController: UIViewController {
     private let updateInterval: TimeInterval = 0.1
     private var updateTimer: Timer?
     private var lastUpdated = Date()
+    private var visibleCoordinatesPending = false
     
     public override func viewDidLoad() {
         mapView.delegate = self
@@ -125,21 +126,24 @@ public class MapViewController: UIViewController {
                 missionPathForegroundAnnotation = MGLPolyline(coordinates: pathCoordinates, count: UInt(pathCoordinates.count))
                 mapView.addAnnotation(missionPathForegroundAnnotation!)
                 
-                var visibleCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
-                if let state = session?.state?.value,
-                    let droneLocation = state.location {
-                    visibleCoordinates.append(droneLocation.coordinate)
-                    if let userLocation = Dronelink.shared.locationManager.location {
-                        if (userLocation.distance(from: droneLocation) < 10000) {
-                            visibleCoordinates.append(userLocation.coordinate)
-                        }
-                    }
+                if (visibleCoordinatesPending) {
+                    var visibleCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
+//                    if let state = session?.state?.value,
+//                        let droneLocation = state.location {
+//                        visibleCoordinates.append(droneLocation.coordinate)
+//                        if let userLocation = Dronelink.shared.locationManager.location {
+//                            if (userLocation.distance(from: droneLocation) < 10000) {
+//                                visibleCoordinates.append(userLocation.coordinate)
+//                            }
+//                        }
+//                    }
+                    
+                    mapView.setVisibleCoordinates(
+                        visibleCoordinates,
+                        count: UInt(visibleCoordinates.count),
+                        edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
+                    visibleCoordinatesPending = false
                 }
-                
-                mapView.setVisibleCoordinates(
-                    visibleCoordinates,
-                    count: UInt(visibleCoordinates.count),
-                    edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
             }
         }
     }
@@ -151,6 +155,7 @@ extension MapViewController: DronelinkDelegate {
     public func onMissionLoaded(executor: MissionExecutor) {
         DispatchQueue.main.async {
             self.missionExecutor = executor
+            self.visibleCoordinatesPending = true
             executor.add(delegate: self)
             self.updateMissionEstimate()
         }

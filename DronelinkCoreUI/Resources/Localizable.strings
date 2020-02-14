@@ -21,6 +21,9 @@
 "FuncViewController.input.required" = "This input is required.";
 "FuncViewController.input.drone" = "Mark";
 "FuncViewController.input.drone.unavailable" = "Please connect a drone";
+"FuncViewController.input.summary" = "Input Summary";
+"FuncViewController.input.none" = "No Input";
+"FuncViewController.input.array.values" = "values";
 
 "MissionViewController.timeElapsed.empty" = "--:--";
 "MissionViewController.start.countdown" = "Starting in %d";
@@ -33,8 +36,8 @@
 "MissionViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
 "MissionViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
 
-"MissionExecutorOffsetsViewController.altitudeYaw" = "ALT/YAW";
-"MissionExecutorOffsetsViewController.position" = "POSITION";
+"DroneOffsetsViewController.altitudeYaw" = "ALT/YAW/EV";
+"DroneOffsetsViewController.position" = "POSITION";
 
 "TelemetryViewController.distance.prefix" = "D";
 "TelemetryViewController.altitude.prefix" = "A";

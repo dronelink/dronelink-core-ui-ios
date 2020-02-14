@@ -1,5 +1,5 @@
 //
-//  MissionExecutorOffsetsViewController.swift
+//  DroneOffsetsViewController.swift
 //  DronelinkCoreUI
 //
 //  Created by Jim McAndrew on 2/6/20.
@@ -12,11 +12,11 @@ import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 
-public class MissionExecutorOffsetsViewController: UIViewController {
-    public static func create(droneSessionManager: DroneSessionManager) -> MissionExecutorOffsetsViewController {
-        let missionExecutorOffsetsViewController = MissionExecutorOffsetsViewController()
-        missionExecutorOffsetsViewController.droneSessionManager = droneSessionManager
-        return missionExecutorOffsetsViewController
+public class DroneOffsetsViewController: UIViewController {
+    public static func create(droneSessionManager: DroneSessionManager) -> DroneOffsetsViewController {
+        let droneOffsetsViewController = DroneOffsetsViewController()
+        droneOffsetsViewController.droneSessionManager = droneSessionManager
+        return droneOffsetsViewController
     }
     
     private var droneSessionManager: DroneSessionManager!
@@ -29,15 +29,24 @@ public class MissionExecutorOffsetsViewController: UIViewController {
     private let upButton = MDCFloatingButton()
     private let downButton = MDCFloatingButton()
     private let stickTypeSegmentedControl = UISegmentedControl(items: [
-        "MissionExecutorOffsetsViewController.altitudeYaw".localized,
-        "MissionExecutorOffsetsViewController.position".localized
+        "DroneOffsetsViewController.altitudeYaw".localized,
+        "DroneOffsetsViewController.position".localized
     ])
     private let evNegButton = MDCFloatingButton()
     private let evPosButton = MDCFloatingButton()
     private let evLabel = UILabel()
-    private let updateInterval: TimeInterval = 1.0
+    private let positionReferenceButton = MDCFloatingButton()
+    private let positionOffsetButton = MDCFloatingButton()
+    private let positionLabel = UILabel()
+    
+    private let updateInterval: TimeInterval = 0.25
     private var updateTimer: Timer?
     private var exposureCommand: Mission.ExposureCompensationStepCameraCommand?
+    
+    private var offsets: DroneOffsets {
+        get { Dronelink.shared.droneOffsets }
+        set (newOffsets) { Dronelink.shared.droneOffsets = newOffsets }
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +77,7 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt", action: #selector(onRight(sender:)))
         configureButton(button: upButton, image: "baseline_arrow_drop_up_white_36pt", action: #selector(onUp(sender:)))
         configureButton(button: downButton, image: "baseline_arrow_drop_down_white_36pt", action: #selector(onDown(sender:)))
+        
         configureButton(button: evNegButton, image: "baseline_remove_white_36pt", action: #selector(onEVNeg(sender:)))
         configureButton(button: evPosButton, image: "baseline_add_white_36pt", action: #selector(onEVPos(sender:)))
         
@@ -75,6 +85,14 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         evLabel.font = UIFont.boldSystemFont(ofSize: 14)
         evLabel.textColor = detailsLabel.textColor
         view.addSubview(evLabel)
+        
+        configureButton(button: positionReferenceButton, image: "map-marker-radius-outline", action: #selector(onPositionReference(sender:)))
+        configureButton(button: positionOffsetButton, image: "map-marker-distance", action: #selector(onPositionOffset(sender:)))
+        
+        positionLabel.textAlignment = .center
+        positionLabel.font = UIFont.boldSystemFont(ofSize: 12)
+        positionLabel.textColor = detailsLabel.textColor
+        view.addSubview(positionLabel)
         
         update()
     }
@@ -105,7 +123,7 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         super.updateViewConstraints()
         
         let defaultPadding = 10
-        let buttonSize = 36
+        let buttonSize = 42
         
         stickTypeSegmentedControl.snp.remakeConstraints { make in
             make.height.equalTo(25)
@@ -131,21 +149,21 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         upButton.snp.remakeConstraints { make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
-            make.top.equalTo(detailsLabel.snp.bottom).offset(5)
+            make.top.equalTo(detailsLabel.snp.bottom).offset(defaultPadding)
             make.centerX.equalToSuperview()
         }
         
         downButton.snp.remakeConstraints { make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
-            make.top.equalTo(upButton.snp.bottom).offset(14)
+            make.top.equalTo(upButton.snp.bottom).offset(20)
             make.centerX.equalTo(upButton)
         }
         
         leftButton.snp.remakeConstraints { make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
-            make.top.equalTo(upButton).offset(25)
+            make.top.equalTo(upButton).offset(33)
             make.right.equalTo(upButton.snp.left).offset(-defaultPadding)
         }
         
@@ -177,6 +195,21 @@ public class MissionExecutorOffsetsViewController: UIViewController {
             make.centerY.equalTo(evPosButton)
         }
         
+        positionReferenceButton.snp.remakeConstraints { make in
+            make.edges.equalTo(evNegButton)
+        }
+        
+        positionOffsetButton.snp.remakeConstraints { make in
+            make.edges.equalTo(evPosButton)
+        }
+        
+        positionLabel.snp.remakeConstraints { make in
+            make.height.equalTo(buttonSize)
+            make.left.equalTo(positionReferenceButton.snp.right).offset(5)
+            make.right.equalTo(positionOffsetButton.snp.left).offset(-5)
+            make.centerY.equalTo(positionOffsetButton)
+        }
+        
         update()
     }
         
@@ -185,16 +218,12 @@ public class MissionExecutorOffsetsViewController: UIViewController {
     }
     
     @objc func onClear(sender: Any) {
-        guard let session = session else {
-            return
-        }
-        
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
-            session.offsets.droneAltitude = 0
-            session.offsets.droneYaw = 0
+            offsets.droneAltitude = 0
+            offsets.droneYaw = 0
         }
         else {
-            session.offsets.droneCoordinate = Mission.Vector2()
+            offsets.droneCoordinate = Mission.Vector2()
         }
         
         update()
@@ -206,14 +235,14 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         }
         
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
-            session.offsets.droneYaw += -3.0.convertDegreesToRadians
+            offsets.droneYaw += -3.0.convertDegreesToRadians
         }
         else {
             guard let state = session.state?.value else {
                 return
             }
             
-            session.offsets.droneCoordinate = session.offsets.droneCoordinate.add(
+            offsets.droneCoordinate = offsets.droneCoordinate.add(
                 vector: Mission.Vector2(
                     direction: state.missionOrientation.yaw - (Double.pi / 2),
                     magnitude: 1.0.convertFeetToMeters))
@@ -228,14 +257,14 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         }
         
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
-            session.offsets.droneYaw += 3.0.convertDegreesToRadians
+            offsets.droneYaw += 3.0.convertDegreesToRadians
         }
         else {
             guard let state = session.state?.value else {
                 return
             }
             
-            session.offsets.droneCoordinate = session.offsets.droneCoordinate.add(
+            offsets.droneCoordinate = offsets.droneCoordinate.add(
                 vector: Mission.Vector2(
                     direction: state.missionOrientation.yaw + (Double.pi / 2),
                     magnitude: 1.0.convertFeetToMeters))
@@ -250,14 +279,14 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         }
         
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
-            session.offsets.droneAltitude += 1.0.convertFeetToMeters
+            offsets.droneAltitude += 1.0.convertFeetToMeters
         }
         else {
             guard let state = session.state?.value else {
                 return
             }
             
-            session.offsets.droneCoordinate = session.offsets.droneCoordinate.add(
+            offsets.droneCoordinate = offsets.droneCoordinate.add(
                 vector: Mission.Vector2(
                     direction: state.missionOrientation.yaw,
                     magnitude: 1.0.convertFeetToMeters))
@@ -272,14 +301,14 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         }
         
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
-            session.offsets.droneAltitude += -1.0.convertFeetToMeters
+            offsets.droneAltitude += -1.0.convertFeetToMeters
         }
         else {
             guard let state = session.state?.value else {
                 return
             }
             
-            session.offsets.droneCoordinate = session.offsets.droneCoordinate.add(
+            offsets.droneCoordinate = offsets.droneCoordinate.add(
                 vector: Mission.Vector2(
                     direction: state.missionOrientation.yaw + Double.pi,
                     magnitude: 1.0.convertFeetToMeters))
@@ -312,14 +341,45 @@ public class MissionExecutorOffsetsViewController: UIViewController {
         do {
             let exposureCommand = Mission.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
             try? session.add(command: exposureCommand)
-            session.offsets.cameraExposureCompensationSteps += steps
+            offsets.cameraExposureCompensationSteps += steps
             self.exposureCommand = exposureCommand
             update()
         }
     }
     
+    @objc func onPositionReference(sender: Any) {
+        guard let coordinate = session?.state?.value.location?.coordinate else {
+            return
+        }
+        
+        offsets.droneCoordinateReference = coordinate
+        update()
+    }
+    
+    @objc func onPositionOffset(sender: Any) {
+        guard
+            let session = session,
+            let reference = offsets.droneCoordinateReference,
+            let current = session.state?.value.location?.coordinate
+        else {
+            return
+        }
+        
+        offsets.droneCoordinate = Mission.Vector2(
+            direction: current.bearing(to: reference),
+            magnitude: current.distance(to: reference)
+        )
+        update()
+    }
+    
     @objc func update() {
-        let offsets = session?.offsets ?? DroneSessionOffsets()
+        evNegButton.isHidden = stickTypeSegmentedControl.selectedSegmentIndex != 0
+        evPosButton.isHidden = evNegButton.isHidden
+        evLabel.isHidden = evNegButton.isHidden
+        
+        positionReferenceButton.isHidden = stickTypeSegmentedControl.selectedSegmentIndex != 1
+        positionOffsetButton.isHidden = positionReferenceButton.isHidden
+        positionLabel.isHidden = positionReferenceButton.isHidden
         
         if stickTypeSegmentedControl.selectedSegmentIndex == 0 {
             var details: [String] = []
@@ -333,41 +393,53 @@ public class MissionExecutorOffsetsViewController: UIViewController {
             
             clearButton.isHidden = details.count == 0
             detailsLabel.text = details.joined(separator: " / ")
+            
+            var exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
+            evNegButton.tintColor = exposureCommand == nil ? UIColor.white : MDCPalette.pink.accent400
+            evNegButton.isEnabled = exposureCompensation != nil
+            evPosButton.tintColor = evNegButton.tintColor
+            evPosButton.isEnabled = evNegButton.isEnabled
+            
+            evLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
         }
         else {
             clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
-            detailsLabel.text = clearButton.isHidden ? "" : "\(Dronelink.shared.format(formatter: "angle", value: offsets.droneCoordinate.direction)) → \(Dronelink.shared.format(formatter: "distance", value: offsets.droneCoordinate.magnitude))"
+            detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
+            
+            if let session = session,
+                let reference = offsets.droneCoordinateReference,
+                let current = session.state?.value.location?.coordinate {
+                positionLabel.text = display(vector: Mission.Vector2(
+                    direction: current.bearing(to: reference),
+                    magnitude: current.distance(to: reference)))
+            }
+            else {
+                positionLabel.text = nil
+            }
+            
+            positionReferenceButton.isEnabled = session?.state?.value.location != nil
+            positionOffsetButton.isEnabled = positionReferenceButton.isEnabled && positionLabel.text != nil
         }
-        
-        var exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
-        evNegButton.tintColor = exposureCommand == nil ? UIColor.white : MDCPalette.pink.accent400
-        evNegButton.isEnabled = exposureCompensation != nil
-        evPosButton.tintColor = evNegButton.tintColor
-        evPosButton.isEnabled = evNegButton.isEnabled
-        
-        evLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
+    }
+    
+    func display(vector: Mission.Vector2) -> String {
+        return "\(Dronelink.shared.format(formatter: "angle", value: vector.direction)) → \(Dronelink.shared.format(formatter: "distance", value: vector.magnitude))"
     }
 }
 
-extension MissionExecutorOffsetsViewController: DroneSessionManagerDelegate {
+extension DroneOffsetsViewController: DroneSessionManagerDelegate {
     public func onOpened(session: DroneSession) {
         self.session = session
         session.add(delegate: self)
-        DispatchQueue.main.async {
-            self.update()
-        }
     }
     
     public func onClosed(session: DroneSession) {
         self.session = nil
         session.remove(delegate: self)
-        DispatchQueue.main.async {
-            self.update()
-        }
     }
 }
 
-extension MissionExecutorOffsetsViewController: DroneSessionDelegate {
+extension DroneOffsetsViewController: DroneSessionDelegate {
     public func onInitialized(session: DroneSession) {}
     
     public func onLocated(session: DroneSession) {}

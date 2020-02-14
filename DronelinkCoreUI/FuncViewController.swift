@@ -36,6 +36,7 @@ public class FuncViewController: UIViewController {
     private let variableDroneMarkButton = MDCButton()
     private let variableDroneTextView = UITextView()
     private let variableDroneClearButton = UIButton(type: .custom)
+    private let variableSummaryTextView = UITextView()
     private let progressLabel = UILabel()
     private let dismissButton = UIButton(type: .custom)
     private let primaryColor = MDCPalette.deepPurple.tint800
@@ -44,10 +45,15 @@ public class FuncViewController: UIViewController {
     private let droneImage = DronelinkUI.loadImage(named: "baseline_navigation_white_36pt")
     
     private var intro = true
-    private var step = 0
-    private var lastStep: Bool { (step == (funcExecutor?._func.inputs?.count ?? 0) - 1) }
-    private var hasInputs: Bool { funcExecutor?._func.inputs?.count ?? 0 > 0 }
-    private var input: Mission.FuncInput? { hasInputs ? funcExecutor?._func.inputs?[safeIndex: step] : nil }
+    private var inputIndex = 0
+    private var last: Bool {
+        guard let inputCount = funcExecutor?.inputCount else {
+            return true
+        }
+        return inputIndex == inputCount
+    }
+    private var hasInputs: Bool { funcExecutor?.inputCount ?? 0 > 0 }
+    private var input: Mission.FuncInput? { funcExecutor?.input(index: inputIndex) }
     private var executing = false
     private var value: Any?
     
@@ -126,6 +132,14 @@ public class FuncViewController: UIViewController {
         variableDroneClearButton.setImage(DronelinkUI.loadImage(named: "baseline_cancel_white_36pt"), for: .normal)
         variableDroneClearButton.addTarget(self, action: #selector(onDroneClear), for: .touchUpInside)
         view.addSubview(variableDroneClearButton)
+        
+        variableSummaryTextView.textContainerInset = .zero
+        variableSummaryTextView.backgroundColor = UIColor.clear
+        variableSummaryTextView.font = UIFont.boldSystemFont(ofSize: 12)
+        variableSummaryTextView.textColor = UIColor.white.withAlphaComponent(0.85)
+        variableSummaryTextView.isScrollEnabled = true
+        variableSummaryTextView.isEditable = false
+        view.addSubview(variableSummaryTextView)
         
         progressLabel.font = UIFont.boldSystemFont(ofSize: 12)
         progressLabel.textColor = UIColor.white
@@ -233,13 +247,13 @@ public class FuncViewController: UIViewController {
             make.left.equalTo(variableControl.snp.left).offset(defaultPadding)
             make.right.equalTo(variableControl.snp.right).offset(-defaultPadding)
             make.top.equalTo(variableControl.snp.bottom).offset(-5)
-            make.height.equalTo(30)
+            make.height.equalTo(40)
         }
         
         variablePickerView.snp.remakeConstraints { make in
             make.left.equalTo(variableControl.snp.left).offset(defaultPadding)
             make.right.equalTo(variableControl.snp.right).offset(-defaultPadding)
-            make.top.equalTo(variableControl.snp.bottom).offset(-defaultPadding)
+            make.top.equalTo(variableControl.snp.bottom).offset(-5)
             make.height.equalTo(80)
         }
         
@@ -264,6 +278,13 @@ public class FuncViewController: UIViewController {
             make.bottom.equalTo(variableDroneMarkButton)
         }
         
+        variableSummaryTextView.snp.remakeConstraints { make in
+            make.left.equalTo(variableNameLabel)
+            make.right.equalTo(variableNameLabel)
+            make.top.equalTo(variableNameLabel.snp.bottom).offset(defaultPadding)
+            make.bottom.equalTo(backButton.snp.top).offset(-defaultPadding)
+        }
+        
         backButton.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
@@ -281,7 +302,7 @@ public class FuncViewController: UIViewController {
         nextButton.snp.remakeConstraints { make in
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(backButton)
-            make.width.equalTo(lastStep ? 200 : 85)
+            make.width.equalTo(last ? 200 : 85)
             make.bottom.equalTo(backButton)
         }
         
@@ -293,7 +314,7 @@ public class FuncViewController: UIViewController {
                 make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding * 2)
             }
             else {
-                make.top.equalTo(variableControl.snp.bottom)
+                make.top.equalTo(variableControl.snp.bottom).offset(5)
             }
         }
         
@@ -330,22 +351,32 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onBack(sender: Any) {
-        step -= 1
+        inputIndex -= 1
+        funcExecutor?.removeLastDynamicInput()
         readValue()
         view.setNeedsUpdateConstraints()
     }
     
     @objc func onNext(sender: Any) {
-        if (!writeValue(next: true)) {
-            return
-        }
-        
-        if (lastStep) {
+        if (last) {
             onPrimary(sender: sender)
             return
         }
         
-        step += 1
+        if (!writeValue(next: true)) {
+            return
+        }
+        
+        funcExecutor?.addNextDynamicInput(droneSession: session) { error in
+            DispatchQueue.main.async {
+                DronelinkUI.shared.showSnackbar(text: error)
+                self.inputIndex -= 1
+                self.readValue()
+                self.view.setNeedsUpdateConstraints()
+           }
+       }
+        
+        inputIndex += 1
         readValue()
         view.setNeedsUpdateConstraints()
     }
@@ -361,7 +392,7 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onDroneClear(sender: Any) {
-        funcExecutor?.clearValue(index: step)
+        funcExecutor?.clearValue(index: inputIndex)
         readValue()
     }
     
@@ -404,7 +435,7 @@ public class FuncViewController: UIViewController {
                 
             case .drone:
                 if next {
-                    if funcExecutor?.readValue(index: step) == nil && !input.optional {
+                    if funcExecutor?.readValue(index: inputIndex) == nil && !input.optional {
                         DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.required".localized)
                         return false
                     }
@@ -419,7 +450,7 @@ public class FuncViewController: UIViewController {
             return false
         }
         
-        funcExecutor?.writeValue(index: step, value: value)
+        funcExecutor?.writeValue(index: inputIndex, value: value)
         return true
     }
     
@@ -429,7 +460,7 @@ public class FuncViewController: UIViewController {
         variablePickerView.reloadAllComponents()
         variableDroneTextView.text = ""
         
-        guard let value = funcExecutor?.readValue(index: step) else {
+        guard let value = funcExecutor?.readValue(index: inputIndex) else {
             self.value = nil
             update()
             return
@@ -473,12 +504,48 @@ public class FuncViewController: UIViewController {
         }
     }
     
+    var summary: String {
+        guard let funcExecutor = funcExecutor else {
+            return ""
+        }
+        
+        var summary: [String] = []
+        for index in 0..<funcExecutor.inputCount {
+            if let input = funcExecutor.input(index: index) {
+                var details = "FuncViewController.input.none".localized
+                if let value = funcExecutor.readValue(index: index) {
+                    if let valueBoolean = value as? Bool {
+                        details = (valueBoolean ? "yes" : "no").localized
+                    }
+                    else if let valueDouble = value as? Double {
+                        details = "\(valueDouble)"
+                    }
+                    else if let valueString = value as? String {
+                        details = valueString
+                    }
+                    else if let valueArray = value as? [Any], valueArray.count > 0 {
+                        if valueArray.count > 1 {
+                            details = "\(valueArray.count) \("FuncViewController.input.array.values".localized)"
+                        }
+                        else if let valueString = valueArray[0] as? String {
+                            details = valueString
+                        }
+                    }
+                }
+                
+                summary.append("\(index + 1). \(input.descriptors.name ?? "")\n\(details)")
+            }
+        }
+        
+        return summary.joined(separator: "\n\n")
+    }
+    
     func update() {
         guard let funcExecutor = funcExecutor else {
             return
         }
         
-        titleLabel.text = funcExecutor._func.descriptors.name
+        titleLabel.text = funcExecutor.descriptors.name
 
         variableNameLabel.isHidden = true
         variableDescriptionTextView.isHidden = true
@@ -488,6 +555,7 @@ public class FuncViewController: UIViewController {
         variableDroneMarkButton.isHidden = true
         variableDroneClearButton.isHidden = true
         variableDroneTextView.isHidden = true
+        variableSummaryTextView.isHidden = true
         
         if intro {
             variableDescriptionTextView.isHidden = false
@@ -496,59 +564,68 @@ public class FuncViewController: UIViewController {
             progressLabel.isHidden = true
             primaryButton.isHidden = false
             primaryButton.setTitle((executing ? "FuncViewController.primary.executing" : hasInputs ? "FuncViewController.primary.intro" : "FuncViewController.primary.execute").localized, for: .normal)
-            variableDescriptionTextView.text = funcExecutor._func.descriptors.description
+            variableDescriptionTextView.text = funcExecutor.descriptors.description
+            return
         }
-        else {
-            primaryButton.isHidden = true
-            backButton.isHidden = false
-            backButton.isEnabled = step > 0
-            nextButton.isHidden = false
-            nextButton.setTitle((lastStep ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
-            progressLabel.isHidden = lastStep
-            progressLabel.text = "\(step + 1) / \(funcExecutor._func.inputs?.count ?? 0)"
 
-            if let input = input {
-                variableNameLabel.isHidden = false
-                variableNameLabel.text = input.descriptors.name
-                if !(input.descriptors.description?.isEmpty ?? true) {
-                    variableDescriptionTextView.isHidden = false
-                    variableDescriptionTextView.text = input.descriptors.description
-                }
-
-                switch input.variable.valueType {
-                case .boolean:
-                    variableSegmentedControl.isHidden = false
-                    break
-                    
-                case .number:
-                    variableTextField.isHidden = false
-                    variableTextField.keyboardType = .decimalPad
-                    break
-                    
-                case .string:
-                    if input.enumValues == nil {
-                        variableTextField.isHidden = false
-                        variableTextField.keyboardType = .default
-                    }
-                    else {
-                        variablePickerView.isHidden = false
-                    }
-                    break
-                    
-                case .drone:
-                    variableDroneMarkButton.isHidden = false
-                    variableDroneTextView.isHidden = false
-                    variableDroneClearButton.isHidden = value == nil
-                    break
-                }
+        primaryButton.isHidden = true
+        backButton.isHidden = false
+        backButton.isEnabled = inputIndex > 0
+        nextButton.isHidden = false
+        nextButton.setTitle((last ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
+        progressLabel.isHidden = last
+        progressLabel.text = "\(inputIndex + 1) / \(funcExecutor.inputCount ?? 0)"
+        
+        if let input = input {
+            variableNameLabel.isHidden = false
+            variableNameLabel.text = input.descriptors.name
+            if !(input.descriptors.description?.isEmpty ?? true) {
+                variableDescriptionTextView.isHidden = false
+                variableDescriptionTextView.text = input.descriptors.description
             }
+
+            switch input.variable.valueType {
+            case .boolean:
+                variableSegmentedControl.isHidden = false
+                break
+                
+            case .number:
+                variableTextField.isHidden = false
+                variableTextField.keyboardType = .decimalPad
+                break
+                
+            case .string:
+                if input.enumValues == nil {
+                    variableTextField.isHidden = false
+                    variableTextField.keyboardType = .default
+                }
+                else {
+                    variablePickerView.isHidden = false
+                }
+                break
+                
+            case .drone:
+                variableDroneMarkButton.isHidden = false
+                variableDroneTextView.isHidden = false
+                variableDroneClearButton.isHidden = value == nil
+                break
+            }
+            return
+        }
+        
+        if last {
+            variableNameLabel.isHidden = false
+            variableNameLabel.text = "FuncViewController.input.summary".localized
+            variableSummaryTextView.isHidden = false
+            variableSummaryTextView.text = summary
+            return
         }
     }
 }
 
 extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     public func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        guard let input = input else {
+        guard let input = input, input.enumValues != nil else {
             return 0
         }
         return 1
@@ -569,7 +646,7 @@ extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         if row == 0 {
             return ""
         }
-        return input.enumValues?[row - 1] ?? ""
+        return input.enumValues?[safeIndex: row - 1] ?? ""
     }
 }
 
@@ -585,10 +662,24 @@ extension FuncViewController: DronelinkDelegate {
     
     public func onFuncLoaded(executor: FuncExecutor) {
         funcExecutor = executor
-        intro = !hasInputs || !(executor._func.descriptors.description?.isEmpty ?? true)
         executor.add(delegate: self)
         DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
+            self.inputIndex = 0
+            if !self.hasInputs {
+                executor.addNextDynamicInput(droneSession: self.session) { error in
+                     DispatchQueue.main.async {
+                         DronelinkUI.shared.showSnackbar(text: error)
+                    }
+                }
+            }
+            
+            self.intro = !self.hasInputs || !(executor.descriptors.description?.isEmpty ?? true)
+            if (!self.intro) {
+                self.readValue()
+            }
+            else {
+                self.view.setNeedsUpdateConstraints()
+            }
         }
     }
     
