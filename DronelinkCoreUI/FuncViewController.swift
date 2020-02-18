@@ -54,6 +54,7 @@ public class FuncViewController: UIViewController {
     }
     private var hasInputs: Bool { funcExecutor?.inputCount ?? 0 > 0 }
     private var input: Mission.FuncInput? { funcExecutor?.input(index: inputIndex) }
+    private var valueNumberMeasurementTypeDisplay: String? { funcExecutor?.readValueNumberMeasurementTypeDisplay(index: inputIndex) }
     private var executing = false
     private var value: Any?
     
@@ -310,7 +311,7 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(35)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            if (intro && (input?.descriptors.description?.isEmpty ?? true)) {
+            if (intro && (funcExecutor?.descriptors.description?.isEmpty ?? true)) {
                 make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding * 2)
             }
             else {
@@ -352,7 +353,9 @@ public class FuncViewController: UIViewController {
     
     @objc func onBack(sender: Any) {
         inputIndex -= 1
-        funcExecutor?.removeLastDynamicInput()
+        if inputIndex < (funcExecutor?.inputCount ?? 0) - 1 {
+            funcExecutor?.removeLastDynamicInput()
+        }
         readValue()
         view.setNeedsUpdateConstraints()
     }
@@ -392,7 +395,7 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onDroneClear(sender: Any) {
-        funcExecutor?.clearValue(index: inputIndex)
+        funcExecutor?.clearArrayValue(index: inputIndex)
         readValue()
     }
     
@@ -513,27 +516,16 @@ public class FuncViewController: UIViewController {
         for index in 0..<funcExecutor.inputCount {
             if let input = funcExecutor.input(index: index) {
                 var details = "FuncViewController.input.none".localized
-                if let value = funcExecutor.readValue(index: index) {
-                    if let valueBoolean = value as? Bool {
-                        details = (valueBoolean ? "yes" : "no").localized
-                    }
-                    else if let valueDouble = value as? Double {
-                        details = "\(valueDouble)"
-                    }
-                    else if let valueString = value as? String {
-                        details = valueString
-                    }
-                    else if let valueArray = value as? [Any], valueArray.count > 0 {
-                        if valueArray.count > 1 {
-                            details = "\(valueArray.count) \("FuncViewController.input.array.values".localized)"
-                        }
-                        else if let valueString = valueArray[0] as? String {
-                            details = valueString
-                        }
-                    }
+                if let value = funcExecutor.readValue(index: index, formatted: true) as? String {
+                    details = value
                 }
                 
-                summary.append("\(index + 1). \(input.descriptors.name ?? "")\n\(details)")
+                var name = input.descriptors.name ?? ""
+                if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay {
+                    name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
+                }
+                
+                summary.append("\(index + 1). \(name)\n\(details)")
             }
         }
         
@@ -578,7 +570,16 @@ public class FuncViewController: UIViewController {
         
         if let input = input {
             variableNameLabel.isHidden = false
-            variableNameLabel.text = input.descriptors.name
+            var name = input.descriptors.name ?? ""
+            if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay {
+                name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
+            }
+            
+            if !input.optional {
+                name = "\(name) *"
+            }
+            variableNameLabel.text = name
+            
             if !(input.descriptors.description?.isEmpty ?? true) {
                 variableDescriptionTextView.isHidden = false
                 variableDescriptionTextView.text = input.descriptors.description
