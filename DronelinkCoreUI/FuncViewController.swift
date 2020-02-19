@@ -29,7 +29,7 @@ public class FuncViewController: UIViewController {
     private let titleImageView = UIImageView()
     private let titleLabel = UILabel()
     private let variableNameLabel = UILabel()
-    private let variableDescriptionTextView = UITextView()
+    private let variableDescriptionLabel = UILabel()
     private let variableSegmentedControl = UISegmentedControl()
     private let variableTextField = MDCTextField()
     private let variablePickerView = UIPickerView()
@@ -80,19 +80,25 @@ public class FuncViewController: UIViewController {
         
         titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
         titleLabel.textColor = UIColor.white
+        titleLabel.numberOfLines = 1
+        titleLabel.lineBreakMode = .byTruncatingTail
         view.addSubview(titleLabel)
         
         variableNameLabel.font = UIFont.boldSystemFont(ofSize: 14)
         variableNameLabel.textColor = UIColor.white
+        variableNameLabel.numberOfLines = 1
+        variableNameLabel.lineBreakMode = .byTruncatingTail
+        variableNameLabel.minimumScaleFactor = 0.5
+        variableNameLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(variableNameLabel)
         
-        variableDescriptionTextView.textContainerInset = .zero
-        variableDescriptionTextView.backgroundColor = UIColor.clear
-        variableDescriptionTextView.font = UIFont.boldSystemFont(ofSize: 12)
-        variableDescriptionTextView.textColor = UIColor.white.withAlphaComponent(0.85)
-        variableDescriptionTextView.isScrollEnabled = true
-        variableDescriptionTextView.isEditable = false
-        view.addSubview(variableDescriptionTextView)
+        variableDescriptionLabel.font = UIFont.boldSystemFont(ofSize: 12)
+        variableDescriptionLabel.textColor = UIColor.white.withAlphaComponent(0.85)
+        variableDescriptionLabel.numberOfLines = 2
+        variableDescriptionLabel.lineBreakMode = .byTruncatingTail
+        variableDescriptionLabel.minimumScaleFactor = 0.5
+        variableDescriptionLabel.adjustsFontSizeToFitWidth = true
+        view.addSubview(variableDescriptionLabel)
         
         variableSegmentedControl.tintColor = primaryColor
         variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
@@ -216,72 +222,70 @@ public class FuncViewController: UIViewController {
         }
         
         variableNameLabel.snp.remakeConstraints { make in
-            make.left.equalTo(titleImageView.snp.left).offset(5)
-            make.right.equalTo(dismissButton.snp.right)
-            make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding)
-            make.height.equalTo(20)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalTo(dismissButton.snp.left).offset(-defaultPadding)
+            make.top.equalToSuperview().offset(defaultPadding)
+            make.height.equalTo(25)
         }
         
-        variableDescriptionTextView.snp.remakeConstraints { make in
-            make.left.equalTo(titleImageView.snp.left)
-            make.right.equalTo(dismissButton.snp.right)
+        variableDescriptionLabel.snp.remakeConstraints { make in
+            make.left.equalTo(variableNameLabel.snp.left)
+            make.right.equalToSuperview().offset(-defaultPadding)
             if intro {
                 make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding)
-                make.height.equalTo(45)
             }
             else {
                 make.top.equalTo(variableNameLabel.snp.bottom).offset(4)
-                make.height.equalTo(30)
             }
         }
         
-        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
+        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionLabel
         
         variableSegmentedControl.snp.remakeConstraints { make in
-            make.left.equalTo(variableControl.snp.left).offset(defaultPadding)
-            make.right.equalTo(variableControl.snp.right).offset(-defaultPadding)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalTo(variableControl.snp.bottom).offset(defaultPadding)
             make.height.equalTo(30)
         }
         
         variableTextField.snp.remakeConstraints { make in
-            make.left.equalTo(variableControl.snp.left).offset(defaultPadding)
-            make.right.equalTo(variableControl.snp.right).offset(-defaultPadding)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalTo(variableControl.snp.bottom).offset(-5)
             make.height.equalTo(40)
         }
         
         variablePickerView.snp.remakeConstraints { make in
-            make.left.equalTo(variableControl.snp.left).offset(defaultPadding)
-            make.right.equalTo(variableControl.snp.right).offset(-defaultPadding)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalTo(variableControl.snp.bottom).offset(-5)
             make.height.equalTo(80)
         }
         
         variableDroneMarkButton.snp.remakeConstraints { make in
-            make.left.equalTo(variableControl.snp.left)
+            make.left.equalToSuperview().offset(defaultPadding)
             make.width.equalTo(110)
-            make.top.equalTo(variableControl.snp.bottom).offset(5)
+            make.top.equalTo(variableControl.snp.bottom).offset(defaultPadding)
             make.height.equalTo(40)
         }
         
         variableDroneClearButton.snp.remakeConstraints { make in
             make.height.equalTo(25)
             make.width.equalTo(variableDroneClearButton.snp.height)
-            make.right.equalTo(variableControl.snp.right)
+            make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalTo(variableDroneMarkButton)
         }
         
         variableDroneTextView.snp.remakeConstraints { make in
-            make.left.equalTo(variableDroneMarkButton.snp.right).offset(defaultPadding)
+            make.left.equalTo(variableDroneMarkButton.snp.right).offset(5)
             make.right.equalTo(variableDroneClearButton.snp.left).offset(5)
             make.top.equalTo(variableDroneMarkButton)
-            make.bottom.equalTo(variableDroneMarkButton)
+            make.bottom.equalTo(backButton.snp.top).offset(-defaultPadding)
         }
         
         variableSummaryTextView.snp.remakeConstraints { make in
-            make.left.equalTo(variableNameLabel)
-            make.right.equalTo(variableNameLabel)
+            make.left.equalTo(variableDescriptionLabel)
+            make.right.equalTo(variableDescriptionLabel)
             make.top.equalTo(variableNameLabel.snp.bottom).offset(defaultPadding)
             make.bottom.equalTo(backButton.snp.top).offset(-defaultPadding)
         }
@@ -315,7 +319,7 @@ public class FuncViewController: UIViewController {
                 make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding * 2)
             }
             else {
-                make.top.equalTo(variableControl.snp.bottom).offset(5)
+                make.top.equalTo(variableControl.snp.bottom).offset(defaultPadding)
             }
         }
         
@@ -380,6 +384,7 @@ public class FuncViewController: UIViewController {
        }
         
         inputIndex += 1
+        variableTextField.resignFirstResponder()
         readValue()
         view.setNeedsUpdateConstraints()
     }
@@ -479,7 +484,7 @@ public class FuncViewController: UIViewController {
             if let valueArray = value as? [Any] {
                 let valueArrayStrings = valueArray.reversed().enumerated().map { value -> String in
                     if let valueString = value.element as? String {
-                        return "\(valueArray.count - value.offset)\t\(valueString.replacingOccurrences(of: "\n", with: "\n\t"))"
+                        return "\(valueArray.count - value.offset). \(valueString)"
                     }
                     return ""
                 }
@@ -536,11 +541,11 @@ public class FuncViewController: UIViewController {
         guard let funcExecutor = funcExecutor else {
             return
         }
-        
-        titleLabel.text = funcExecutor.descriptors.name
 
+        titleImageView.isHidden = true
+        titleLabel.isHidden = true
         variableNameLabel.isHidden = true
-        variableDescriptionTextView.isHidden = true
+        variableDescriptionLabel.isHidden = true
         variableSegmentedControl.isHidden = true
         variableTextField.isHidden = true
         variablePickerView.isHidden = true
@@ -550,13 +555,17 @@ public class FuncViewController: UIViewController {
         variableSummaryTextView.isHidden = true
         
         if intro {
-            variableDescriptionTextView.isHidden = false
+            titleImageView.isHidden = false
+            titleLabel.isHidden = false
+            variableDescriptionLabel.isHidden = false
             backButton.isHidden = true
             nextButton.isHidden = true
             progressLabel.isHidden = true
             primaryButton.isHidden = false
+
+            titleLabel.text = funcExecutor.descriptors.name
             primaryButton.setTitle((executing ? "FuncViewController.primary.executing" : hasInputs ? "FuncViewController.primary.intro" : "FuncViewController.primary.execute").localized, for: .normal)
-            variableDescriptionTextView.text = funcExecutor.descriptors.description
+            variableDescriptionLabel.text = funcExecutor.descriptors.description
             return
         }
 
@@ -581,8 +590,8 @@ public class FuncViewController: UIViewController {
             variableNameLabel.text = name
             
             if !(input.descriptors.description?.isEmpty ?? true) {
-                variableDescriptionTextView.isHidden = false
-                variableDescriptionTextView.text = input.descriptors.description
+                variableDescriptionLabel.isHidden = false
+                variableDescriptionLabel.text = input.descriptors.description
             }
 
             switch input.variable.valueType {
@@ -674,7 +683,7 @@ extension FuncViewController: DronelinkDelegate {
                 }
             }
             
-            self.intro = !self.hasInputs || !(executor.descriptors.description?.isEmpty ?? true)
+            self.intro = true
             if (!self.intro) {
                 self.readValue()
             }

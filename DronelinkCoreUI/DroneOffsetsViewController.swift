@@ -23,6 +23,7 @@ public class DroneOffsetsViewController: UIViewController {
     private var session: DroneSession?
     
     private let detailsLabel = UILabel()
+    private let moreButton = UIButton(type: .custom)
     private let clearButton = UIButton(type: .custom)
     private let leftButton = MDCFloatingButton()
     private let rightButton = MDCFloatingButton()
@@ -63,6 +64,11 @@ public class DroneOffsetsViewController: UIViewController {
         detailsLabel.font = UIFont.boldSystemFont(ofSize: 14)
         detailsLabel.textColor = UIColor.white
         view.addSubview(detailsLabel)
+        
+        moreButton.tintColor = UIColor.white.withAlphaComponent(0.85)
+        moreButton.setImage(DronelinkUI.loadImage(named: "baseline_more_white_36pt"), for: .normal)
+        moreButton.addTarget(self, action: #selector(onMore), for: .touchUpInside)
+        view.addSubview(moreButton)
         
         clearButton.tintColor = UIColor.white.withAlphaComponent(0.85)
         clearButton.setImage(DronelinkUI.loadImage(named: "baseline_cancel_white_36pt"), for: .normal)
@@ -132,6 +138,13 @@ public class DroneOffsetsViewController: UIViewController {
             make.top.equalToSuperview().offset(8)
         }
         
+        moreButton.snp.remakeConstraints { make in
+            make.height.equalTo(stickTypeSegmentedControl)
+            make.width.equalTo(moreButton.snp.height)
+            make.left.equalTo(stickTypeSegmentedControl)
+            make.top.equalTo(stickTypeSegmentedControl.snp.bottom).offset(defaultPadding)
+        }
+        
         clearButton.snp.remakeConstraints { make in
             make.height.equalTo(stickTypeSegmentedControl)
             make.width.equalTo(clearButton.snp.height)
@@ -141,8 +154,8 @@ public class DroneOffsetsViewController: UIViewController {
         
         detailsLabel.snp.remakeConstraints { make in
             make.height.equalTo(stickTypeSegmentedControl)
-            make.left.equalTo(stickTypeSegmentedControl)
-            make.right.equalTo(clearButton.snp.left).offset(defaultPadding)
+            make.left.equalTo(moreButton.snp.right).offset(5)
+            make.right.equalTo(clearButton.snp.left).offset(-5)
             make.top.equalTo(stickTypeSegmentedControl.snp.bottom).offset(defaultPadding)
         }
         
@@ -215,6 +228,33 @@ public class DroneOffsetsViewController: UIViewController {
         
     @objc func onStickTypeChanged(sender: Any) {
         update()
+    }
+    
+    @objc func onMore(sender: Any) {
+        let alert = UIAlertController(title: "DroneOffsetsViewController.more".localized, message: nil, preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender as? UIView
+
+        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.resetGimbal".localized, style: .default , handler:{ _ in
+            self.session?.drone.gimbal(channel: 0)?.reset()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.levelGimbal".localized, style: .default , handler:{ _ in
+            var command = Mission.OrientationGimbalCommand()
+            command.orientation.x = 0
+            try? self.session?.add(command: command)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.nadirGimbal".localized, style: .default , handler:{ _ in
+            var command = Mission.OrientationGimbalCommand()
+            command.orientation.x = -90.convertDegreesToRadians
+            try? self.session?.add(command: command)
+        }))
+
+        alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
+            
+        }))
+
+        present(alert, animated: true)
     }
     
     @objc func onClear(sender: Any) {
@@ -391,6 +431,7 @@ public class DroneOffsetsViewController: UIViewController {
                 details.append(Dronelink.shared.format(formatter: "altitude", value: offsets.droneAltitude))
             }
             
+            moreButton.isHidden = session == nil
             clearButton.isHidden = details.count == 0
             detailsLabel.text = details.joined(separator: " / ")
             
@@ -403,6 +444,7 @@ public class DroneOffsetsViewController: UIViewController {
             evLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
         }
         else {
+            moreButton.isHidden = true
             clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
             detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
             
