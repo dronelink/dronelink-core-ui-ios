@@ -44,6 +44,7 @@ public class FuncViewController: UIViewController {
     private let cancelImage = DronelinkUI.loadImage(named: "baseline_close_white_36pt")
     private let droneImage = DronelinkUI.loadImage(named: "baseline_navigation_white_36pt")
     
+    private let segmentedMaxOptions = 2
     private var intro = true
     private var inputIndex = 0
     private var last: Bool {
@@ -101,8 +102,6 @@ public class FuncViewController: UIViewController {
         view.addSubview(variableDescriptionLabel)
         
         variableSegmentedControl.tintColor = primaryColor
-        variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
-        variableSegmentedControl.insertSegment(withTitle: "no".localized, at: 1, animated: false)
         view.addSubview(variableSegmentedControl)
         
         variableTextField.tintColor = UIColor.white
@@ -338,6 +337,7 @@ public class FuncViewController: UIViewController {
         
         if (intro && hasInputs) {
             intro = false
+            readValue()
             view.setNeedsUpdateConstraints()
             return
         }
@@ -400,7 +400,7 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onDroneClear(sender: Any) {
-        funcExecutor?.clearArrayValue(index: inputIndex)
+        funcExecutor?.clearValue(index: inputIndex)
         readValue()
     }
     
@@ -428,15 +428,22 @@ public class FuncViewController: UIViewController {
                 break
                 
             case .string:
-                if input.enumValues == nil {
-                    if let text = variableTextField.text, !text.isEmpty {
-                        value = text
+                if let enumValues = input.enumValues {
+                    if enumValues.count <= segmentedMaxOptions {
+                        if (variableSegmentedControl.selectedSegmentIndex != UISegmentedControl.noSegment) {
+                            value = enumValues[variableSegmentedControl.selectedSegmentIndex]
+                        }
+                    }
+                    else {
+                        let index = variablePickerView.selectedRow(inComponent: 0) - 1
+                        if index >= 0 {
+                            value = enumValues[index]
+                        }
                     }
                 }
                 else {
-                    let index = variablePickerView.selectedRow(inComponent: 0) - 1
-                    if index >= 0 {
-                        value = input.enumValues?[index]
+                    if let text = variableTextField.text, !text.isEmpty {
+                        value = text
                     }
                 }
                 break
@@ -465,8 +472,26 @@ public class FuncViewController: UIViewController {
     func readValue() {
         variableTextField.text = ""
         variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
+        variableSegmentedControl.removeAllSegments()
         variablePickerView.reloadAllComponents()
         variableDroneTextView.text = ""
+        
+        guard let input = input else {
+            self.value = nil
+            update()
+            return
+        }
+        
+        if input.variable.valueType == .boolean {
+            variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
+            variableSegmentedControl.insertSegment(withTitle: "no".localized, at: 1, animated: false)
+            
+        }
+        else if let enumValues = input.enumValues {
+            enumValues.enumerated().forEach { (index, enumValue) in
+                variableSegmentedControl.insertSegment(withTitle: enumValue, at: index, animated: false)
+            }
+        }
         
         guard let value = funcExecutor?.readValue(index: inputIndex) else {
             self.value = nil
@@ -476,7 +501,7 @@ public class FuncViewController: UIViewController {
         self.value = value
         update()
         
-        if input?.variable.valueType == .drone {
+        if input.variable.valueType == .drone {
             if let valueString = value as? String {
                 variableDroneTextView.text = valueString
             }
@@ -504,9 +529,10 @@ public class FuncViewController: UIViewController {
         
         if let valueString = value as? String {
             variableTextField.text = valueString
-            input?.enumValues?.enumerated().forEach { (index, enumValue) in
+            input.enumValues?.enumerated().forEach { (index, enumValue) in
                 if enumValue == valueString {
-                    variablePickerView.selectRow(index + 1, inComponent: 0, animated: false)
+                    self.variableSegmentedControl.selectedSegmentIndex = index
+                    self.variablePickerView.selectRow(index + 1, inComponent: 0, animated: false)
                 }
             }
         }
@@ -605,12 +631,13 @@ public class FuncViewController: UIViewController {
                 break
                 
             case .string:
-                if input.enumValues == nil {
-                    variableTextField.isHidden = false
-                    variableTextField.keyboardType = .default
+                if let enumsValues = input.enumValues {
+                    variablePickerView.isHidden = enumsValues.count <= segmentedMaxOptions
+                    variableSegmentedControl.isHidden = !variablePickerView.isHidden
                 }
                 else {
-                    variablePickerView.isHidden = false
+                    variableTextField.isHidden = false
+                    variableTextField.keyboardType = .default
                 }
                 break
                 
@@ -654,7 +681,7 @@ extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         }
         
         if row == 0 {
-            return ""
+            return "FuncViewController.input.choose".localized
         }
         return input.enumValues?[safeIndex: row - 1] ?? ""
     }

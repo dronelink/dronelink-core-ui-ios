@@ -23,6 +23,7 @@
 "FuncViewController.input.drone.unavailable" = "Please connect a drone";
 "FuncViewController.input.summary" = "Input Summary";
 "FuncViewController.input.none" = "No Input";
+"FuncViewController.input.choose" = "Choose...";
 
 "MissionViewController.timeElapsed.empty" = "--:--";
 "MissionViewController.start.countdown" = "Starting in %d";
