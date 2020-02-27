@@ -403,6 +403,7 @@ public class FuncViewController: UIViewController {
         Dronelink.shared.unloadFunc()
     }
     
+    @discardableResult
     func writeValue(next: Bool = false) -> Bool {
         guard let input = input else {
             return false
@@ -452,6 +453,9 @@ public class FuncViewController: UIViewController {
                     return true
                 }
                 value = session
+                break
+            
+            @unknown default:
                 break
         }
         
@@ -596,7 +600,7 @@ public class FuncViewController: UIViewController {
         nextButton.isHidden = false
         nextButton.setTitle((last ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
         progressLabel.isHidden = last
-        progressLabel.text = "\(inputIndex + 1) / \(funcExecutor.inputCount ?? 0)"
+        progressLabel.text = "\(inputIndex + 1) / \(funcExecutor.inputCount)"
         
         if let input = input {
             variableNameLabel.isHidden = false
@@ -640,6 +644,9 @@ public class FuncViewController: UIViewController {
                 variableDroneMarkButton.isHidden = false
                 variableDroneTextView.isHidden = false
                 variableDroneClearButton.isHidden = value == nil
+                break
+            
+            @unknown default:
                 break
             }
             return

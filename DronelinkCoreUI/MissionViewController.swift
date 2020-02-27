@@ -231,8 +231,8 @@ public class MissionViewController: UIViewController {
                     missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
                 }
                 
-                let distance = Dronelink.shared.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation)) ?? ""
-                let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : Dronelink.shared.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!) ?? ""
+                let distance = Dronelink.shared.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation))
+                let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : Dronelink.shared.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!)
                 DronelinkUI.shared.showDialog(
                     title: "MissionViewController.start.takeoffLocationWarning.title".localized,
                     details: altitude == nil

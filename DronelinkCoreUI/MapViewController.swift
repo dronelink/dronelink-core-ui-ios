@@ -127,7 +127,7 @@ public class MapViewController: UIViewController {
                 mapView.addAnnotation(missionPathForegroundAnnotation!)
                 
                 if (visibleCoordinatesPending) {
-                    var visibleCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
+                    let visibleCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
 //                    if let state = session?.state?.value,
 //                        let droneLocation = state.location {
 //                        visibleCoordinates.append(droneLocation.coordinate)

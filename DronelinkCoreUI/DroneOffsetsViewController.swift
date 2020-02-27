@@ -358,7 +358,7 @@ public class DroneOffsetsViewController: UIViewController {
     }
     
     @objc func onEVNeg(sender: Any) {
-        guard exposureCommand == nil, let exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation else {
+        guard exposureCommand == nil else {
             return
         }
         
@@ -366,7 +366,7 @@ public class DroneOffsetsViewController: UIViewController {
     }
     
     @objc func onEVPos(sender: Any) {
-        guard exposureCommand == nil, let exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation else {
+        guard exposureCommand == nil else {
             return
         }
         
@@ -435,7 +435,7 @@ public class DroneOffsetsViewController: UIViewController {
             clearButton.isHidden = details.count == 0
             detailsLabel.text = details.joined(separator: " / ")
             
-            var exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
+            let exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
             evNegButton.tintColor = exposureCommand == nil ? UIColor.white : MDCPalette.pink.accent400
             evNegButton.isEnabled = exposureCompensation != nil
             evPosButton.tintColor = evNegButton.tintColor
