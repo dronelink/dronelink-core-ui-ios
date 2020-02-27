@@ -55,7 +55,7 @@ public class FuncViewController: UIViewController {
     }
     private var hasInputs: Bool { funcExecutor?.inputCount ?? 0 > 0 }
     private var input: Mission.FuncInput? { funcExecutor?.input(index: inputIndex) }
-    private var valueNumberMeasurementTypeDisplay: String? { funcExecutor?.readValueNumberMeasurementTypeDisplay(index: inputIndex) }
+    private func valueNumberMeasurementTypeDisplay(index: Int? = nil) -> String? { funcExecutor?.readValueNumberMeasurementTypeDisplay(index: index ?? inputIndex) }
     private var executing = false
     private var value: Any?
     
@@ -314,12 +314,7 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(35)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            if (intro && (funcExecutor?.descriptors.description?.isEmpty ?? true)) {
-                make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding * 2)
-            }
-            else {
-                make.top.equalTo(variableControl.snp.bottom).offset(defaultPadding)
-            }
+            make.bottom.equalToSuperview().offset(-defaultPadding)
         }
         
         update()
@@ -365,7 +360,7 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onNext(sender: Any) {
-        if (last) {
+        if last {
             onPrimary(sender: sender)
             return
         }
@@ -552,7 +547,7 @@ public class FuncViewController: UIViewController {
                 }
                 
                 var name = input.descriptors.name ?? ""
-                if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay {
+                if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay(index: index) {
                     name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
                 }
                 
@@ -606,7 +601,7 @@ public class FuncViewController: UIViewController {
         if let input = input {
             variableNameLabel.isHidden = false
             var name = input.descriptors.name ?? ""
-            if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay {
+            if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay() {
                 name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
             }
             
@@ -711,12 +706,7 @@ extension FuncViewController: DronelinkDelegate {
             }
             
             self.intro = true
-            if (!self.intro) {
-                self.readValue()
-            }
-            else {
-                self.view.setNeedsUpdateConstraints()
-            }
+            self.view.setNeedsUpdateConstraints()
         }
     }
     
