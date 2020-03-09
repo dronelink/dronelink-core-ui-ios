@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.source_files  = "DronelinkCoreUI/**/*.swift"
   s.resources = "DronelinkCoreUI/**/*.{strings,xcassets}"
 
-  s.dependency "DronelinkCore", "~> 1.2.0"
+  s.dependency "DronelinkCore", "~> 1.3.0"
   s.dependency "SnapKit", "~> 5.0.0"
   s.dependency "Mapbox-iOS-SDK", "~> 5.5.0"
   s.dependency "MaterialComponents/Palettes", "~> 103.1.0"

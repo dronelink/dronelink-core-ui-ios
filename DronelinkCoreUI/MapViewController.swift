@@ -29,11 +29,12 @@ public class MapViewController: UIViewController {
     private var userDroneAnnotation: MGLAnnotation?
     private var missionPathBackgroundAnnotation: MGLAnnotation?
     private var missionPathForegroundAnnotation: MGLAnnotation?
+    private var missionReengagementBackgroundAnnotation: MGLAnnotation?
+    private var missionReengagementForegroundAnnotation: MGLAnnotation?
     private var missionTakeoffAreaAnnotation: MGLAnnotation?
     private let updateInterval: TimeInterval = 0.1
     private var updateTimer: Timer?
     private var lastUpdated = Date()
-    private var visibleCoordinatesPending = false
     
     public override func viewDidLoad() {
         mapView.delegate = self
@@ -107,6 +108,14 @@ public class MapViewController: UIViewController {
             mapView.removeAnnotation(missionPathForegroundAnnotation)
         }
         
+        if let missionReengagementBackgroundAnnotation = missionReengagementBackgroundAnnotation {
+            mapView.removeAnnotation(missionReengagementBackgroundAnnotation)
+        }
+        
+        if let missionReengagementForegroundAnnotation = missionReengagementForegroundAnnotation {
+            mapView.removeAnnotation(missionReengagementForegroundAnnotation)
+        }
+        
         if let requiredTakeoffArea = missionExecutor?.requiredTakeoffArea {
             let segments = 100
             let coordinates = (0...segments).map { index -> CLLocationCoordinate2D in
@@ -117,6 +126,7 @@ public class MapViewController: UIViewController {
             mapView.addAnnotation(missionTakeoffAreaAnnotation!)
         }
         
+        var visibleCoordinates: [CLLocationCoordinate2D] = []
         if let segments = missionExecutor?.estimateSegmentCoordinates() {
             let pathCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
             if (pathCoordinates.count > 0) {
@@ -126,25 +136,28 @@ public class MapViewController: UIViewController {
                 missionPathForegroundAnnotation = MGLPolyline(coordinates: pathCoordinates, count: UInt(pathCoordinates.count))
                 mapView.addAnnotation(missionPathForegroundAnnotation!)
                 
-                if (visibleCoordinatesPending) {
-                    let visibleCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
-//                    if let state = session?.state?.value,
-//                        let droneLocation = state.location {
-//                        visibleCoordinates.append(droneLocation.coordinate)
-//                        if let userLocation = Dronelink.shared.locationManager.location {
-//                            if (userLocation.distance(from: droneLocation) < 10000) {
-//                                visibleCoordinates.append(userLocation.coordinate)
-//                            }
-//                        }
-//                    }
-                    
-                    mapView.setVisibleCoordinates(
-                        visibleCoordinates,
-                        count: UInt(visibleCoordinates.count),
-                        edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
-                    visibleCoordinatesPending = false
-                }
+                visibleCoordinates.append(contentsOf: pathCoordinates)
             }
+        }
+        
+        if let segments = missionExecutor?.reengagementCoordinates {
+            let reengagementCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
+            if (reengagementCoordinates.count > 0) {
+                missionReengagementBackgroundAnnotation = MGLPolyline(coordinates: reengagementCoordinates, count: UInt(reengagementCoordinates.count))
+                mapView.addAnnotation(missionReengagementBackgroundAnnotation!)
+                
+                missionReengagementForegroundAnnotation = MGLPolyline(coordinates: reengagementCoordinates, count: UInt(reengagementCoordinates.count))
+                mapView.addAnnotation(missionReengagementForegroundAnnotation!)
+                
+                visibleCoordinates.append(contentsOf: reengagementCoordinates)
+            }
+        }
+        
+        if (visibleCoordinates.count > 0) {
+            mapView.setVisibleCoordinates(
+                visibleCoordinates,
+                count: UInt(visibleCoordinates.count),
+                edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
         }
     }
 }
@@ -155,7 +168,6 @@ extension MapViewController: DronelinkDelegate {
     public func onMissionLoaded(executor: MissionExecutor) {
         DispatchQueue.main.async {
             self.missionExecutor = executor
-            self.visibleCoordinatesPending = true
             executor.add(delegate: self)
             self.updateMissionEstimate()
         }
@@ -230,11 +242,11 @@ extension MapViewController: MGLMapViewDelegate {
     }
 
     public func mapView(_ mapView: MGLMapView, lineWidthForPolylineAnnotation annotation: MGLPolyline) -> CGFloat {
-        if (annotation === missionPathBackgroundAnnotation) {
+        if (annotation === missionPathBackgroundAnnotation || annotation === missionReengagementBackgroundAnnotation) {
             return 6
         }
 
-        if (annotation === missionPathForegroundAnnotation) {
+        if (annotation === missionPathForegroundAnnotation || annotation === missionReengagementForegroundAnnotation) {
             return 2.5
         }
 
@@ -250,8 +262,16 @@ extension MapViewController: MGLMapViewDelegate {
             return MDCPalette.lightBlue.tint800
         }
 
-        if (annotation === missionPathBackgroundAnnotation) {
+        if (annotation === missionPathForegroundAnnotation) {
             return MDCPalette.cyan.accent400!
+        }
+
+        if (annotation === missionReengagementBackgroundAnnotation) {
+            return MDCPalette.purple.tint800
+        }
+
+        if (annotation === missionReengagementForegroundAnnotation) {
+            return MDCPalette.purple.accent200!
         }
 
         return MDCPalette.cyan.accent400!
