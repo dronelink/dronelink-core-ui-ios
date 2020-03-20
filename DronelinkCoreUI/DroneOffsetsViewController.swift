@@ -14,12 +14,12 @@ import MaterialComponents.MaterialProgressView
 
 public class DroneOffsetsViewController: UIViewController {
     public enum Style: Int, CaseIterable {
-        case altYawEv = 0
+        case altYaw = 0
         case position
         
         var display: String {
             switch self {
-            case .altYawEv: return "DroneOffsetsViewController.altitudeYaw".localized
+            case .altYaw: return "DroneOffsetsViewController.altitudeYaw".localized
             case .position: return "DroneOffsetsViewController.position".localized
             }
         }
@@ -50,7 +50,6 @@ public class DroneOffsetsViewController: UIViewController {
     
     private let updateInterval: TimeInterval = 0.25
     private var updateTimer: Timer?
-    private var exposureCommand: Mission.ExposureCompensationStepCameraCommand?
     private var style: Style { styles[styleSegmentedControl!.selectedSegmentIndex] }
     private var offsets: DroneOffsets {
         get { Dronelink.shared.droneOffsets }
@@ -66,7 +65,7 @@ public class DroneOffsetsViewController: UIViewController {
         
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
-        view.backgroundColor = DronelinkUI.Constants.overlayColor
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         
         styleSegmentedControl = UISegmentedControl(items: styles.map({ $0.display }))
         styleSegmentedControl.selectedSegmentIndex = 0
@@ -74,12 +73,14 @@ public class DroneOffsetsViewController: UIViewController {
         view.addSubview(styleSegmentedControl)
         
         detailsLabel.textAlignment = .center
-        detailsLabel.font = UIFont.boldSystemFont(ofSize: 14)
+        detailsLabel.font = UIFont.boldSystemFont(ofSize: 16)
         detailsLabel.textColor = UIColor.white
+        detailsLabel.minimumScaleFactor = 0.5
+        detailsLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(detailsLabel)
         
         moreButton.tintColor = UIColor.white.withAlphaComponent(0.85)
-        moreButton.setImage(DronelinkUI.loadImage(named: "baseline_more_white_36pt"), for: .normal)
+        moreButton.setImage(DronelinkUI.loadImage(named: "outline_more_white_36pt"), for: .normal)
         moreButton.addTarget(self, action: #selector(onMore), for: .touchUpInside)
         view.addSubview(moreButton)
         
@@ -92,22 +93,14 @@ public class DroneOffsetsViewController: UIViewController {
         configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt", action: #selector(onRight(sender:)))
         configureButton(button: upButton, image: "baseline_arrow_drop_up_white_36pt", action: #selector(onUp(sender:)))
         configureButton(button: downButton, image: "baseline_arrow_drop_down_white_36pt", action: #selector(onDown(sender:)))
-        
-        switch style {
-        case .altYawEv:
-            configureButton(button: c1Button, image: "baseline_remove_white_36pt", action: #selector(onC1(sender:)))
-            configureButton(button: c2Button, image: "baseline_add_white_36pt", action: #selector(onC2(sender:)))
-            break
-        
-        case .position:
-            configureButton(button: c1Button, image: "map-marker-radius-outline", action: #selector(onC1(sender:)))
-            configureButton(button: c2Button, image: "map-marker-distance", action: #selector(onC2(sender:)))
-            break
-        }
+        configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
+        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
         
         cLabel.textAlignment = .center
-        cLabel.font = UIFont.boldSystemFont(ofSize: 12)
+        cLabel.font = UIFont.boldSystemFont(ofSize: 14)
         cLabel.textColor = detailsLabel.textColor
+        cLabel.minimumScaleFactor = 0.5
+        cLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(cLabel)
         
         update()
@@ -126,9 +119,9 @@ public class DroneOffsetsViewController: UIViewController {
         droneSessionManager.remove(delegate: self)
     }
     
-    private func configureButton(button: MDCFloatingButton, image: String, action: Selector) {
+    private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector) {
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setBackgroundColor(UIColor.darkGray.withAlphaComponent(0.85))
+        button.setBackgroundColor((color ?? UIColor.darkGray).withAlphaComponent(0.85))
         button.setImage(DronelinkUI.loadImage(named: image), for: .normal)
         button.tintColor = UIColor.white
         button.addTarget(self, action: action, for: .touchUpInside)
@@ -224,17 +217,6 @@ public class DroneOffsetsViewController: UIViewController {
     }
         
     @objc func onStyleChanged(sender: Any) {
-        switch style {
-        case .altYawEv:
-            configureButton(button: c1Button, image: "baseline_remove_white_36pt", action: #selector(onC1(sender:)))
-            configureButton(button: c2Button, image: "baseline_add_white_36pt", action: #selector(onC2(sender:)))
-            break
-        
-        case .position:
-            configureButton(button: c1Button, image: "map-marker-radius-outline", action: #selector(onC1(sender:)))
-            configureButton(button: c2Button, image: "map-marker-distance", action: #selector(onC2(sender:)))
-            break
-        }
         update()
     }
     
@@ -267,7 +249,7 @@ public class DroneOffsetsViewController: UIViewController {
     
     @objc func onClear(sender: Any) {
         switch style {
-        case .altYawEv:
+        case .altYaw:
             offsets.droneAltitude = 0
             offsets.droneYaw = 0
             break
@@ -286,7 +268,7 @@ public class DroneOffsetsViewController: UIViewController {
         }
         
         switch style {
-        case .altYawEv:
+        case .altYaw:
             offsets.droneYaw += -3.0.convertDegreesToRadians
             break
         
@@ -311,7 +293,7 @@ public class DroneOffsetsViewController: UIViewController {
         }
         
         switch style {
-        case .altYawEv:
+        case .altYaw:
             offsets.droneYaw += 3.0.convertDegreesToRadians
             break
         
@@ -336,7 +318,7 @@ public class DroneOffsetsViewController: UIViewController {
         }
         
         switch style {
-        case .altYawEv:
+        case .altYaw:
             offsets.droneAltitude += 1.0.convertFeetToMeters
             break
         
@@ -361,7 +343,7 @@ public class DroneOffsetsViewController: UIViewController {
         }
         
         switch style {
-        case .altYawEv:
+        case .altYaw:
             offsets.droneAltitude += -1.0.convertFeetToMeters
             break
         
@@ -382,12 +364,12 @@ public class DroneOffsetsViewController: UIViewController {
     
     @objc func onC1(sender: Any) {
         switch style {
-        case .altYawEv:
-            guard exposureCommand == nil else {
+        case .altYaw:
+            guard let altitude = session?.state?.value.altitude else {
                 return
             }
             
-            onEV(steps: -1)
+            offsets.droneAltitudeReference = altitude
             break
         
         case .position:
@@ -396,19 +378,23 @@ public class DroneOffsetsViewController: UIViewController {
             }
             
             offsets.droneCoordinateReference = coordinate
-            update()
             break
         }
+        update()
     }
     
     @objc func onC2(sender: Any) {
         switch style {
-        case .altYawEv:
-            guard exposureCommand == nil else {
+        case .altYaw:
+            guard
+                let session = session,
+                let reference = offsets.droneAltitudeReference,
+                let current = session.state?.value.altitude
+            else {
                 return
             }
             
-            onEV(steps: 1)
+            offsets.droneAltitude = reference - current
             break
         
         case .position:
@@ -424,28 +410,14 @@ public class DroneOffsetsViewController: UIViewController {
                 direction: reference.bearing(to: current),
                 magnitude: reference.distance(to: current)
             )
-            update()
             break
         }
-    }
-    
-    private func onEV(steps: Int) {
-        guard let session = session else {
-            return
-        }
-        
-        do {
-            let exposureCommand = Mission.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
-            try? session.add(command: exposureCommand)
-            offsets.cameraExposureCompensationSteps += steps
-            self.exposureCommand = exposureCommand
-            update()
-        }
+        update()
     }
     
     @objc func update() {
         switch style {
-        case .altYawEv:
+        case .altYaw:
             var details: [String] = []
             if offsets.droneYaw != 0 {
                 details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw, extraParams: [false]))
@@ -459,17 +431,21 @@ public class DroneOffsetsViewController: UIViewController {
             clearButton.isHidden = details.count == 0
             detailsLabel.text = details.joined(separator: " / ")
             
-            let exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
-            c1Button.tintColor = exposureCommand == nil ? UIColor.white : MDCPalette.pink.accent400
-            c1Button.isEnabled = exposureCompensation != nil
-            c2Button.tintColor = c1Button.tintColor
-            c2Button.isEnabled = c1Button.isEnabled
+            if let session = session,
+                let reference = offsets.droneAltitudeReference,
+                let current = session.state?.value.altitude {
+                cLabel.text = Dronelink.shared.format(formatter: "distance", value: reference - current)
+            }
+            else {
+                cLabel.text = nil
+            }
             
-            cLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
+            c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
+            c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
             break
         
         case .position:
-            moreButton.isHidden = true
+            moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
             clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
             detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
             
@@ -484,7 +460,7 @@ public class DroneOffsetsViewController: UIViewController {
                 cLabel.text = nil
             }
             
-            c1Button.isEnabled = session?.state?.value.location != nil
+            c1Button.isEnabled = session?.state?.value.location != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
             c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
             break
         }
@@ -498,36 +474,9 @@ public class DroneOffsetsViewController: UIViewController {
 extension DroneOffsetsViewController: DroneSessionManagerDelegate {
     public func onOpened(session: DroneSession) {
         self.session = session
-        session.add(delegate: self)
     }
     
     public func onClosed(session: DroneSession) {
         self.session = nil
-        session.remove(delegate: self)
     }
-}
-
-extension DroneOffsetsViewController: DroneSessionDelegate {
-    public func onInitialized(session: DroneSession) {}
-    
-    public func onLocated(session: DroneSession) {}
-    
-    public func onMotorsChanged(session: DroneSession, value: Bool) {}
-    
-    public func onCommandExecuted(session: DroneSession, command: MissionCommand) {}
-    
-    public func onCommandFinished(session: DroneSession, command: MissionCommand, error: Error?) {
-        guard let exposureCommand = self.exposureCommand else {
-            return
-        }
-        
-        if command.id == exposureCommand.id {
-            self.exposureCommand = nil
-            DispatchQueue.main.async {
-                self.view.setNeedsUpdateConstraints()
-            }
-        }
-    }
-    
-    public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
 }
