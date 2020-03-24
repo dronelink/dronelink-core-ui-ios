@@ -217,6 +217,8 @@ public class DroneOffsetsViewController: UIViewController {
     }
         
     @objc func onStyleChanged(sender: Any) {
+        configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
+        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
         update()
     }
     
@@ -416,6 +418,11 @@ public class DroneOffsetsViewController: UIViewController {
     }
     
     @objc func update() {
+        upButton.isEnabled = session != nil
+        downButton.isEnabled = upButton.isEnabled
+        leftButton.isEnabled = upButton.isEnabled
+        rightButton.isEnabled = upButton.isEnabled
+        
         switch style {
         case .altYaw:
             var details: [String] = []

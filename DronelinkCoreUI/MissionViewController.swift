@@ -79,12 +79,16 @@ public class MissionViewController: UIViewController {
         
         timeElapsedLabel.font = timeElapsedLabel.font.withSize(15)
         timeElapsedLabel.textColor = titleLabel.textColor
+        timeElapsedLabel.minimumScaleFactor = 0.5
+        timeElapsedLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(timeElapsedLabel)
         
         timeRemainingLabel.textAlignment = .right
         timeRemainingLabel.font = timeElapsedLabel.font
         timeRemainingLabel.textColor = timeElapsedLabel.textColor
         timeRemainingLabel.text = timeElapsedLabel.text
+        timeRemainingLabel.minimumScaleFactor = 0.5
+        timeRemainingLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(timeRemainingLabel)
         
         progressView.trackTintColor = UIColor.white.withAlphaComponent(0.75)
