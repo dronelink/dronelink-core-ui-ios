@@ -27,14 +27,15 @@ public class MapViewController: UIViewController {
     private let droneAnnotation = MGLPointAnnotation()
     private var droneAnnotationView: MGLAnnotationView?
     private var userDroneAnnotation: MGLAnnotation?
-    private var missionPathBackgroundAnnotation: MGLAnnotation?
-    private var missionPathForegroundAnnotation: MGLAnnotation?
-    private var missionReengagementBackgroundAnnotation: MGLAnnotation?
-    private var missionReengagementForegroundAnnotation: MGLAnnotation?
-    private var missionTakeoffAreaAnnotation: MGLAnnotation?
+    private var missionRequiredTakeoffAreaAnnotation: MGLAnnotation?
+    private var missionEstimateBackgroundAnnotation: MGLAnnotation?
+    private var missionEstimateForegroundAnnotation: MGLAnnotation?
+    private var missionReengagementEstimateBackgroundAnnotation: MGLAnnotation?
+    private var missionReengagementEstimateForegroundAnnotation: MGLAnnotation?
     private let updateInterval: TimeInterval = 0.1
     private var updateTimer: Timer?
     private var lastUpdated = Date()
+    private var missionCentered = false
     
     public override func viewDidLoad() {
         mapView.delegate = self
@@ -61,16 +62,16 @@ public class MapViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         updateTimer = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
-        Dronelink.shared.add(delegate: self)
         droneSessionManager.add(delegate: self)
+        Dronelink.shared.add(delegate: self)
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         updateTimer?.invalidate()
         updateTimer = nil
-        Dronelink.shared.remove(delegate: self)
         droneSessionManager.remove(delegate: self)
+        Dronelink.shared.remove(delegate: self)
         missionExecutor?.remove(delegate: self)
     }
     
@@ -95,65 +96,66 @@ public class MapViewController: UIViewController {
         }
     }
     
-    private func updateMissionEstimate() {
-        if let mapMissionRequiredTakeoffAreaAnnotation = missionTakeoffAreaAnnotation {
+    private func updateMissionRequiredTakeoffArea() {
+        if let mapMissionRequiredTakeoffAreaAnnotation = missionRequiredTakeoffAreaAnnotation {
             mapView.removeAnnotation(mapMissionRequiredTakeoffAreaAnnotation)
         }
-        
-        if let missionPathBackgroundAnnotation = missionPathBackgroundAnnotation {
-            mapView.removeAnnotation(missionPathBackgroundAnnotation)
-        }
-        
-        if let missionPathForegroundAnnotation = missionPathForegroundAnnotation {
-            mapView.removeAnnotation(missionPathForegroundAnnotation)
-        }
-        
-        if let missionReengagementBackgroundAnnotation = missionReengagementBackgroundAnnotation {
-            mapView.removeAnnotation(missionReengagementBackgroundAnnotation)
-        }
-        
-        if let missionReengagementForegroundAnnotation = missionReengagementForegroundAnnotation {
-            mapView.removeAnnotation(missionReengagementForegroundAnnotation)
-        }
-        
+
         if let requiredTakeoffArea = missionExecutor?.requiredTakeoffArea {
             let segments = 100
             let coordinates = (0...segments).map { index -> CLLocationCoordinate2D in
                 let percent = Double(index) / Double(segments)
                 return requiredTakeoffArea.coordinate.coordinate.coordinate(bearing: percent * Double.pi * 2, distance: requiredTakeoffArea.distanceTolerance.horizontal)
             }
-            missionTakeoffAreaAnnotation = MGLPolygon(coordinates: coordinates, count: UInt(coordinates.count))
-            mapView.addAnnotation(missionTakeoffAreaAnnotation!)
+            missionRequiredTakeoffAreaAnnotation = MGLPolygon(coordinates: coordinates, count: UInt(coordinates.count))
+            mapView.addAnnotation(missionRequiredTakeoffAreaAnnotation!)
         }
-        
+    }
+    
+    private func updateMissionEstimate() {
+        if let missionEstimateBackgroundAnnotation = missionEstimateBackgroundAnnotation {
+            mapView.removeAnnotation(missionEstimateBackgroundAnnotation)
+        }
+
+        if let missionEstimateForegroundAnnotation = missionEstimateForegroundAnnotation {
+            mapView.removeAnnotation(missionEstimateForegroundAnnotation)
+        }
+
+        if let missionReengagementEstimateBackgroundAnnotation = missionReengagementEstimateBackgroundAnnotation {
+            mapView.removeAnnotation(missionReengagementEstimateBackgroundAnnotation)
+        }
+
+        if let missionReengagementEstimateForegroundAnnotation = missionReengagementEstimateForegroundAnnotation {
+            mapView.removeAnnotation(missionReengagementEstimateForegroundAnnotation)
+        }
+
         var visibleCoordinates: [CLLocationCoordinate2D] = []
-        if let segments = missionExecutor?.estimateSegmentCoordinates() {
-            let pathCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
-            if (pathCoordinates.count > 0) {
-                missionPathBackgroundAnnotation = MGLPolyline(coordinates: pathCoordinates, count: UInt(pathCoordinates.count))
-                mapView.addAnnotation(missionPathBackgroundAnnotation!)
-                
-                missionPathForegroundAnnotation = MGLPolyline(coordinates: pathCoordinates, count: UInt(pathCoordinates.count))
-                mapView.addAnnotation(missionPathForegroundAnnotation!)
-                
-                visibleCoordinates.append(contentsOf: pathCoordinates)
+        if let estimateCoordinates = missionExecutor?.estimate?.coordinates.map({ $0.coordinate }), estimateCoordinates.count > 0 {
+            missionEstimateBackgroundAnnotation = MGLPolyline(coordinates: estimateCoordinates, count: UInt(estimateCoordinates.count))
+            mapView.addAnnotation(missionEstimateBackgroundAnnotation!)
+
+            missionEstimateForegroundAnnotation = MGLPolyline(coordinates: estimateCoordinates, count: UInt(estimateCoordinates.count))
+            mapView.addAnnotation(missionEstimateForegroundAnnotation!)
+
+            if !missionCentered {
+                visibleCoordinates.append(contentsOf: estimateCoordinates)
+            }
+
+            if let reengagementEstimateCoordinates = missionExecutor?.estimate?.reengagementCoordinates?.map({ $0.coordinate }), reengagementEstimateCoordinates.count > 0 {
+                missionReengagementEstimateBackgroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
+                mapView.addAnnotation(missionReengagementEstimateBackgroundAnnotation!)
+
+                missionReengagementEstimateForegroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
+                mapView.addAnnotation(missionReengagementEstimateForegroundAnnotation!)
+
+                if !missionCentered {
+                    visibleCoordinates.append(contentsOf: reengagementEstimateCoordinates)
+                }
             }
         }
-        
-        if let segments = missionExecutor?.reengagementCoordinates {
-            let reengagementCoordinates = segments.flatMap { $0.map({ $0.coordinate }) }
-            if (reengagementCoordinates.count > 0) {
-                missionReengagementBackgroundAnnotation = MGLPolyline(coordinates: reengagementCoordinates, count: UInt(reengagementCoordinates.count))
-                mapView.addAnnotation(missionReengagementBackgroundAnnotation!)
-                
-                missionReengagementForegroundAnnotation = MGLPolyline(coordinates: reengagementCoordinates, count: UInt(reengagementCoordinates.count))
-                mapView.addAnnotation(missionReengagementForegroundAnnotation!)
-                
-                visibleCoordinates.append(contentsOf: reengagementCoordinates)
-            }
-        }
-        
+
         if (visibleCoordinates.count > 0) {
+            missionCentered = true
             mapView.setVisibleCoordinates(
                 visibleCoordinates,
                 count: UInt(visibleCoordinates.count),
@@ -168,15 +170,21 @@ extension MapViewController: DronelinkDelegate {
     public func onMissionLoaded(executor: MissionExecutor) {
         DispatchQueue.main.async {
             self.missionExecutor = executor
+            self.missionCentered = false
             executor.add(delegate: self)
-            self.updateMissionEstimate()
+            self.updateMissionRequiredTakeoffArea()
+            if executor.estimated {
+                self.updateMissionEstimate()
+            }
         }
     }
     
     public func onMissionUnloaded(executor: MissionExecutor) {
         DispatchQueue.main.async {
             self.missionExecutor = nil
+            self.missionCentered = false
             executor.remove(delegate: self)
+            self.updateMissionRequiredTakeoffArea()
             self.updateMissionEstimate()
         }
     }
@@ -199,11 +207,15 @@ extension MapViewController: DroneSessionManagerDelegate {
 }
 
 extension MapViewController: MissionExecutorDelegate {
-    public func onMissionEstimated(executor: MissionExecutor, duration: TimeInterval) {
+    public func onMissionEstimating(executor: MissionExecutor) {}
+    
+    public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
         DispatchQueue.main.async {
             self.updateMissionEstimate()
         }
     }
+    
+    public func onMissionEngaging(executor: MissionExecutor) {}
     
     public func onMissionEngaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {}
     
@@ -242,11 +254,11 @@ extension MapViewController: MGLMapViewDelegate {
     }
 
     public func mapView(_ mapView: MGLMapView, lineWidthForPolylineAnnotation annotation: MGLPolyline) -> CGFloat {
-        if (annotation === missionPathBackgroundAnnotation || annotation === missionReengagementBackgroundAnnotation) {
+        if (annotation === missionEstimateBackgroundAnnotation || annotation === missionReengagementEstimateBackgroundAnnotation) {
             return 6
         }
 
-        if (annotation === missionPathForegroundAnnotation || annotation === missionReengagementForegroundAnnotation) {
+        if (annotation === missionEstimateForegroundAnnotation || annotation === missionReengagementEstimateForegroundAnnotation) {
             return 2.5
         }
 
@@ -254,23 +266,23 @@ extension MapViewController: MGLMapViewDelegate {
     }
 
     public func mapView(_ mapView: MGLMapView, strokeColorForShapeAnnotation annotation: MGLShape) -> UIColor {
-        if (annotation === missionTakeoffAreaAnnotation) {
+        if (annotation === missionRequiredTakeoffAreaAnnotation) {
             return MDCPalette.orange.accent200!
         }
 
-        if (annotation === missionPathBackgroundAnnotation) {
+        if (annotation === missionEstimateBackgroundAnnotation) {
             return MDCPalette.lightBlue.tint800
         }
 
-        if (annotation === missionPathForegroundAnnotation) {
+        if (annotation === missionEstimateForegroundAnnotation) {
             return MDCPalette.cyan.accent400!
         }
 
-        if (annotation === missionReengagementBackgroundAnnotation) {
+        if (annotation === missionReengagementEstimateBackgroundAnnotation) {
             return MDCPalette.purple.tint800
         }
 
-        if (annotation === missionReengagementForegroundAnnotation) {
+        if (annotation === missionReengagementEstimateForegroundAnnotation) {
             return MDCPalette.purple.accent200!
         }
 
@@ -278,7 +290,7 @@ extension MapViewController: MGLMapViewDelegate {
     }
 
     public func mapView(_ mapView: MGLMapView, fillColorForPolygonAnnotation annotation: MGLPolygon) -> UIColor {
-        if (annotation === missionTakeoffAreaAnnotation) {
+        if (annotation === missionRequiredTakeoffAreaAnnotation) {
             return MDCPalette.orange.accent400!
         }
 
@@ -286,7 +298,7 @@ extension MapViewController: MGLMapViewDelegate {
     }
 
     public func mapView(_ mapView: MGLMapView, alphaForShapeAnnotation annotation: MGLShape) -> CGFloat {
-        if (annotation === missionTakeoffAreaAnnotation) {
+        if (annotation === missionRequiredTakeoffAreaAnnotation) {
             return 0.75
         }
 

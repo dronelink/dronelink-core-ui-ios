@@ -165,15 +165,15 @@ public class TelemetryViewController: UIViewController {
 
 extension TelemetryViewController: DroneSessionManagerDelegate {
     public func onOpened(session: DroneSession) {
+        self.session = session
         DispatchQueue.main.async {
-            self.session = session
             self.view.setNeedsUpdateConstraints()
         }
     }
     
     public func onClosed(session: DroneSession) {
+        self.session = nil
         DispatchQueue.main.async {
-            self.session = nil
             self.view.setNeedsUpdateConstraints()
         }
     }

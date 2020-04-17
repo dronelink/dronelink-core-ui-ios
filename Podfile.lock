@@ -1,8 +1,13 @@
 PODS:
-  - DronelinkCore (1.3.0)
+  - DronelinkCore (1.4.0)
   - Mapbox-iOS-SDK (5.7.0):
     - MapboxMobileEvents (= 0.10.2)
   - MapboxMobileEvents (0.10.2)
+  - MaterialComponents/ActivityIndicator (107.4.0):
+    - MaterialComponents/Palettes
+    - MaterialComponents/private/Application
+    - MDFInternationalization
+    - MotionAnimator (~> 2.0)
   - MaterialComponents/AnimationTiming (107.4.0)
   - MaterialComponents/Availability (107.4.0)
   - MaterialComponents/Buttons (107.4.0):
@@ -139,11 +144,15 @@ PODS:
     - MaterialComponents/private/Math
   - MDFInternationalization (2.0.0)
   - MDFTextAccessibility (2.0.0)
+  - MotionAnimator (2.8.1):
+    - MotionInterchange (~> 1.6)
+  - MotionInterchange (1.6.0)
   - SnapKit (5.0.1)
 
 DEPENDENCIES:
-  - DronelinkCore (~> 1.3.0)
+  - DronelinkCore (~> 1.4.0)
   - Mapbox-iOS-SDK (~> 5.7.0)
+  - MaterialComponents/ActivityIndicator (~> 107.4.0)
   - MaterialComponents/Buttons (~> 107.4.0)
   - "MaterialComponents/Buttons+Theming (~> 107.4.0)"
   - MaterialComponents/Dialogs (~> 107.4.0)
@@ -162,17 +171,21 @@ SPEC REPOS:
     - MaterialComponents
     - MDFInternationalization
     - MDFTextAccessibility
+    - MotionAnimator
+    - MotionInterchange
     - SnapKit
 
 SPEC CHECKSUMS:
-  DronelinkCore: ebe28a8caee706b112214dd39647d4e100a478c7
+  DronelinkCore: 01c112b4e9af09a14c5e56ece0ee045f5a8f6759
   Mapbox-iOS-SDK: 1b7cb0e739247d20ef75f5f14aa6ce34e1f0660f
   MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
   MaterialComponents: 52e2ade4684e3017eff7f62587b37522d217ea50
   MDFInternationalization: 010097556d6b09d2c4ea38e0820ea6d37be6a314
   MDFTextAccessibility: 85c09a1bd9c321f494348e632a25063bcda35a53
+  MotionAnimator: ee16aa30567c5bae0fb2750c132915829cfaaf8a
+  MotionInterchange: ead0e3ae1f3a5fb539e289debbc7ae036160a10d
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
 
-PODFILE CHECKSUM: 9e97e7952a3cf625d6ac4a542300dac7a32dfe65
+PODFILE CHECKSUM: e4713babdbe687ed176adad0c4014112edc303bb
 
 COCOAPODS: 1.9.1

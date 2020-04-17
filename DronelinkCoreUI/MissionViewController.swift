@@ -7,11 +7,13 @@
 //
 import DronelinkCore
 import Foundation
+import CoreLocation
 import UIKit
 import SnapKit
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
+import MaterialComponents.MDCActivityIndicator
 
 public protocol MissionViewControllerDelegate {
     func onExpandToggle()
@@ -29,29 +31,36 @@ public class MissionViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
-    private var engaging = false
+    
     private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    private let activityIndicator = MDCActivityIndicator()
     private let primaryButton = MDCFloatingButton()
     private let expandToggleButton = UIButton()
     private let countdownProgressView = MDCProgressView()
     private let titleLabel = UILabel()
-    private let timeElapsedLabel = UILabel()
+    private let subtitleLabel = UILabel()
+    private let executionDurationLabel = UILabel()
     private let timeRemainingLabel = UILabel()
     private let progressView = MDCProgressView()
     private let messagesTextView = UITextView()
     private let dismissButton = UIButton(type: .custom)
-    private var countdownTimer: Timer?
-    private var countdownRemaining = 0
-    private var countdownMax = 60
-    private let updateInterval: TimeInterval = 0.5
-    private var lastUpdated = Date()
-    private let primaryEngagedColor = MDCPalette.pink.accent400
-    private let primaryDisengagedColor = MDCPalette.deepPurple.tint800
+    
+    private let primaryEngagedColor = DronelinkUI.Constants.secondaryColor
+    private let primaryDisengagedColor = DronelinkUI.Constants.primaryColor
     private let progressEngagedColor = MDCPalette.pink.accent400
     private let progressDisengagedColor = MDCPalette.deepPurple.accent200
     private let cancelImage = DronelinkUI.loadImage(named: "baseline_close_white_36pt")
     private let engageImage = DronelinkUI.loadImage(named: "baseline_play_arrow_white_36pt")
     private let disengageImage = DronelinkUI.loadImage(named: "baseline_pause_white_36pt")
+    
+    private var previousEstimateContext: (coordinate: CLLocationCoordinate2D, altitude: Double)?
+    private var engageOnMissionEstimated = false
+    private var countdownTimer: Timer?
+    private var countdownRemaining = 0
+    private var countdownMax = 60
+    private let updateInterval: TimeInterval = 0.5
+    private var lastUpdated = Date()
+    private var expanded = false
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,25 +77,38 @@ public class MissionViewController: UIViewController {
         countdownProgressView.trackTintColor = UIColor.white.withAlphaComponent(0.75)
         countdownProgressView.isHidden = true
         view.addSubview(countdownProgressView)
+
+        activityIndicator.radius = 20
+        activityIndicator.strokeWidth = 5
+        activityIndicator.cycleColors = [progressEngagedColor!]
+        view.addSubview(activityIndicator)
         
         primaryButton.tintColor = UIColor.white
         primaryButton.addTarget(self, action: #selector(onPrimary(sender:)), for: .touchUpInside)
         view.addSubview(primaryButton)
         
         titleLabel.font = UIFont.boldSystemFont(ofSize: 17)
+        titleLabel.minimumScaleFactor = 0.5
+        titleLabel.adjustsFontSizeToFitWidth = true
         titleLabel.textColor = UIColor.white
         view.addSubview(titleLabel)
         
-        timeElapsedLabel.font = timeElapsedLabel.font.withSize(15)
-        timeElapsedLabel.textColor = titleLabel.textColor
-        timeElapsedLabel.minimumScaleFactor = 0.5
-        timeElapsedLabel.adjustsFontSizeToFitWidth = true
-        view.addSubview(timeElapsedLabel)
+        subtitleLabel.font = UIFont.systemFont(ofSize: 14)
+        subtitleLabel.minimumScaleFactor = 0.5
+        subtitleLabel.adjustsFontSizeToFitWidth = true
+        subtitleLabel.textColor = UIColor.white
+        view.addSubview(subtitleLabel)
+        
+        executionDurationLabel.font = executionDurationLabel.font.withSize(15)
+        executionDurationLabel.textColor = titleLabel.textColor
+        executionDurationLabel.minimumScaleFactor = 0.5
+        executionDurationLabel.adjustsFontSizeToFitWidth = true
+        view.addSubview(executionDurationLabel)
         
         timeRemainingLabel.textAlignment = .right
-        timeRemainingLabel.font = timeElapsedLabel.font
-        timeRemainingLabel.textColor = timeElapsedLabel.textColor
-        timeRemainingLabel.text = timeElapsedLabel.text
+        timeRemainingLabel.font = executionDurationLabel.font
+        timeRemainingLabel.textColor = executionDurationLabel.textColor
+        timeRemainingLabel.text = executionDurationLabel.text
         timeRemainingLabel.minimumScaleFactor = 0.5
         timeRemainingLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(timeRemainingLabel)
@@ -108,21 +130,19 @@ public class MissionViewController: UIViewController {
         dismissButton.setImage(DronelinkUI.loadImage(named: "baseline_close_white_36pt"), for: .normal)
         dismissButton.addTarget(self, action: #selector(onDismiss), for: .touchUpInside)
         view.addSubview(dismissButton)
-        
-        update()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Dronelink.shared.add(delegate: self)
         droneSessionManager.add(delegate: self)
+        Dronelink.shared.add(delegate: self)
         update()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        Dronelink.shared.remove(delegate: self)
         droneSessionManager.remove(delegate: self)
+        Dronelink.shared.remove(delegate: self)
         missionExecutor?.remove(delegate: self)
     }
     
@@ -136,12 +156,15 @@ public class MissionViewController: UIViewController {
             make.edges.equalToSuperview()
         }
         
-        primaryButton.isEnabled = session != nil
         primaryButton.snp.remakeConstraints { make in
             make.height.equalTo(60)
             make.width.equalTo(primaryButton.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
             make.left.equalToSuperview().offset(15)
+        }
+        
+        activityIndicator.snp.remakeConstraints { make in
+            make.edges.equalTo(primaryButton)
         }
         
         countdownProgressView.snp.remakeConstraints { make in
@@ -155,7 +178,7 @@ public class MissionViewController: UIViewController {
             make.top.equalToSuperview()
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
-            make.bottom.equalTo(timeElapsedLabel.snp.bottom)
+            make.bottom.equalTo(executionDurationLabel.snp.bottom)
         }
         
         titleLabel.snp.remakeConstraints { make in
@@ -165,25 +188,32 @@ public class MissionViewController: UIViewController {
             make.top.equalTo(primaryButton.snp.top)
         }
         
-        timeElapsedLabel.snp.remakeConstraints { make in
+        subtitleLabel.snp.remakeConstraints { make in
             make.height.equalTo(labelHeight)
-            make.width.equalTo(timeElapsedLabel.snp.height).multipliedBy(1.75)
+            make.left.equalTo(titleLabel.snp.left)
+            make.right.equalTo(titleLabel.snp.right)
+            make.top.equalTo(titleLabel.snp.bottom)
+        }
+        
+        executionDurationLabel.snp.remakeConstraints { make in
+            make.height.equalTo(labelHeight)
+            make.width.equalTo(executionDurationLabel.snp.height).multipliedBy(1.75)
             make.left.equalTo(titleLabel.snp.left)
             make.top.equalTo(titleLabel.snp.bottom)
         }
         
         timeRemainingLabel.snp.remakeConstraints { make in
-            make.height.equalTo(timeElapsedLabel.snp.height)
-            make.width.equalTo(timeElapsedLabel.snp.width)
+            make.height.equalTo(executionDurationLabel.snp.height)
+            make.width.equalTo(executionDurationLabel.snp.width)
             make.right.equalToSuperview().offset(-15)
-            make.top.equalTo(timeElapsedLabel.snp.top)
+            make.top.equalTo(executionDurationLabel.snp.top)
         }
         
         progressView.snp.remakeConstraints { make in
-            make.left.equalTo(timeElapsedLabel.snp.right)
+            make.left.equalTo(executionDurationLabel.snp.right)
             make.right.equalTo(timeRemainingLabel.snp.left)
             make.height.equalTo(4)
-            make.centerY.equalTo(timeElapsedLabel.snp.centerY)
+            make.centerY.equalTo(executionDurationLabel.snp.centerY)
         }
         
         messagesTextView.snp.remakeConstraints { make in
@@ -209,64 +239,62 @@ public class MissionViewController: UIViewController {
     @objc func onPrimary(sender: Any) {
         guard let missionExecutor = missionExecutor else { return }
         
-        if (engaging || missionExecutor.engaged) {
-            missionExecutor.disengage(reason: Mission.Message(title: "MissionDisengageReason.user.disengaged".localized))
-            return
-        }
-        
         if countdownTimer != nil {
             stopCountdown()
             return
         }
         
-        if let session = session {
-            if let engageDisallowedReasons = missionExecutor.engageDisallowedReasons(droneSession: session), engageDisallowedReasons.count > 0 {
-                let reason = engageDisallowedReasons.first!
-                DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
-                return
+        if missionExecutor.engaged {
+            missionExecutor.disengage(reason: Mission.Message(title: "MissionDisengageReason.user.disengaged".localized))
+            return
+        }
+
+        guard let session = session else {
+            return
+        }
+        
+        if let engageDisallowedReasons = missionExecutor.engageDisallowedReasons(droneSession: session), engageDisallowedReasons.count > 0 {
+            let reason = engageDisallowedReasons.first!
+            DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
+            return
+        }
+
+        missionExecutor.droneTakeoffAltitudeAlternate = nil
+        if missionExecutor.requiredTakeoffArea == nil,
+            let actualTakeoffLocation = session.state?.value.takeoffLocation,
+            let suggestedTakeoffLocation = missionExecutor.takeoffCoordinate?.location,
+            actualTakeoffLocation.distance(from: suggestedTakeoffLocation) > 50.convertFeetToMeters {
+            if let deviceLocation = Dronelink.shared.locationManager.location, deviceLocation.verticalAccuracy >= 0 {
+                missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
             }
 
-            missionExecutor.droneTakeoffAltitudeAlternate = nil
-            if missionExecutor.requiredTakeoffArea == nil,
-                let actualTakeoffLocation = session.state?.value.takeoffLocation,
-                let suggestedTakeoffLocation = missionExecutor.takeoffCoordinate?.location,
-                actualTakeoffLocation.distance(from: suggestedTakeoffLocation) > 10 {
-                if let deviceLocation = Dronelink.shared.locationManager.location, deviceLocation.verticalAccuracy >= 0 {
-                    missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
-                }
-                
-                let distance = Dronelink.shared.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation))
-                let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : Dronelink.shared.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!)
-                DronelinkUI.shared.showDialog(
-                    title: "MissionViewController.start.takeoffLocationWarning.title".localized,
-                    details: altitude == nil
-                        ? String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable".localized, distance)
-                        : String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.available".localized, distance, altitude!),
-                    actions: [
-                        MDCAlertAction(title: "continue".localized, emphasis: .high, handler: { action in
-                            self.startCountdown()
-                        }),
-                        MDCAlertAction(title: "cancel".localized, emphasis: .low, handler: { action in
-                        })
-                    ])
-                return
-            }
-            
-            DispatchQueue.main.async {
-                self.startCountdown()
-            }
+            let distance = Dronelink.shared.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation))
+            let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : Dronelink.shared.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!)
+            DronelinkUI.shared.showDialog(
+                title: "MissionViewController.start.takeoffLocationWarning.title".localized,
+                details: altitude != nil && missionExecutor.elevationsRequired
+                    ? String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.available".localized, distance, altitude!)
+                    : String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable".localized, distance),
+                actions: [
+                    MDCAlertAction(title: "continue".localized, emphasis: .high, handler: { action in
+                        self.startCountdown()
+                    }),
+                    MDCAlertAction(title: "cancel".localized, emphasis: .low, handler: { action in
+                    })
+                ])
+            return
         }
+
+        startCountdown()
     }
     
     private func startCountdown() {
         countdownRemaining = countdownMax
         Dronelink.shared.announce(message: "\(countdownRemaining / 20)")
-        countdownProgressView.setHidden(false, animated: true)
-        progressView.setHidden(true, animated: true)
         countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
             guard
-                let missionExecutor = self.missionExecutor,
-                let session = self.session
+                let _ = self.missionExecutor,
+                let _ = self.session
             else {
                 self.stopCountdown()
                 return
@@ -274,19 +302,10 @@ public class MissionViewController: UIViewController {
             
             self.countdownRemaining -= 1
             if (self.countdownRemaining == 0) {
-                self.engaging = true
                 self.stopCountdown(aborted: false)
-                do {
-                    try missionExecutor.engage(droneSession: session)
-                }
-                catch MissionExecutorError.droneSerialNumberUnavailable {
-                    DronelinkUI.shared.showDialog(title: "MissionViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "MissionViewController.start.engage.droneSerialNumberUnavailable.message".localized)
-                    self.engaging = false
-                    self.update()
-                }
-                catch {
-                    self.engaging = false
-                    self.update()
+                self.engageOnMissionEstimated = true
+                if !self.estimateMission() {
+                    self.engage()
                 }
             }
             else {
@@ -300,8 +319,6 @@ public class MissionViewController: UIViewController {
     }
     
     private func stopCountdown(aborted: Bool = true) {
-        countdownProgressView.setHidden(true, animated: true)
-        progressView.setHidden(false, animated: true)
         countdownTimer?.invalidate()
         countdownTimer = nil
         update()
@@ -310,7 +327,36 @@ public class MissionViewController: UIViewController {
         }
     }
     
+    private func engage() {
+        engageOnMissionEstimated = false
+        DispatchQueue.main.async {
+            guard
+                let missionExecutor = self.missionExecutor,
+                let session = self.session
+            else {
+                return
+            }
+
+            do {
+                try missionExecutor.engage(droneSession: session) { disallowed in
+                    DronelinkUI.shared.showDialog(title: disallowed.title, details: disallowed.details)
+                    DispatchQueue.main.async {
+                        self.update()
+                    }
+                }
+            }
+            catch DronelinkError.droneSerialNumberUnavailable {
+                DronelinkUI.shared.showDialog(title: "MissionViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "MissionViewController.start.engage.droneSerialNumberUnavailable.message".localized)
+                self.update()
+            }
+            catch {
+                self.update()
+            }
+        }
+    }
+    
     @objc func onExpandToggle() {
+        expanded = !expanded
         delegate?.onExpandToggle()
     }
     
@@ -319,40 +365,119 @@ public class MissionViewController: UIViewController {
     }
     
     func update() {
-        timeElapsedLabel.isHidden = countdownTimer != nil
-        timeRemainingLabel.isHidden = timeElapsedLabel.isHidden
-        
-        if countdownTimer != nil {
-            titleLabel.text = String(format: "MissionViewController.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
-            timeElapsedLabel.text = NumberFormatter.localizedString(from: countdownRemaining as NSNumber, number: .decimal)
-            timeRemainingLabel.text = nil
-            let progress = Float(countdownMax - countdownRemaining) / Float(countdownMax)
-            countdownProgressView.setProgress(progress, animated: true)
-            countdownProgressView.progressTintColor = progressDisengagedColor?.interpolate(progressEngagedColor, percent: CGFloat(progress))
-            messagesTextView.text = nil
-            primaryButton.setBackgroundColor(primaryDisengagedColor.interpolate(primaryEngagedColor, percent: CGFloat(progress)))
-            primaryButton.setImage(cancelImage, for: .normal)
-            dismissButton.isHidden = true
+        guard let missionExecutor = missionExecutor else {
             return
         }
+
+        titleLabel.text = missionExecutor.descriptors.display
+
+        if missionExecutor.estimating {
+            activityIndicator.isHidden = false
+            primaryButton.isHidden = true
+            subtitleLabel.isHidden = false
+            executionDurationLabel.isHidden = true
+            timeRemainingLabel.isHidden = true
+            progressView.isHidden = true
+            countdownProgressView.isHidden = true
+            dismissButton.isHidden = false
+            messagesTextView.isHidden = true
+
+            activityIndicator.startAnimating()
+            subtitleLabel.text = "MissionViewController.estimating".localized
+            return
+        }
+
+        if countdownTimer != nil {
+            activityIndicator.isHidden = true
+            primaryButton.isHidden = false
+            subtitleLabel.isHidden = true
+            executionDurationLabel.isHidden = true
+            timeRemainingLabel.isHidden = true
+            progressView.isHidden = true
+            countdownProgressView.isHidden = false
+            dismissButton.isHidden = false
+            messagesTextView.isHidden = true
+
+            activityIndicator.stopAnimating()
+            let progress = Float(countdownMax - countdownRemaining) / Float(countdownMax)
+            primaryButton.isEnabled = true
+            primaryButton.setBackgroundColor(primaryDisengagedColor.interpolate(primaryEngagedColor, percent: CGFloat(progress)))
+            primaryButton.setImage(cancelImage, for: .normal)
+            titleLabel.text = String(format: "MissionViewController.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
+            countdownProgressView.setProgress(progress, animated: true)
+            countdownProgressView.progressTintColor = progressDisengagedColor?.interpolate(progressEngagedColor, percent: CGFloat(progress))
+            return
+        }
+
+        if missionExecutor.engaging {
+            activityIndicator.isHidden = false
+            activityIndicator.startAnimating()
+            primaryButton.isHidden = true
+            subtitleLabel.isHidden = false
+            executionDurationLabel.isHidden = true
+            timeRemainingLabel.isHidden = true
+            progressView.isHidden = true
+            countdownProgressView.isHidden = true
+            dismissButton.isHidden = true
+            messagesTextView.isHidden = true
+
+            subtitleLabel.text = "MissionViewController.start.engaging".localized
+            return
+        }
+
+        activityIndicator.isHidden = true
+        primaryButton.isHidden = false
+        subtitleLabel.isHidden = true
+        executionDurationLabel.isHidden = false
+        timeRemainingLabel.isHidden = false
+        progressView.isHidden = false
+        countdownProgressView.isHidden = true
+        dismissButton.isHidden = missionExecutor.engaged
+        messagesTextView.isHidden = false
+
+        activityIndicator.stopAnimating()
+        primaryButton.isEnabled = session != nil
+        var estimateTime = 0.0
+        var executionDuration = 0.0
+        if let estimate = missionExecutor.estimate {
+            estimateTime = estimate.time
+            executionDuration = missionExecutor.executionDuration
+        }
+        let timeRemaining = max(estimateTime - executionDuration, 0)
+        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "MissionViewController.executionDuration.empty".localized)
+        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "MissionViewController.executionDuration.empty".localized)
+        progressView.setProgress(Float(min(estimateTime == 0 ? 0 : executionDuration / estimateTime, 1)), animated: true)
+
+        if missionExecutor.engaged {
+            progressView.progressTintColor = progressEngagedColor
+            messagesTextView.text = expanded ? missionExecutor.executingMessageGroups.map({ $0.display }).joined(separator: "\n\n") : nil
+            primaryButton.setBackgroundColor(primaryEngagedColor)
+            primaryButton.setImage(disengageImage, for: .normal)
+        }
+        else {
+            progressView.progressTintColor = progressDisengagedColor
+            messagesTextView.text = nil
+            primaryButton.setBackgroundColor(primaryDisengagedColor)
+            primaryButton.setImage(engageImage, for: .normal)
+        }
+    }
+    
+    @discardableResult
+    func estimateMission() -> Bool {
+        guard let missionExecutor = missionExecutor, !missionExecutor.estimating else {
+            return false
+        }
         
-        let engaged = engaging || missionExecutor?.engaged ?? false
-        let totalTime = missionExecutor?.estimateTotalTime() ?? 0
-        let timeElapsed = missionExecutor?.componentExecutionDuration() ?? 0
-        let timeRemaining = max(totalTime - timeElapsed, 0)
-        timeElapsedLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeElapsed, defaultValue: "MissionViewController.timeElapsed.empty".localized)
-        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "MissionViewController.timeElapsed.empty".localized)
-        progressView.setProgress(Float(min(totalTime == 0 ? 0 : timeElapsed / totalTime, 1)), animated: true)
-        progressView.progressTintColor = engaged ? progressEngagedColor: progressDisengagedColor
-        messagesTextView.text = missionExecutor?.engaged ?? false ? missionExecutor?.executingMessageGroups.map({
-            return $0.display
-        }).joined(separator: "\n\n") : nil
+        let estimateContext = (coordinate: session?.state?.value.location?.coordinate ?? CLLocationCoordinate2D(), altitude: session?.state?.value.altitude ?? 0)
+        if let previousEstimateContext = previousEstimateContext {
+            if previousEstimateContext.coordinate.distance(to: estimateContext.coordinate) < 1 && abs(previousEstimateContext.altitude - estimateContext.altitude) < 1 {
+                return false
+            }
+        }
         
-        primaryButton.setBackgroundColor(engaged ? primaryEngagedColor : primaryDisengagedColor)
-        primaryButton.setImage(engaged ? disengageImage : engageImage, for: .normal)
-        dismissButton.isHidden = engaged
-        countdownProgressView.progress = 0
-        titleLabel.text = engaging ? "MissionViewController.start.engaging".localized : missionExecutor?.missionDescriptors.display
+        previousEstimateContext = estimateContext
+        missionExecutor.estimate(droneSession: self.session)
+        return true
     }
 }
 
@@ -361,52 +486,87 @@ extension MissionViewController: DronelinkDelegate {
     
     public func onMissionLoaded(executor: MissionExecutor) {
         missionExecutor = executor
+        previousEstimateContext = nil
         executor.add(delegate: self)
+        estimateMission()
+        
         DispatchQueue.main.async {
             self.view.setNeedsUpdateConstraints()
+            self.update()
         }
     }
     
     public func onMissionUnloaded(executor: MissionExecutor) {
         missionExecutor = nil
+        previousEstimateContext = nil
         executor.remove(delegate: self)
         DispatchQueue.main.async {
             self.view.setNeedsUpdateConstraints()
+            self.update()
         }
     }
     
-    public func onFuncLoaded(executor: FuncExecutor) {
-    }
+    public func onFuncLoaded(executor: FuncExecutor) {}
     
-    public func onFuncUnloaded(executor: FuncExecutor) {
-    }
+    public func onFuncUnloaded(executor: FuncExecutor) {}
 }
 
 extension MissionViewController: DroneSessionManagerDelegate {
     public func onOpened(session: DroneSession) {
         self.session = session
+        session.add(delegate: self)
         DispatchQueue.main.async {
             self.view.setNeedsUpdateConstraints()
-        }
-        
-        if let missionExecutor = missionExecutor {
-            //delay to give the aircraft time to report location
-            DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
-                missionExecutor.estimate(droneSession: session)
-            }
+            self.update()
         }
     }
     
     public func onClosed(session: DroneSession) {
         self.session = nil
+        session.remove(delegate: self)
         DispatchQueue.main.async {
             self.view.setNeedsUpdateConstraints()
+            self.update()
         }
     }
 }
 
+extension MissionViewController: DroneSessionDelegate {
+    public func onInitialized(session: DroneSession) {}
+    
+    public func onLocated(session: DroneSession) {
+        estimateMission()
+    }
+    
+    public func onMotorsChanged(session: DroneSession, value: Bool) {}
+    
+    public func onCommandExecuted(session: DroneSession, command: MissionCommand) {}
+    
+    public func onCommandFinished(session: DroneSession, command: MissionCommand, error: Error?) {}
+    
+    public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
+}
+
 extension MissionViewController: MissionExecutorDelegate {
-    public func onMissionEstimated(executor: MissionExecutor, duration: TimeInterval) {
+    public func onMissionEstimating(executor: MissionExecutor) {
+        DispatchQueue.main.async {
+            self.update()
+        }
+    }
+    
+    public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+        if self.engageOnMissionEstimated {
+            self.engage()
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.update()
+        }
+    }
+    
+    public func onMissionEngaging(executor: MissionExecutor) {
+        Dronelink.shared.announce(message: "MissionViewController.engaging".localized)
         DispatchQueue.main.async {
             self.update()
         }
@@ -419,7 +579,6 @@ extension MissionViewController: MissionExecutorDelegate {
     }
     
     public func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
-        engaging = false
         if (-lastUpdated.timeIntervalSinceNow >= updateInterval) {
             lastUpdated = Date()
             DispatchQueue.main.async {
@@ -429,17 +588,17 @@ extension MissionViewController: MissionExecutorDelegate {
     }
     
     public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {
-        engaging = false
         if (reason.title != "MissionDisengageReason.user.disengaged".localized) {
             DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
         }
         
-        if let status = executor.status {
-            if status.completed {
-                Dronelink.shared.unloadMission()
-            }
+        if executor.status.completed {
+            Dronelink.shared.unloadMission()
+            Dronelink.shared.announce(message: reason.title)
+            return
         }
-        
+
+        Dronelink.shared.announce(message: "MissionViewController.disengaged".localized)
         DispatchQueue.main.async {
             self.update()
         }

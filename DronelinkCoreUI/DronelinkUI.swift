@@ -10,6 +10,7 @@ import UIKit
 import UserNotifications
 import MaterialComponents.MaterialDialogs
 import MaterialComponents.MaterialSnackbar
+import MaterialComponents.MaterialPalettes
 import DronelinkCore
 
 extension DronelinkUI {
@@ -21,7 +22,9 @@ extension DronelinkUI {
     
     public static let Constants = (
         cornerRadius: CGFloat(10.0),
-        overlayColor: UIColor.black.withAlphaComponent(0.6)
+        overlayColor: UIColor.black.withAlphaComponent(0.6),
+        primaryColor: MDCPalette.deepPurple.tint800,
+        secondaryColor: MDCPalette.pink.accent400
     )
 }
 

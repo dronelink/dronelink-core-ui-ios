@@ -25,16 +25,19 @@
 "FuncViewController.input.none" = "No Input";
 "FuncViewController.input.choose" = "Choose...";
 
-"MissionViewController.timeElapsed.empty" = "--:--";
+"MissionViewController.executionDuration.empty" = "--:--";
+"MissionViewController.estimating" = "Estimating flight path and time...";
 "MissionViewController.start.countdown" = "Starting in %d";
 "MissionViewController.start.countdown" = "Starting in %d";
 "MissionViewController.start.engaging" = "Preparing to execute...";
 "MissionViewController.start.cancelled" = "Countdown Stopped";
 "MissionViewController.start.takeoffLocationWarning.title" = "Confirm Takeoff Location";
-"MissionViewController.start.takeoffLocationWarning.message.device.altitude.available" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust any AGL and MSL altitudes automatically.";
+"MissionViewController.start.takeoffLocationWarning.message.device.altitude.available" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.";
 "MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.";
 "MissionViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
 "MissionViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
+"MissionViewController.engaging" = "Starting Mission";
+"MissionViewController.disengaged" = "Mission Stopped";
 
 "DroneOffsetsViewController.altitudeYaw" = "ALT/YAW";
 "DroneOffsetsViewController.position" = "POSITION";

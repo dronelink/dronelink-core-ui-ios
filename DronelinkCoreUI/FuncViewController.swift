@@ -29,7 +29,7 @@ public class FuncViewController: UIViewController {
     private let titleImageView = UIImageView()
     private let titleLabel = UILabel()
     private let variableNameLabel = UILabel()
-    private let variableDescriptionLabel = UILabel()
+    private let variableDescriptionTextView = UITextView()
     private let variableSegmentedControl = UISegmentedControl()
     private let variableTextField = MDCTextField()
     private let variablePickerView = UIPickerView()
@@ -93,13 +93,14 @@ public class FuncViewController: UIViewController {
         variableNameLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(variableNameLabel)
         
-        variableDescriptionLabel.font = UIFont.boldSystemFont(ofSize: 12)
-        variableDescriptionLabel.textColor = UIColor.white.withAlphaComponent(0.85)
-        variableDescriptionLabel.numberOfLines = 2
-        variableDescriptionLabel.lineBreakMode = .byTruncatingTail
-        variableDescriptionLabel.minimumScaleFactor = 0.5
-        variableDescriptionLabel.adjustsFontSizeToFitWidth = true
-        view.addSubview(variableDescriptionLabel)
+        
+        variableDescriptionTextView.textContainerInset = .zero
+        variableDescriptionTextView.backgroundColor = UIColor.clear
+        variableDescriptionTextView.font = UIFont.boldSystemFont(ofSize: 12)
+        variableDescriptionTextView.textColor = UIColor.white.withAlphaComponent(0.85)
+        variableDescriptionTextView.isScrollEnabled = true
+        variableDescriptionTextView.isEditable = false
+        view.addSubview(variableDescriptionTextView)
         
         variableSegmentedControl.tintColor = primaryColor
         view.addSubview(variableSegmentedControl)
@@ -227,7 +228,7 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(25)
         }
         
-        variableDescriptionLabel.snp.remakeConstraints { make in
+        variableDescriptionTextView.snp.remakeConstraints { make in
             make.left.equalTo(variableNameLabel.snp.left)
             make.right.equalToSuperview().offset(-defaultPadding)
             if intro {
@@ -236,9 +237,10 @@ public class FuncViewController: UIViewController {
             else {
                 make.top.equalTo(variableNameLabel.snp.bottom).offset(4)
             }
+            make.height.equalTo(28)
         }
         
-        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionLabel
+        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
         
         variableSegmentedControl.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
@@ -283,8 +285,8 @@ public class FuncViewController: UIViewController {
         }
         
         variableSummaryTextView.snp.remakeConstraints { make in
-            make.left.equalTo(variableDescriptionLabel)
-            make.right.equalTo(variableDescriptionLabel)
+            make.left.equalTo(variableDescriptionTextView)
+            make.right.equalTo(variableDescriptionTextView)
             make.top.equalTo(variableNameLabel.snp.bottom).offset(defaultPadding)
             make.bottom.equalTo(backButton.snp.top).offset(-defaultPadding)
         }
@@ -570,7 +572,7 @@ public class FuncViewController: UIViewController {
         titleImageView.isHidden = true
         titleLabel.isHidden = true
         variableNameLabel.isHidden = true
-        variableDescriptionLabel.isHidden = true
+        variableDescriptionTextView.isHidden = true
         variableSegmentedControl.isHidden = true
         variableTextField.isHidden = true
         variablePickerView.isHidden = true
@@ -582,7 +584,7 @@ public class FuncViewController: UIViewController {
         if intro {
             titleImageView.isHidden = false
             titleLabel.isHidden = false
-            variableDescriptionLabel.isHidden = false
+            variableDescriptionTextView.isHidden = false
             backButton.isHidden = true
             nextButton.isHidden = true
             progressLabel.isHidden = true
@@ -590,7 +592,7 @@ public class FuncViewController: UIViewController {
 
             titleLabel.text = funcExecutor.descriptors.name
             primaryButton.setTitle((executing ? "FuncViewController.primary.executing" : hasInputs ? "FuncViewController.primary.intro" : "FuncViewController.primary.execute").localized, for: .normal)
-            variableDescriptionLabel.text = funcExecutor.descriptors.description
+            variableDescriptionTextView.text = funcExecutor.descriptors.description
             return
         }
 
@@ -600,7 +602,7 @@ public class FuncViewController: UIViewController {
         nextButton.isHidden = false
         nextButton.setTitle((last ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
         progressLabel.isHidden = last
-        progressLabel.text = "\(inputIndex + 1) / \(funcExecutor.inputCount)"
+        progressLabel.text = inputIndex + 1 == funcExecutor.inputCount ? "\(inputIndex + 1)" : "\(inputIndex + 1) / \(funcExecutor.inputCount)"
         
         if let input = input {
             variableNameLabel.isHidden = false
@@ -615,8 +617,8 @@ public class FuncViewController: UIViewController {
             variableNameLabel.text = name
             
             if !(input.descriptors.description?.isEmpty ?? true) {
-                variableDescriptionLabel.isHidden = false
-                variableDescriptionLabel.text = input.descriptors.description
+                variableDescriptionTextView.isHidden = false
+                variableDescriptionTextView.text = input.descriptors.description
             }
 
             switch input.variable.valueType {
@@ -706,6 +708,7 @@ extension FuncViewController: DronelinkDelegate {
             self.inputIndex = 0
             if !self.hasInputs {
                 executor.addNextDynamicInput(droneSession: self.session) { error in
+                    Dronelink.shared.unloadFunc()
                      DispatchQueue.main.async {
                          DronelinkUI.shared.showSnackbar(text: error)
                     }

@@ -422,22 +422,22 @@ public class DroneOffsetsViewController: UIViewController {
         downButton.isEnabled = upButton.isEnabled
         leftButton.isEnabled = upButton.isEnabled
         rightButton.isEnabled = upButton.isEnabled
-        
+
         switch style {
         case .altYaw:
             var details: [String] = []
             if offsets.droneYaw != 0 {
                 details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw, extraParams: [false]))
             }
-            
+
             if offsets.droneAltitude != 0 {
                 details.append(Dronelink.shared.format(formatter: "altitude", value: offsets.droneAltitude))
             }
-            
+
             moreButton.isHidden = session == nil
             clearButton.isHidden = details.count == 0
             detailsLabel.text = details.joined(separator: " / ")
-            
+
             if let session = session,
                 let reference = offsets.droneAltitudeReference,
                 let current = session.state?.value.altitude {
@@ -446,16 +446,16 @@ public class DroneOffsetsViewController: UIViewController {
             else {
                 cLabel.text = nil
             }
-            
+
             c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
             c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
             break
-        
+
         case .position:
             moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
             clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
             detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
-            
+
             if let session = session,
                 let reference = offsets.droneCoordinateReference,
                 let current = session.state?.value.location?.coordinate {
@@ -466,7 +466,7 @@ public class DroneOffsetsViewController: UIViewController {
             else {
                 cLabel.text = nil
             }
-            
+
             c1Button.isEnabled = session?.state?.value.location != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
             c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
             break

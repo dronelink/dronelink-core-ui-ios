@@ -46,8 +46,8 @@ public class CameraOffsetsViewController: UIViewController {
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         
-        configureButton(button: c1Button, image: "baseline_add_white_24pt", action: #selector(onC1(sender:)))
-        configureButton(button: c2Button, image: "baseline_remove_white_24pt", action: #selector(onC2(sender:)))
+        configureButton(button: c1Button, image: "baseline_remove_white_24pt", action: #selector(onC1(sender:)))
+        configureButton(button: c2Button, image: "baseline_add_white_24pt", action: #selector(onC2(sender:)))
         
         cLabel.textAlignment = .center
         cLabel.font = UIFont.boldSystemFont(ofSize: 14)
@@ -145,7 +145,7 @@ public class CameraOffsetsViewController: UIViewController {
     
     @objc func update() {
         let exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
-        c1Button.tintColor = exposureCommand == nil ? UIColor.white : MDCPalette.pink.accent400
+        c1Button.tintColor = exposureCommand == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
         c1Button.isEnabled = exposureCompensation != nil
         c2Button.tintColor = c1Button.tintColor
         c2Button.isEnabled = c1Button.isEnabled
