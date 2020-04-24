@@ -16,7 +16,7 @@ import MaterialComponents.MaterialProgressView
 import MaterialComponents.MDCActivityIndicator
 
 public protocol MissionViewControllerDelegate {
-    func onExpandToggle()
+    func onMissionExpandToggle()
 }
 
 public class MissionViewController: UIViewController {
@@ -357,7 +357,7 @@ public class MissionViewController: UIViewController {
     
     @objc func onExpandToggle() {
         expanded = !expanded
-        delegate?.onExpandToggle()
+        delegate?.onMissionExpandToggle()
     }
     
     @objc func onDismiss() {
@@ -476,7 +476,7 @@ public class MissionViewController: UIViewController {
         }
         
         previousEstimateContext = estimateContext
-        missionExecutor.estimate(droneSession: self.session)
+        missionExecutor.estimate(droneSession: self.session, altitudeRequired: true, timeRequired: true)
         return true
     }
 }

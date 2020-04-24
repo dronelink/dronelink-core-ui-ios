@@ -15,8 +15,8 @@ import DronelinkCore
 
 extension DronelinkUI {
     public static let shared = DronelinkUI()
-    internal static let bundle = Bundle.init(for: DronelinkUI.self)
-    internal static func loadImage(named: String, renderingMode: UIImage.RenderingMode = .alwaysTemplate) -> UIImage? {
+    public static let bundle = Bundle.init(for: DronelinkUI.self)
+    public static func loadImage(named: String, renderingMode: UIImage.RenderingMode = .alwaysTemplate) -> UIImage? {
         return UIImage(named: named, in: DronelinkUI.bundle, compatibleWith: nil)?.withRenderingMode(renderingMode)
     }
     

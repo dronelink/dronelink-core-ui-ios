@@ -11,14 +11,21 @@ import UIKit
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
 import MaterialComponents.MaterialTextFields
+import Kingfisher
+
+public protocol FuncViewControllerDelegate {
+    func onFuncExpanded(value: Bool)
+}
 
 public class FuncViewController: UIViewController {
-    public static func create(droneSessionManager: DroneSessionManager) -> FuncViewController {
+    public static func create(droneSessionManager: DroneSessionManager, delegate: FuncViewControllerDelegate? = nil) -> FuncViewController {
         let funcViewController = FuncViewController()
         funcViewController.droneSessionManager = droneSessionManager
+        funcViewController.delegate = delegate
         return funcViewController
     }
     
+    private var delegate: FuncViewControllerDelegate?
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var funcExecutor: FuncExecutor?
@@ -30,6 +37,7 @@ public class FuncViewController: UIViewController {
     private let titleLabel = UILabel()
     private let variableNameLabel = UILabel()
     private let variableDescriptionTextView = UITextView()
+    private let variableImageView = UIImageView()
     private let variableSegmentedControl = UISegmentedControl()
     private let variableTextField = MDCTextField()
     private let variablePickerView = UIPickerView()
@@ -93,7 +101,6 @@ public class FuncViewController: UIViewController {
         variableNameLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(variableNameLabel)
         
-        
         variableDescriptionTextView.textContainerInset = .zero
         variableDescriptionTextView.backgroundColor = UIColor.clear
         variableDescriptionTextView.font = UIFont.boldSystemFont(ofSize: 12)
@@ -101,6 +108,9 @@ public class FuncViewController: UIViewController {
         variableDescriptionTextView.isScrollEnabled = true
         variableDescriptionTextView.isEditable = false
         view.addSubview(variableDescriptionTextView)
+        
+        variableImageView.contentMode = .scaleAspectFit
+        view.addSubview(variableImageView)
         
         variableSegmentedControl.tintColor = primaryColor
         view.addSubview(variableSegmentedControl)
@@ -240,6 +250,13 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(28)
         }
         
+        variableImageView.snp.remakeConstraints { make in
+            make.top.equalTo(backButton.snp.bottom)
+            make.left.equalToSuperview()
+            make.right.equalToSuperview()
+            make.bottom.equalToSuperview()
+        }
+        
         let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
         
         variableSegmentedControl.snp.remakeConstraints { make in
@@ -293,7 +310,7 @@ public class FuncViewController: UIViewController {
         
         backButton.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
-            make.bottom.equalToSuperview().offset(-defaultPadding)
+            make.top.equalTo(variableDroneMarkButton.snp.bottom)
             make.height.equalTo(35)
             make.width.equalTo(85)
         }
@@ -482,6 +499,8 @@ public class FuncViewController: UIViewController {
             update()
             return
         }
+
+        delegate?.onFuncExpanded(value: !(input.imageUrl?.isEmpty ?? true))
         
         if input.variable.valueType == .boolean {
             variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
@@ -573,6 +592,7 @@ public class FuncViewController: UIViewController {
         titleLabel.isHidden = true
         variableNameLabel.isHidden = true
         variableDescriptionTextView.isHidden = true
+        variableImageView.isHidden = true
         variableSegmentedControl.isHidden = true
         variableTextField.isHidden = true
         variablePickerView.isHidden = true
@@ -619,6 +639,11 @@ public class FuncViewController: UIViewController {
             if !(input.descriptors.description?.isEmpty ?? true) {
                 variableDescriptionTextView.isHidden = false
                 variableDescriptionTextView.text = input.descriptors.description
+            }
+            
+            if let imageUrl = input.imageUrl, !imageUrl.isEmpty {
+                variableImageView.kf.setImage(with: URL(string: imageUrl))
+                variableImageView.isHidden = false
             }
 
             switch input.variable.valueType {

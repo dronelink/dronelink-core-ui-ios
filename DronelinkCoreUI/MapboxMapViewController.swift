@@ -1,5 +1,5 @@
 //
-//  MapView.swift
+//  MapboxMapViewController.swift
 //  DronelinkCoreUI
 //
 //  Created by Jim McAndrew on 10/28/19.
@@ -11,9 +11,9 @@ import Mapbox
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 
-public class MapViewController: UIViewController {
-    public static func create(droneSessionManager: DroneSessionManager) -> MapViewController {
-        let mapViewController = MapViewController()
+public class MapboxMapViewController: UIViewController {
+    public static func create(droneSessionManager: DroneSessionManager) -> MapboxMapViewController {
+        let mapViewController = MapboxMapViewController()
         mapViewController.droneSessionManager = droneSessionManager
         return mapViewController
     }
@@ -130,7 +130,7 @@ public class MapViewController: UIViewController {
         }
 
         var visibleCoordinates: [CLLocationCoordinate2D] = []
-        if let estimateCoordinates = missionExecutor?.estimate?.coordinates.map({ $0.coordinate }), estimateCoordinates.count > 0 {
+        if let estimateCoordinates = missionExecutor?.estimate?.spatials.map({ $0.coordinate.coordinate }), estimateCoordinates.count > 0 {
             missionEstimateBackgroundAnnotation = MGLPolyline(coordinates: estimateCoordinates, count: UInt(estimateCoordinates.count))
             mapView.addAnnotation(missionEstimateBackgroundAnnotation!)
 
@@ -141,7 +141,7 @@ public class MapViewController: UIViewController {
                 visibleCoordinates.append(contentsOf: estimateCoordinates)
             }
 
-            if let reengagementEstimateCoordinates = missionExecutor?.estimate?.reengagementCoordinates?.map({ $0.coordinate }), reengagementEstimateCoordinates.count > 0 {
+            if let reengagementEstimateCoordinates = missionExecutor?.estimate?.reengagementSpatials?.map({ $0.coordinate.coordinate }), reengagementEstimateCoordinates.count > 0 {
                 missionReengagementEstimateBackgroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
                 mapView.addAnnotation(missionReengagementEstimateBackgroundAnnotation!)
 
@@ -164,7 +164,7 @@ public class MapViewController: UIViewController {
     }
 }
 
-extension MapViewController: DronelinkDelegate {
+extension MapboxMapViewController: DronelinkDelegate {
     public func onRegistered(error: String?) {}
     
     public func onMissionLoaded(executor: MissionExecutor) {
@@ -196,7 +196,7 @@ extension MapViewController: DronelinkDelegate {
     }
 }
 
-extension MapViewController: DroneSessionManagerDelegate {
+extension MapboxMapViewController: DroneSessionManagerDelegate {
     public func onOpened(session: DroneSession) {
         self.session = session
     }
@@ -206,7 +206,7 @@ extension MapViewController: DroneSessionManagerDelegate {
     }
 }
 
-extension MapViewController: MissionExecutorDelegate {
+extension MapboxMapViewController: MissionExecutorDelegate {
     public func onMissionEstimating(executor: MissionExecutor) {}
     
     public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
@@ -224,7 +224,7 @@ extension MapViewController: MissionExecutorDelegate {
     public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {}
 }
 
-extension MapViewController: MGLMapViewDelegate {
+extension MapboxMapViewController: MGLMapViewDelegate {
     public func mapView(_ mapView: MGLMapView, viewFor annotation: MGLAnnotation) -> MGLAnnotationView? {
         if (annotation === droneHomeAnnotation) {
             var droneHome = mapView.dequeueReusableAnnotationView(withIdentifier: "drone-home")
