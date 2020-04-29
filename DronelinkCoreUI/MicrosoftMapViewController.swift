@@ -13,6 +13,13 @@ import MaterialComponents.MaterialPalettes
 import MicrosoftMaps
 
 public class MicrosoftMapViewController: UIViewController {
+    public enum Tracking {
+        case none
+        case thirdPersonNadir
+        case thirdPersonOblique
+        case firstPerson
+    }
+    
     public static func create(droneSessionManager: DroneSessionManager, credentialsKey: String) -> MicrosoftMapViewController {
         let mapViewController = MicrosoftMapViewController()
         mapViewController.mapView.credentialsKey = credentialsKey
@@ -24,6 +31,7 @@ public class MicrosoftMapViewController: UIViewController {
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
     private let mapView = MSMapView()
+    private let moreButton = UIButton(type: .custom)
     private let droneLayer = MSMapElementLayer()
     private let droneIcon = MSMapIcon()
     private let droneHomeIcon = MSMapIcon()
@@ -37,10 +45,19 @@ public class MicrosoftMapViewController: UIViewController {
     private var updateDroneElementsTimer: Timer?
     private var lastUpdatedDroneElements = Date()
     private var droneTakeoffAltitude: Double?
+    private var tracking = Tracking.none
+    private var trackingPrevious = Tracking.none
     
     public override func viewDidLoad() {
         mapView.addShadow()
         mapView.clipsToBounds = true
+        mapView.addCameraDidChangeHandler { (reason, camera) -> Bool in
+            if reason == .userInteraction {
+                self.tracking = .none
+                self.trackingPrevious = .none
+            }
+            return true
+        }
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         mapView.setStyleSheet(MSMapStyleSheets.roadDark())
         mapView.projection = MSMapProjection.globe
@@ -54,6 +71,17 @@ public class MicrosoftMapViewController: UIViewController {
         view.addSubview(mapView)
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        moreButton.tintColor = UIColor.white
+        moreButton.setImage(DronelinkUI.loadImage(named: "baseline_layers_white_36pt"), for: .normal)
+        moreButton.addTarget(self, action: #selector(onMore(sender:)), for: .touchUpInside)
+        view.addSubview(moreButton)
+        moreButton.snp.makeConstraints { make in
+            make.right.equalToSuperview().offset(-10)
+            make.top.equalToSuperview().offset(10)
+            make.width.equalTo(30)
+            make.height.equalTo(30)
         }
         
         updateScene(elements: .user, animation: .none)
@@ -93,6 +121,43 @@ public class MicrosoftMapViewController: UIViewController {
         Dronelink.shared.remove(delegate: self)
         session?.remove(delegate: self)
         missionExecutor?.remove(delegate: self)
+    }
+    
+    @objc func onMore(sender: Any) {
+        let alert = UIAlertController(title: "MicrosoftMapViewController.more".localized, message: nil, preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender as? UIView
+        
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.reset".localized, style: .default, handler: { _ in
+            self.tracking = .none
+            self.trackingPrevious = .none
+            self.updateScene()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.follow".localized, style: .default, handler: { _ in
+            self.tracking = .thirdPersonNadir
+        }))
+        
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.chase.plane".localized, style: .default, handler: { _ in
+            self.tracking = .thirdPersonOblique
+        }))
+        
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.fpv".localized, style: .default, handler: { _ in
+            self.tracking = .firstPerson
+        }))
+        
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.satellite".localized, style: .default, handler: { _ in
+            self.mapView.setStyleSheet(MSMapStyleSheets.aerialWithOverlay())
+        }))
+        
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.streets".localized, style: .default, handler: { _ in
+            self.mapView.setStyleSheet(MSMapStyleSheets.roadDark())
+        }))
+
+        alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
+            
+        }))
+
+        present(alert, animated: true)
     }
     
     @objc func updateDroneElements() {
@@ -153,6 +218,46 @@ public class MicrosoftMapViewController: UIViewController {
             
             if droneMissionExecutedPolyline?.path.size ?? 0 != droneMissionExecutedPositions.count {
                 droneMissionExecutedPolyline?.path = MSGeopath(positions: droneMissionExecutedPositions, altitudeReferenceSystem: .geoid)
+            }
+        }
+        
+        if session?.located ?? false, let state = session?.state?.value, let location = state.location {
+            var trackingScene: MSMapScene?
+            switch (tracking) {
+            case .none:
+                break
+                
+            case .thirdPersonNadir:
+                trackingScene = MSMapScene(
+                    location: MSGeopoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude),
+                    radius: max(20, state.altitude))
+                break
+                
+            case .thirdPersonOblique:
+                trackingScene = MSMapScene(camera: MSMapCamera(
+                    location: MSGeopoint(
+                        position: positionAboveDroneTakeoffLocation(
+                            coordinate: location.coordinate.coordinate(bearing: state.missionOrientation.yaw + Double.pi, distance: 10),
+                            altitude: state.altitude + 5),
+                        altitudeReferenceSystem: .geoid),
+                    heading: state.missionOrientation.yaw.convertRadiansToDegrees,
+                    pitch: 75))
+                break
+                
+            case .firstPerson:
+                trackingScene = MSMapScene(
+                    camera: MSMapCamera(
+                        location: MSGeopoint(
+                            position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude),
+                            altitudeReferenceSystem: .geoid),
+                        heading: state.missionOrientation.yaw.convertRadiansToDegrees,
+                        pitch: min((session?.gimbalState(channel: 0)?.value.missionOrientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
+                break
+            }
+            
+            if let trackingScene = trackingScene {
+                mapView.setScene(trackingScene, with: trackingPrevious == tracking ? .linear : .none)
+                trackingPrevious = tracking
             }
         }
     }
@@ -304,7 +409,7 @@ public class MicrosoftMapViewController: UIViewController {
         return position
     }
     
-    private func updateScene(elements: SceneElements = .standard, animation: MSMapAnimationKind = .bow) {
+    private func updateScene(elements: SceneElements = .standard, animation: MSMapAnimationKind = .linear) {
         var positions: [MSGeoposition] = []
         if elements.contains(.user),
             let location = Dronelink.shared.locationManager.location {

@@ -56,3 +56,11 @@
 "TelemetryViewController.unit.horizontalSpeed.imperial" = "mph";
 "TelemetryViewController.unit.verticalSpeed.metric" = "m/s";
 "TelemetryViewController.unit.verticalSpeed.imperial" = "fps";
+
+"MicrosoftMapViewController.more" = "Map Options";
+"MicrosoftMapViewController.reset" = "Reset";
+"MicrosoftMapViewController.follow" = "Follow";
+"MicrosoftMapViewController.chase.plane" = "Chase Plane";
+"MicrosoftMapViewController.fpv" = "FPV";
+"MicrosoftMapViewController.satellite" = "Satellite";
+"MicrosoftMapViewController.streets" = "Streets & Buildings";
