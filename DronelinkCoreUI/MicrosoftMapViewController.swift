@@ -355,7 +355,7 @@ public class MicrosoftMapViewController: UIViewController {
             let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             
             let polyline = MSMapPolyline()
-            polyline.strokeColor = MDCPalette.cyan.accent400!.withAlphaComponent(0.83)
+            polyline.strokeColor = MDCPalette.cyan.accent400!.withAlphaComponent(0.73)
             polyline.strokeWidth = 1
             polyline.path = path
             missionDynamicLayer.elements.add(polyline)
@@ -462,7 +462,10 @@ public class MicrosoftMapViewController: UIViewController {
         
         if positions.count > 0 {
             let boundingBox = MSGeoboundingBox(positions: positions)
-            let radius = boundingBox.northWestCorner.coordinate.distance(to: boundingBox.southEastCorner.coordinate) * 0.5
+            var radius = boundingBox.northWestCorner.coordinate.distance(to: boundingBox.southEastCorner.coordinate) * 0.5
+            if positions.count < 10 && radius < 100 {
+                radius = 100
+            }
             let center = boundingBox.northWestCorner.coordinate.coordinate(
                 bearing: boundingBox.northWestCorner.coordinate.bearing(to: boundingBox.southEastCorner.coordinate),
                 distance: radius)
