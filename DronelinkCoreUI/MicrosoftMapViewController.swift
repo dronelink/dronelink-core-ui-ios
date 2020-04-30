@@ -20,6 +20,11 @@ public class MicrosoftMapViewController: UIViewController {
         case firstPerson
     }
     
+    public enum Style {
+        case streets
+        case satellite
+    }
+    
     public static func create(droneSessionManager: DroneSessionManager, credentialsKey: String) -> MicrosoftMapViewController {
         let mapViewController = MicrosoftMapViewController()
         mapViewController.mapView.credentialsKey = credentialsKey
@@ -31,7 +36,6 @@ public class MicrosoftMapViewController: UIViewController {
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
     private let mapView = MSMapView()
-    private let moreButton = UIButton(type: .custom)
     private let droneLayer = MSMapElementLayer()
     private let droneIcon = MSMapIcon()
     private let droneHomeIcon = MSMapIcon()
@@ -45,6 +49,8 @@ public class MicrosoftMapViewController: UIViewController {
     private var updateDroneElementsTimer: Timer?
     private var lastUpdatedDroneElements = Date()
     private var droneTakeoffAltitude: Double?
+    private var droneTakeoffAltitudeReferenceSystem: MSMapAltitudeReferenceSystem { droneTakeoffAltitude == nil ? .surface : .geoid }
+    private var style = Style.streets
     private var tracking = Tracking.none
     private var trackingPrevious = Tracking.none
     
@@ -59,7 +65,7 @@ public class MicrosoftMapViewController: UIViewController {
             return true
         }
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        mapView.setStyleSheet(MSMapStyleSheets.roadDark())
+        update(style: .streets)
         mapView.projection = MSMapProjection.globe
         mapView.businessLandmarksVisible = false
         mapView.buildingsVisible = true
@@ -71,17 +77,6 @@ public class MicrosoftMapViewController: UIViewController {
         view.addSubview(mapView)
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-        }
-        
-        moreButton.tintColor = UIColor.white
-        moreButton.setImage(DronelinkUI.loadImage(named: "baseline_layers_white_36pt"), for: .normal)
-        moreButton.addTarget(self, action: #selector(onMore(sender:)), for: .touchUpInside)
-        view.addSubview(moreButton)
-        moreButton.snp.makeConstraints { make in
-            make.right.equalToSuperview().offset(-10)
-            make.top.equalToSuperview().offset(10)
-            make.width.equalTo(30)
-            make.height.equalTo(30)
         }
         
         updateScene(elements: .user, animation: .none)
@@ -123,7 +118,7 @@ public class MicrosoftMapViewController: UIViewController {
         missionExecutor?.remove(delegate: self)
     }
     
-    @objc func onMore(sender: Any) {
+    public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
         let alert = UIAlertController(title: "MicrosoftMapViewController.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
         
@@ -133,31 +128,49 @@ public class MicrosoftMapViewController: UIViewController {
             self.updateScene()
         }))
         
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.follow".localized, style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { _ in
             self.tracking = .thirdPersonNadir
         }))
         
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.chase.plane".localized, style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { _ in
             self.tracking = .thirdPersonOblique
         }))
         
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.fpv".localized, style: .default, handler: { _ in
+        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { _ in
             self.tracking = .firstPerson
         }))
         
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.satellite".localized, style: .default, handler: { _ in
-            self.mapView.setStyleSheet(MSMapStyleSheets.aerialWithOverlay())
-        }))
+        if style == .streets {
+            alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.satellite".localized, style: .default, handler: { _ in
+                self.update(style: .satellite)
+            }))
+        }
+        else {
+            alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.streets".localized, style: .default, handler: { _ in
+                self.update(style: .streets)
+            }))
+        }
         
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.streets".localized, style: .default, handler: { _ in
-            self.mapView.setStyleSheet(MSMapStyleSheets.roadDark())
-        }))
+        actions?.forEach { alert.addAction($0) }
 
         alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
             
         }))
 
         present(alert, animated: true)
+    }
+    
+    func update(style: Style) {
+        self.style = style
+        switch (style) {
+        case .streets:
+            mapView.setStyleSheet(MSMapStyleSheets.roadDark())
+            break
+            
+        case .satellite:
+            mapView.setStyleSheet(MSMapStyleSheets.aerialWithOverlay())
+            break
+        }
     }
     
     @objc func updateDroneElements() {
@@ -177,7 +190,7 @@ public class MicrosoftMapViewController: UIViewController {
                 rotation += 360;
             }
             droneIcon.rotation = Float(rotation)
-            droneIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude), altitudeReferenceSystem: .geoid)
+            droneIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             addPositionAboveDroneTakeoffLocation(positions: &droneSessionPositions, coordinate: location.coordinate, altitude: state.altitude)
         }
         
@@ -191,13 +204,13 @@ public class MicrosoftMapViewController: UIViewController {
             if droneSessionPolyline == nil {
                 let droneSessionPolyline = MSMapPolyline()
                 droneSessionPolyline.strokeColor = UIColor.white.withAlphaComponent(0.95)
-                droneSessionPolyline.strokeWidth = 2
+                droneSessionPolyline.strokeWidth = 1
                 droneLayer.elements.add(droneSessionPolyline)
                 self.droneSessionPolyline = droneSessionPolyline
             }
             
             if droneSessionPolyline?.path.size ?? 0 != droneSessionPositions.count {
-                droneSessionPolyline?.path = MSGeopath(positions: droneSessionPositions, altitudeReferenceSystem: .geoid)
+                droneSessionPolyline?.path = MSGeopath(positions: droneSessionPositions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             }
         }
         
@@ -211,13 +224,13 @@ public class MicrosoftMapViewController: UIViewController {
             if droneMissionExecutedPolyline == nil {
                 let droneMissionExecutedPolyline = MSMapPolyline()
                 droneMissionExecutedPolyline.strokeColor = MDCPalette.pink.accent400!
-                droneMissionExecutedPolyline.strokeWidth = 4
+                droneMissionExecutedPolyline.strokeWidth = 2
                 droneLayer.elements.add(droneMissionExecutedPolyline)
                 self.droneMissionExecutedPolyline = droneMissionExecutedPolyline
             }
             
             if droneMissionExecutedPolyline?.path.size ?? 0 != droneMissionExecutedPositions.count {
-                droneMissionExecutedPolyline?.path = MSGeopath(positions: droneMissionExecutedPositions, altitudeReferenceSystem: .geoid)
+                droneMissionExecutedPolyline?.path = MSGeopath(positions: droneMissionExecutedPositions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             }
         }
         
@@ -230,18 +243,18 @@ public class MicrosoftMapViewController: UIViewController {
             case .thirdPersonNadir:
                 trackingScene = MSMapScene(
                     location: MSGeopoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude),
-                    radius: max(20, state.altitude))
+                    radius: max(20, state.altitude / 1.5))
                 break
                 
             case .thirdPersonOblique:
                 trackingScene = MSMapScene(camera: MSMapCamera(
                     location: MSGeopoint(
                         position: positionAboveDroneTakeoffLocation(
-                            coordinate: location.coordinate.coordinate(bearing: state.missionOrientation.yaw + Double.pi, distance: 10),
-                            altitude: state.altitude + 5),
-                        altitudeReferenceSystem: .geoid),
+                            coordinate: location.coordinate.coordinate(bearing: state.missionOrientation.yaw + Double.pi, distance: 15),
+                            altitude: state.altitude + 7),
+                        altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
                     heading: state.missionOrientation.yaw.convertRadiansToDegrees,
-                    pitch: 75))
+                    pitch: 65))
                 break
                 
             case .firstPerson:
@@ -249,7 +262,7 @@ public class MicrosoftMapViewController: UIViewController {
                     camera: MSMapCamera(
                         location: MSGeopoint(
                             position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude),
-                            altitudeReferenceSystem: .geoid),
+                            altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
                         heading: state.missionOrientation.yaw.convertRadiansToDegrees,
                         pitch: min((session?.gimbalState(channel: 0)?.value.missionOrientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
                 break
@@ -272,9 +285,9 @@ public class MicrosoftMapViewController: UIViewController {
         
         if let requiredTakeoffArea = missionExecutor?.requiredTakeoffArea {
             let polygon = MSMapPolygon()
-            polygon.strokeColor = MDCPalette.orange.accent200!
-            polygon.strokeWidth = 2
-            polygon.fillColor = MDCPalette.orange.accent400!.withAlphaComponent(0.85)
+            polygon.strokeColor = MDCPalette.orange.accent200!.withAlphaComponent(0.5)
+            polygon.strokeWidth = 1
+            polygon.fillColor = MDCPalette.orange.accent400!.withAlphaComponent(0.3)
             polygon.shapes = [
                 MSGeocircle(
                     center: MSGeoposition(coordinates: requiredTakeoffArea.coordinate.coordinate),
@@ -291,7 +304,7 @@ public class MicrosoftMapViewController: UIViewController {
                 }
                 
                 let polygon = MSMapPolygon()
-                polygon.strokeColor = MDCPalette.red.accent400!.withAlphaComponent(0.85)
+                polygon.strokeColor = MDCPalette.red.accent400!.withAlphaComponent(0.7)
                 polygon.strokeWidth = 2
                 polygon.fillColor = MDCPalette.red.accent400!.withAlphaComponent(0.5)
                 
@@ -304,13 +317,13 @@ public class MicrosoftMapViewController: UIViewController {
                         MSGeocircle(
                             center: positionAboveDroneTakeoffLocation(coordinate: center, altitude: restrictionZone.zone.minAltitude.value),
                             radius: radius,
-                            altitudeReference: .geoid
+                            altitudeReference: droneTakeoffAltitudeReferenceSystem
                         )//, TODO microsoft is ignoring z!
-//                        MSGeocircle(
-//                            center: positionAboveDroneTakeoffLocation(coordinate: center, altitude: restrictionZone.zone.maxAltitude.value),
-//                            radius: radius,
-//                            altitudeReference: .geoid
-//                        )
+                        //MSGeocircle(
+                        //    center: positionAboveDroneTakeoffLocation(coordinate: center, altitude: restrictionZone.zone.maxAltitude.value),
+                        //    radius: radius,
+                        //    altitudeReference: droneTakeoffAltitudeReferenceSystem
+                        //)
                     ]
                     break
                     
@@ -318,12 +331,12 @@ public class MicrosoftMapViewController: UIViewController {
                     polygon.paths = [
                         MSGeopath(
                             positions: coordinates.map { positionAboveDroneTakeoffLocation(coordinate: $0.coordinate, altitude: restrictionZone.zone.minAltitude.value) },
-                            altitudeReferenceSystem: .geoid
-                        )//, TODO need to test
-//                        MSGeopath(
-//                            positions: coordinates.map { positionAboveDroneTakeoffLocation(coordinate: $0.coordinate, altitude: restrictionZone.zone.maxAltitude.value) },
-//                            altitudeReferenceSystem: .geoid
-//                        )
+                            altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem
+                        )//,
+                        //MSGeopath(
+                        //    positions: coordinates.map { positionAboveDroneTakeoffLocation(coordinate: $0.coordinate, altitude: restrictionZone.zone.maxAltitude.value) },
+                        //    altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem
+                        //)
                     ]
                     break
                 }
@@ -339,37 +352,25 @@ public class MicrosoftMapViewController: UIViewController {
         if let estimateSpatials = missionExecutor?.estimate?.spatials, estimateSpatials.count > 0 {
             var positions: [MSGeoposition] = []
             estimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
-            let path = MSGeopath(positions: positions, altitudeReferenceSystem: .geoid)
+            let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             
-            let backgroundPolyline = MSMapPolyline()
-            backgroundPolyline.strokeColor = MDCPalette.lightBlue.tint800
-            backgroundPolyline.strokeWidth = 6
-            backgroundPolyline.path = path
-            missionDynamicLayer.elements.add(backgroundPolyline)
-            
-            let foregroundPolyline = MSMapPolyline()
-            foregroundPolyline.strokeColor = MDCPalette.cyan.accent400!
-            foregroundPolyline.strokeWidth = 2
-            foregroundPolyline.path = path
-            missionDynamicLayer.elements.add(foregroundPolyline)
+            let polyline = MSMapPolyline()
+            polyline.strokeColor = MDCPalette.cyan.accent400!.withAlphaComponent(0.83)
+            polyline.strokeWidth = 1
+            polyline.path = path
+            missionDynamicLayer.elements.add(polyline)
         }
         
         if let reengagementEstimateSpatials = missionExecutor?.estimate?.reengagementSpatials, reengagementEstimateSpatials.count > 0 {
             var positions: [MSGeoposition] = []
             reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
-            let path = MSGeopath(positions: positions, altitudeReferenceSystem: .geoid)
+            let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             
-            let backgroundPolyline = MSMapPolyline()
-            backgroundPolyline.strokeColor = MDCPalette.purple.tint800
-            backgroundPolyline.strokeWidth = 6
-            backgroundPolyline.path = path
-            missionDynamicLayer.elements.add(backgroundPolyline)
-            
-            let foregroundPolyline = MSMapPolyline()
-            foregroundPolyline.strokeColor = MDCPalette.purple.accent200!
-            foregroundPolyline.strokeWidth = 2
-            foregroundPolyline.path = path
-            missionDynamicLayer.elements.add(foregroundPolyline)
+            let polyline = MSMapPolyline()
+            polyline.strokeColor = MDCPalette.purple.accent200!
+            polyline.strokeWidth = 1
+            polyline.path = path
+            missionDynamicLayer.elements.add(polyline)
         }
     }
     
@@ -382,9 +383,12 @@ public class MicrosoftMapViewController: UIViewController {
             point = MSGeopoint(latitude: takeoffCoordinate.latitude, longitude: takeoffCoordinate.longitude)
         }
         
-        if let point = point {
-            droneTakeoffAltitude = -point.toAltitudeReferenceSystem(.geoid, map: mapView).position.altitude
+        guard let pointValid = point else {
+            droneTakeoffAltitude = nil
+            return
         }
+        
+        droneTakeoffAltitude = -pointValid.toAltitudeReferenceSystem(.geoid, map: mapView).position.altitude
     }
     
     private func positionAboveDroneTakeoffLocation(coordinate: CLLocationCoordinate2D, altitude: Double) -> MSGeoposition {
@@ -410,6 +414,10 @@ public class MicrosoftMapViewController: UIViewController {
     }
     
     private func updateScene(elements: SceneElements = .standard, animation: MSMapAnimationKind = .linear) {
+        if tracking != .none {
+            return
+        }
+        
         var positions: [MSGeoposition] = []
         if elements.contains(.user),
             let location = Dronelink.shared.locationManager.location {
@@ -453,8 +461,14 @@ public class MicrosoftMapViewController: UIViewController {
         }
         
         if positions.count > 0 {
-            let margin = 10.0
-            mapView.setScene(MSMapScene(boundingBox: MSGeoboundingBox(positions: positions), leftMargin: margin, topMargin: margin, rightMargin: margin, bottomMargin: margin), with: animation)
+            let boundingBox = MSGeoboundingBox(positions: positions)
+            let radius = boundingBox.northWestCorner.coordinate.distance(to: boundingBox.southEastCorner.coordinate) * 0.5
+            let center = boundingBox.northWestCorner.coordinate.coordinate(
+                bearing: boundingBox.northWestCorner.coordinate.bearing(to: boundingBox.southEastCorner.coordinate),
+                distance: radius)
+
+            //using the bounding box directly isn't great
+            mapView.setScene(MSMapScene(location: MSGeopoint(position: MSGeoposition(coordinates: center)), radius: radius), with: animation)
         }
     }
     
@@ -544,6 +558,7 @@ extension MicrosoftMapViewController: MissionExecutorDelegate {
     
     public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
         DispatchQueue.main.async {
+            self.updateScene()
             self.updateMissionDynamicElements()
         }
     }

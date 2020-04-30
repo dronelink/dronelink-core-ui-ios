@@ -75,6 +75,19 @@ public class MapboxMapViewController: UIViewController {
         missionExecutor?.remove(delegate: self)
     }
     
+    public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
+        let alert = UIAlertController(title: "MicrosoftMapViewController.more".localized, message: nil, preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender as? UIView
+        
+        actions?.forEach { alert.addAction($0) }
+
+        alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
+            
+        }))
+
+        present(alert, animated: true)
+    }
+    
     @objc func update() {
         if let state = session?.state?.value, let droneHomeLocation = state.homeLocation {
             droneHomeAnnotation.coordinate = droneHomeLocation.coordinate
