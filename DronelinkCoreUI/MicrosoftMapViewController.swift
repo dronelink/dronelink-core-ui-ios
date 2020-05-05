@@ -59,7 +59,7 @@ public class MicrosoftMapViewController: UIViewController {
     private var droneMissionExecutedPolyline: MSMapPolyline?
     private var droneMissionExecutedPositions: [MSGeoposition] = []
     private let missionStaticLayer = MSMapElementLayer()
-    private let missionDynamicLayer = MSMapElementLayer()
+    private let missionLayer = MSMapElementLayer()
     private let updateDroneElementsInterval: TimeInterval = 0.1
     private var updateDroneElementsTimer: Timer?
     private var droneTakeoffAltitude: Double?
@@ -106,11 +106,8 @@ public class MicrosoftMapViewController: UIViewController {
         droneLayer.elements.add(droneIcon)
         mapView.layers.add(droneLayer)
         
-        missionStaticLayer.zIndex = 1
-        mapView.layers.add(missionStaticLayer)
-        
-        missionDynamicLayer.zIndex = 1
-        mapView.layers.add(missionDynamicLayer)
+        missionLayer.zIndex = 1
+        mapView.layers.add(missionLayer)
         
         updateDroneElements()
     }
@@ -290,12 +287,7 @@ public class MicrosoftMapViewController: UIViewController {
     }
     
     private func updateMissionElements() {
-        updateMissionStaticElements()
-        updateMissionDynamicElements()
-    }
-    
-    private func updateMissionStaticElements() {
-        missionStaticLayer.elements.clear()
+        missionLayer.elements.clear()
         
         if let requiredTakeoffArea = missionExecutor?.requiredTakeoffArea {
             let polygon = MSMapPolygon()
@@ -316,12 +308,12 @@ public class MicrosoftMapViewController: UIViewController {
                 guard let coordinates = missionExecutor?.restrictionZoneBoundaryCoordinates(index: $0.offset) else {
                     return
                 }
-                
+
                 let polygon = MSMapPolygon()
                 polygon.strokeColor = MDCPalette.red.accent400!.withAlphaComponent(0.7)
                 polygon.strokeWidth = 2
                 polygon.fillColor = MDCPalette.red.accent400!.withAlphaComponent(0.5)
-                
+
                 let restrictionZone = $0.element
                 switch restrictionZone.zone.shape {
                 case .circle:
@@ -340,7 +332,7 @@ public class MicrosoftMapViewController: UIViewController {
                         //)
                     ]
                     break
-                    
+
                 case .polygon:
                     polygon.paths = [
                         MSGeopath(
@@ -354,37 +346,33 @@ public class MicrosoftMapViewController: UIViewController {
                     ]
                     break
                 }
-                
-                missionStaticLayer.elements.add(polygon)
+
+                missionLayer.elements.add(polygon)
             }
         }
-    }
-    
-    private func updateMissionDynamicElements() {
-        missionDynamicLayer.elements.clear()
         
         if let estimateSpatials = missionExecutor?.estimate?.spatials, estimateSpatials.count > 0 {
             var positions: [MSGeoposition] = []
             estimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
             let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
-            
+
             let polyline = MSMapPolyline()
             polyline.strokeColor = MDCPalette.cyan.accent400!.withAlphaComponent(0.73)
             polyline.strokeWidth = 1
             polyline.path = path
-            missionDynamicLayer.elements.add(polyline)
+            missionLayer.elements.add(polyline)
         }
-        
+
         if let reengagementEstimateSpatials = missionExecutor?.estimate?.reengagementSpatials, reengagementEstimateSpatials.count > 0 {
             var positions: [MSGeoposition] = []
             reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
             let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
-            
+
             let polyline = MSMapPolyline()
             polyline.strokeColor = MDCPalette.purple.accent200!
             polyline.strokeWidth = 1
             polyline.path = path
-            missionDynamicLayer.elements.add(polyline)
+            missionLayer.elements.add(polyline)
         }
     }
     
@@ -500,7 +488,9 @@ extension MicrosoftMapViewController: DronelinkDelegate {
         DispatchQueue.main.async {
             self.updateScene()
             self.updateDroneTakeoffAltitude()
-            self.updateMissionElements()
+            if executor.estimated {
+                self.updateMissionElements()
+            }
         }
     }
     
@@ -536,12 +526,16 @@ extension MicrosoftMapViewController: DroneSessionDelegate {
     public func onInitialized(session: DroneSession) {}
     
     public func onLocated(session: DroneSession) {
+        if missionExecutor?.estimating ?? false {
+            return
+        }
+        
         DispatchQueue.main.async {
             self.updateScene()
             //wait 2 seconds to give the map time to load the elevation data
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 self.updateDroneTakeoffAltitude()
-                self.updateMissionDynamicElements()
+                self.updateMissionElements()
             }
         }
     }
@@ -561,7 +555,7 @@ extension MicrosoftMapViewController: MissionExecutorDelegate {
     public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
         DispatchQueue.main.async {
             self.updateScene()
-            self.updateMissionDynamicElements()
+            self.updateMissionElements()
         }
     }
     
