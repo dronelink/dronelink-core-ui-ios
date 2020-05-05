@@ -250,14 +250,14 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(28)
         }
         
-        variableImageView.snp.remakeConstraints { make in
-            make.top.equalTo(backButton.snp.bottom)
-            make.left.equalToSuperview()
-            make.right.equalToSuperview()
-            make.bottom.equalToSuperview()
-        }
-        
         let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
+        
+        variableImageView.snp.remakeConstraints { make in
+            make.top.equalTo(variableControl.snp.bottom).offset(input?.variable.valueType == .null ? defaultPadding : 60)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            make.bottom.equalToSuperview().offset(-50)
+        }
         
         variableSegmentedControl.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
@@ -298,7 +298,7 @@ public class FuncViewController: UIViewController {
             make.left.equalTo(variableDroneMarkButton.snp.right).offset(5)
             make.right.equalTo(variableDroneClearButton.snp.left).offset(5)
             make.top.equalTo(variableDroneMarkButton)
-            make.bottom.equalTo(backButton.snp.top).offset(-defaultPadding)
+            make.height.equalTo(variableDroneMarkButton)
         }
         
         variableSummaryTextView.snp.remakeConstraints { make in
@@ -310,7 +310,7 @@ public class FuncViewController: UIViewController {
         
         backButton.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
-            make.top.equalTo(variableDroneMarkButton.snp.bottom)
+            make.bottom.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(35)
             make.width.equalTo(85)
         }
@@ -478,7 +478,7 @@ public class FuncViewController: UIViewController {
                 break
         }
         
-        if !input.optional && value == nil {
+        if !input.optional && value == nil && input.variable.valueType != .null {
             DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.required".localized)
             return false
         }
@@ -631,7 +631,7 @@ public class FuncViewController: UIViewController {
                 name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
             }
             
-            if !input.optional {
+            if !input.optional && input.variable.valueType != .null {
                 name = "\(name) *"
             }
             variableNameLabel.text = name

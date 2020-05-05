@@ -25,6 +25,21 @@ public class MicrosoftMapViewController: UIViewController {
         case satellite
     }
     
+    private struct SceneElements: OptionSet {
+        let rawValue: Int
+
+        static let user = SceneElements(rawValue: 1 << 0)
+        static let droneCurrent = SceneElements(rawValue: 1 << 1)
+        static let droneHome = SceneElements(rawValue: 1 << 2)
+        static let droneTakeoff = SceneElements(rawValue: 1 << 3)
+        static let missionReengagement = SceneElements(rawValue: 1 << 4)
+        static let missionMain = SceneElements(rawValue: 1 << 5)
+        static let missionTakeoff = SceneElements(rawValue: 1 << 6)
+
+        static let all: SceneElements = [.user, .droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
+        static let standard: SceneElements = [.droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
+    }
+    
     public static func create(droneSessionManager: DroneSessionManager, credentialsKey: String) -> MicrosoftMapViewController {
         let mapViewController = MicrosoftMapViewController()
         mapViewController.mapView.credentialsKey = credentialsKey
@@ -47,7 +62,6 @@ public class MicrosoftMapViewController: UIViewController {
     private let missionDynamicLayer = MSMapElementLayer()
     private let updateDroneElementsInterval: TimeInterval = 0.1
     private var updateDroneElementsTimer: Timer?
-    private var lastUpdatedDroneElements = Date()
     private var droneTakeoffAltitude: Double?
     private var droneTakeoffAltitudeReferenceSystem: MSMapAltitudeReferenceSystem { droneTakeoffAltitude == nil ? .surface : .geoid }
     private var style = Style.streets
@@ -473,21 +487,6 @@ public class MicrosoftMapViewController: UIViewController {
             //using the bounding box directly isn't great
             mapView.setScene(MSMapScene(location: MSGeopoint(position: MSGeoposition(coordinates: center)), radius: radius), with: animation)
         }
-    }
-    
-    private struct SceneElements: OptionSet {
-        let rawValue: Int
-
-        static let user = SceneElements(rawValue: 1 << 0)
-        static let droneCurrent = SceneElements(rawValue: 1 << 1)
-        static let droneHome = SceneElements(rawValue: 1 << 2)
-        static let droneTakeoff = SceneElements(rawValue: 1 << 3)
-        static let missionReengagement = SceneElements(rawValue: 1 << 4)
-        static let missionMain = SceneElements(rawValue: 1 << 5)
-        static let missionTakeoff = SceneElements(rawValue: 1 << 6)
-
-        static let all: SceneElements = [.user, .droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
-        static let standard: SceneElements = [.droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
     }
 }
 
