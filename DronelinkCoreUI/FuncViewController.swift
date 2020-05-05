@@ -29,6 +29,7 @@ public class FuncViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var funcExecutor: FuncExecutor?
+    private let imagePlaceholder = MDCActivityIndicator()
     private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let primaryButton = MDCRaisedButton()
     private let backButton = MDCFlatButton()
@@ -69,6 +70,11 @@ public class FuncViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        imagePlaceholder.radius = 20
+        imagePlaceholder.strokeWidth = 5
+        imagePlaceholder.cycleColors = [DronelinkUI.Constants.secondaryColor!]
+        imagePlaceholder.startAnimating()
         
         if #available(iOS 13.0, *) {
             overrideUserInterfaceStyle = .dark
@@ -250,14 +256,23 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(28)
         }
         
-        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
-        
         variableImageView.snp.remakeConstraints { make in
-            make.top.equalTo(variableControl.snp.bottom).offset(input?.variable.valueType == .null ? defaultPadding : 60)
+            var offset = defaultPadding
+            if !(input?.descriptors.description?.isEmpty ?? true) {
+                offset += 28
+            }
+            
+            if input?.variable.valueType != .null {
+                offset += 40
+            }
+            
+            make.top.equalTo(variableNameLabel.snp.bottom).offset(offset)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-50)
         }
+        
+        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
         
         variableSegmentedControl.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
@@ -642,7 +657,8 @@ public class FuncViewController: UIViewController {
             }
             
             if let imageUrl = input.imageUrl, !imageUrl.isEmpty {
-                variableImageView.kf.setImage(with: URL(string: imageUrl))
+                variableImageView.image = nil
+                variableImageView.kf.setImage(with: URL(string: imageUrl), placeholder: imagePlaceholder)
                 variableImageView.isHidden = false
             }
 
@@ -687,6 +703,9 @@ public class FuncViewController: UIViewController {
             return
         }
     }
+}
+
+extension MDCActivityIndicator: Placeholder {
 }
 
 extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
