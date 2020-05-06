@@ -465,12 +465,12 @@ public class MicrosoftMapViewController: UIViewController {
         if positions.count > 0 {
             let boundingBox = MSGeoboundingBox(positions: positions)
             var radius = boundingBox.northWestCorner.coordinate.distance(to: boundingBox.southEastCorner.coordinate) * 0.5
-            if positions.count < 10 && radius < 100 {
-                radius = 100
-            }
             let center = boundingBox.northWestCorner.coordinate.coordinate(
                 bearing: boundingBox.northWestCorner.coordinate.bearing(to: boundingBox.southEastCorner.coordinate),
                 distance: radius)
+            if positions.count < 10 && radius < 100 {
+                radius = 100
+            }
 
             //using the bounding box directly isn't great
             mapView.setScene(MSMapScene(location: MSGeopoint(position: MSGeoposition(coordinates: center)), radius: radius), with: animation)

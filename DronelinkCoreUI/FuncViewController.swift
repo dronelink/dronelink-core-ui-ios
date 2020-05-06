@@ -514,8 +514,6 @@ public class FuncViewController: UIViewController {
             update()
             return
         }
-
-        delegate?.onFuncExpanded(value: !(input.imageUrl?.isEmpty ?? true))
         
         if input.variable.valueType == .boolean {
             variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
@@ -692,6 +690,8 @@ public class FuncViewController: UIViewController {
             @unknown default:
                 break
             }
+
+            delegate?.onFuncExpanded(value: !(input.imageUrl?.isEmpty ?? true))
             return
         }
         
@@ -700,6 +700,8 @@ public class FuncViewController: UIViewController {
             variableNameLabel.text = "FuncViewController.input.summary".localized
             variableSummaryTextView.isHidden = false
             variableSummaryTextView.text = summary
+
+            delegate?.onFuncExpanded(value: funcExecutor.inputCount > 3)
             return
         }
     }
