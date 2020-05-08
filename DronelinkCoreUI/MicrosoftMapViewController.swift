@@ -15,9 +15,9 @@ import MicrosoftMaps
 public class MicrosoftMapViewController: UIViewController {
     public enum Tracking {
         case none
-        case thirdPersonNadir
-        case thirdPersonOblique
-        case firstPerson
+        case thirdPersonNadir //follow
+        case thirdPersonOblique //chase plane
+        case firstPerson //fpv
     }
     
     public enum Style {
@@ -73,14 +73,21 @@ public class MicrosoftMapViewController: UIViewController {
         mapView.clipsToBounds = true
         mapView.addCameraDidChangeHandler { (reason, camera) -> Bool in
             if reason == .userInteraction {
-                self.tracking = .none
-                self.trackingPrevious = .none
+                switch self.tracking {
+                case .thirdPersonNadir:
+                    self.tracking = .none
+                    self.trackingPrevious = .none
+                    break
+                    
+                case .none, .thirdPersonOblique, .firstPerson:
+                    break
+                }
             }
             return true
         }
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         update(style: .streets)
-        mapView.projection = MSMapProjection.globe
+        mapView.projection = .globe
         mapView.businessLandmarksVisible = false
         mapView.buildingsVisible = true
         mapView.transitFeaturesVisible = false
@@ -151,16 +158,18 @@ public class MicrosoftMapViewController: UIViewController {
             self.tracking = .firstPerson
         }))
         
-        if style == .streets {
-            alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.satellite".localized, style: .default, handler: { _ in
-                self.update(style: .satellite)
-            }))
-        }
-        else {
-            alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.streets".localized, style: .default, handler: { _ in
-                self.update(style: .streets)
-            }))
-        }
+//        if tracking == .none {
+//            if style == .streets {
+//                alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.satellite".localized, style: .default, handler: { _ in
+//                    self.update(style: .satellite)
+//                }))
+//            }
+//            else {
+//                alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.streets".localized, style: .default, handler: { _ in
+//                    self.update(style: .streets)
+//                }))
+//            }
+//        }
         
         actions?.forEach { alert.addAction($0) }
 
@@ -262,10 +271,10 @@ public class MicrosoftMapViewController: UIViewController {
                     location: MSGeopoint(
                         position: positionAboveDroneTakeoffLocation(
                             coordinate: location.coordinate.coordinate(bearing: state.missionOrientation.yaw + Double.pi, distance: 15),
-                            altitude: state.altitude + 7),
+                            altitude: state.altitude + 14),
                         altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
                     heading: state.missionOrientation.yaw.convertRadiansToDegrees,
-                    pitch: 65))
+                    pitch: 45))
                 break
                 
             case .firstPerson:
@@ -280,7 +289,10 @@ public class MicrosoftMapViewController: UIViewController {
             }
             
             if let trackingScene = trackingScene {
-                mapView.setScene(trackingScene, with: trackingPrevious == tracking ? .linear : .none)
+                //linear causes a memory leak right now:
+                //https://stackoverflow.com/questions/10122570/replace-a-fragment-programmatically
+                //mapView.setScene(trackingScene, with: trackingPrevious == tracking ? .linear : .none)
+                mapView.setScene(trackingScene, with: .none)
                 trackingPrevious = tracking
             }
         }
@@ -473,7 +485,10 @@ public class MicrosoftMapViewController: UIViewController {
             }
 
             //using the bounding box directly isn't great
-            mapView.setScene(MSMapScene(location: MSGeopoint(position: MSGeoposition(coordinates: center)), radius: radius), with: animation)
+            let bottom = center.coordinate(bearing: 0, distance: radius * 3.15)
+            mapView.setScene(MSMapScene(location: MSGeopoint(latitude: bottom.latitude, longitude: bottom.longitude), radius: radius * 2.0, heading: 0, pitch: 65), with: .none)
+            //ignoring animation because of mem leak
+            //mapView.setScene(MSMapScene(locations: positions.map({ MSGeopoint(position: $0) }), heading: 0, pitch: 45), with: .none)
         }
     }
 }

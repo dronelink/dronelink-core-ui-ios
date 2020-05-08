@@ -60,7 +60,7 @@
 "MicrosoftMapViewController.more" = "Map Options";
 "MicrosoftMapViewController.reset" = "Reset";
 "MicrosoftMapViewController.follow" = "Follow";
-"MicrosoftMapViewController.chase.plane" = "Chase Plane";
-"MicrosoftMapViewController.fpv" = "FPV";
+"MicrosoftMapViewController.chase.plane" = "Chase Plane (Beta)";
+"MicrosoftMapViewController.fpv" = "FPV (Beta)";
 "MicrosoftMapViewController.satellite" = "Satellite";
 "MicrosoftMapViewController.streets" = "Streets & Buildings";
