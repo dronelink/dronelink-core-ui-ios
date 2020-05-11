@@ -445,6 +445,9 @@ public class FuncViewController: UIViewController {
         
         var value: Any? = nil
         switch input.variable.valueType {
+            case .null:
+                break
+            
             case .boolean:
                 if (variableSegmentedControl.selectedSegmentIndex != UISegmentedControl.noSegment) {
                     value = variableSegmentedControl.selectedSegmentIndex == 0
@@ -489,7 +492,7 @@ public class FuncViewController: UIViewController {
                 value = session
                 break
             
-            @unknown default:
+        @unknown default:
                 break
         }
         
@@ -661,6 +664,9 @@ public class FuncViewController: UIViewController {
             }
 
             switch input.variable.valueType {
+            case .null:
+                break
+                
             case .boolean:
                 variableSegmentedControl.isHidden = false
                 break

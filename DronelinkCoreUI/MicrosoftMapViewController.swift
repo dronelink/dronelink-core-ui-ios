@@ -357,6 +357,9 @@ public class MicrosoftMapViewController: UIViewController {
                         //)
                     ]
                     break
+                    
+                @unknown default:
+                    break
                 }
 
                 missionLayer.elements.add(polygon)
