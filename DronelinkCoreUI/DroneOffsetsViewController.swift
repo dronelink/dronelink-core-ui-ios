@@ -36,6 +36,7 @@ public class DroneOffsetsViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     
+    private let debug = false
     private var styleSegmentedControl: UISegmentedControl!
     private let detailsLabel = UILabel()
     private let moreButton = UIButton(type: .custom)
@@ -425,6 +426,11 @@ public class DroneOffsetsViewController: UIViewController {
 
         switch style {
         case .altYaw:
+            c1Button.isHidden = !debug
+            c2Button.isHidden = !debug
+            leftButton.isHidden = false
+            rightButton.isHidden = false
+            
             var details: [String] = []
             if offsets.droneYaw != 0 {
                 details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw, extraParams: [false]))
@@ -452,6 +458,10 @@ public class DroneOffsetsViewController: UIViewController {
             break
 
         case .position:
+            c1Button.isHidden = !debug
+            c2Button.isHidden = false
+            leftButton.isHidden = true
+            rightButton.isHidden = true
             moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
             clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
             detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
