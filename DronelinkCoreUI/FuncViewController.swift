@@ -419,9 +419,13 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onDroneMark(sender: Any) {
-        if session == nil {
+        guard let session = self.session else {
             DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.drone.unavailable".localized)
             return
+        }
+        
+        if input?.extensions?.droneOffsetsCoordinateReference ?? false {
+            Dronelink.shared.droneOffsets.droneCoordinateReference = session.state?.value.location?.coordinate
         }
         
         writeValue()
