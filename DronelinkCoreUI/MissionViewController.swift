@@ -60,7 +60,8 @@ public class MissionViewController: UIViewController {
     private var countdownMax = 60
     private let updateInterval: TimeInterval = 0.5
     private var lastUpdated = Date()
-    private var expanded = false
+    private var _expanded = false
+    public var expanded: Bool { _expanded }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -356,7 +357,11 @@ public class MissionViewController: UIViewController {
     }
     
     @objc func onExpandToggle() {
-        expanded = !expanded
+        toggle(expanded: !expanded)
+    }
+    
+    public func toggle(expanded: Bool) {
+        _expanded = expanded
         delegate?.onMissionExpandToggle()
     }
     
