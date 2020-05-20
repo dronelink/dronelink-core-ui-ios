@@ -15,6 +15,10 @@
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
 
+"FuncViewController.cachedInputs.title" = "Previous Inputs Available";
+"FuncViewController.cachedInputs.message" = "Do you want to load the previous inputs or start over?";
+"FuncViewController.cachedInputs.action.new" = "Start Over";
+"FuncViewController.cachedInputs.action.previous" = "Load Previous";
 "FuncViewController.primary.intro" = "Get Started";
 "FuncViewController.primary.execute" = "Generate Mission";
 "FuncViewController.primary.executing" = "Generating...";

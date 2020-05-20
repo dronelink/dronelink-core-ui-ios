@@ -18,6 +18,8 @@ public protocol FuncViewControllerDelegate {
 }
 
 public class FuncViewController: UIViewController {
+    private static var mostRecentExecuted: FuncExecutor?
+    
     public static func create(droneSessionManager: DroneSessionManager, delegate: FuncViewControllerDelegate? = nil) -> FuncViewController {
         let funcViewController = FuncViewController()
         funcViewController.droneSessionManager = droneSessionManager
@@ -62,7 +64,7 @@ public class FuncViewController: UIViewController {
         }
         return inputIndex == inputCount
     }
-    private var hasInputs: Bool { funcExecutor?.inputCount ?? 0 > 0 }
+    private var hasInputs: Bool { funcExecutor?.inputCount ?? 0 > 0 || funcExecutor?.dynamicInputs != nil }
     private var input: Mission.FuncInput? { funcExecutor?.input(index: inputIndex) }
     private func valueNumberMeasurementTypeDisplay(index: Int? = nil) -> String? { funcExecutor?.readValueNumberMeasurementTypeDisplay(index: index ?? inputIndex) }
     private var executing = false
@@ -365,9 +367,33 @@ public class FuncViewController: UIViewController {
         }
         
         if (intro && hasInputs) {
-            intro = false
-            readValue()
-            view.setNeedsUpdateConstraints()
+            let finish = {
+                self.intro = false
+                if funcExecutor.inputCount == 0 {
+                    self.addNextDynamicInput()
+                }
+                self.readValue()
+                self.view.setNeedsUpdateConstraints()
+            }
+            
+            if let mostRecentExecuted = FuncViewController.mostRecentExecuted,
+                mostRecentExecuted.funcID == funcExecutor.funcID {
+                DronelinkUI.shared.showDialog(
+                    title: "FuncViewController.cachedInputs.title".localized,
+                    details: "FuncViewController.cachedInputs.message".localized,
+                    actions: [
+                        MDCAlertAction(title: "FuncViewController.cachedInputs.action.new".localized, emphasis: .high, handler: { action in
+                            finish()
+                        }),
+                        MDCAlertAction(title: "FuncViewController.cachedInputs.action.previous".localized, handler: { action in
+                            funcExecutor.addCachedInputs(funcExecutor: mostRecentExecuted)
+                            finish()
+                        })
+                    ])
+            }
+            else {
+                finish()
+            }
             return
         }
         
@@ -403,14 +429,7 @@ public class FuncViewController: UIViewController {
             return
         }
         
-        funcExecutor?.addNextDynamicInput(droneSession: session) { error in
-            DispatchQueue.main.async {
-                DronelinkUI.shared.showSnackbar(text: error)
-                self.inputIndex -= 1
-                self.readValue()
-                self.view.setNeedsUpdateConstraints()
-           }
-       }
+        addNextDynamicInput()
         
         inputIndex += 1
         variableTextField.resignFirstResponder()
@@ -439,6 +458,23 @@ public class FuncViewController: UIViewController {
     
     @objc func onDismiss() {
         Dronelink.shared.unloadFunc()
+    }
+    
+    func addNextDynamicInput() {
+        funcExecutor?.addNextDynamicInput(droneSession: session) { error in
+             DispatchQueue.main.async {
+                DronelinkUI.shared.showSnackbar(text: error)
+                self.inputIndex -= 1
+                if self.inputIndex < 0 {
+                    self.inputIndex = 0
+                    self.intro = true
+                }
+                else {
+                    self.readValue()
+                }
+                self.view.setNeedsUpdateConstraints()
+            }
+        }
     }
     
     @discardableResult
@@ -762,15 +798,6 @@ extension FuncViewController: DronelinkDelegate {
         executor.add(delegate: self)
         DispatchQueue.main.async {
             self.inputIndex = 0
-            if !self.hasInputs {
-                executor.addNextDynamicInput(droneSession: self.session) { error in
-                    Dronelink.shared.unloadFunc()
-                     DispatchQueue.main.async {
-                         DronelinkUI.shared.showSnackbar(text: error)
-                    }
-                }
-            }
-            
             self.intro = true
             self.view.setNeedsUpdateConstraints()
         }
@@ -803,6 +830,7 @@ extension FuncViewController: DroneSessionManagerDelegate {
 
 extension FuncViewController: FuncExecutorDelegate {
     public func onFuncExecuted(executor: FuncExecutor) {
+        FuncViewController.mostRecentExecuted = executor
     }
 }
 
