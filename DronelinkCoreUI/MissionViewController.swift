@@ -10,6 +10,7 @@ import Foundation
 import CoreLocation
 import UIKit
 import SnapKit
+import Agrume
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
@@ -259,7 +260,49 @@ public class MissionViewController: UIViewController {
             DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
             return
         }
-
+        
+        promptConfirmation()
+    }
+    
+    private func promptConfirmation() {
+        guard let missionExecutor = missionExecutor, let session = session else { return }
+        
+        if missionExecutor.engagementCount > 0,
+            let confirmationMessage = missionExecutor.reengagementRules.confirmationMessage {
+            var actions = [
+                MDCAlertAction(title: "yes".localized, emphasis: .high, handler: { action in
+                    self.promptTakeoffLocationWarning()
+                }),
+                MDCAlertAction(title: "no".localized, emphasis: .medium, handler: { action in
+                })
+            ]
+            
+            if let confirmationInstructionsImageUrl = missionExecutor.reengagementRules.confirmationInstructionsImageUrl {
+                actions.append(MDCAlertAction(title: "learnMore".localized, emphasis: .low, handler: { action in
+                    let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
+                    doneButton.tintColor = .white
+                    let agrume = Agrume(
+                        url: URL(string: confirmationInstructionsImageUrl)!,
+                        background: .blurred(.regular),
+                        dismissal: .withButton(doneButton))
+                    agrume.statusBarStyle = .lightContent
+                    agrume.show(from: self)
+                }))
+            }
+            
+            DronelinkUI.shared.showDialog(
+                title: confirmationMessage.title,
+                details: confirmationMessage.details,
+                actions: actions)
+            return
+        }
+        
+        promptTakeoffLocationWarning()
+    }
+    
+    private func promptTakeoffLocationWarning() {
+        guard let missionExecutor = missionExecutor, let session = session else { return }
+        
         missionExecutor.droneTakeoffAltitudeAlternate = nil
         if missionExecutor.requiredTakeoffArea == nil,
             let actualTakeoffLocation = session.state?.value.takeoffLocation,
@@ -285,7 +328,7 @@ public class MissionViewController: UIViewController {
                 ])
             return
         }
-
+        
         startCountdown()
     }
     
@@ -498,6 +541,10 @@ extension MissionViewController: DronelinkDelegate {
         DispatchQueue.main.async {
             self.view.setNeedsUpdateConstraints()
             self.update()
+            
+            if let missionDetailsExpanded = executor.userInterfaceSettings?.missionDetailsExpanded {
+                self.toggle(expanded: missionDetailsExpanded)
+            }
         }
     }
     

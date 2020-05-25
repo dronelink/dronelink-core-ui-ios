@@ -17,4 +17,5 @@ target 'DronelinkCoreUI' do
   pod 'MaterialComponents/Snackbar', '~> 109.2.0'
   pod 'MaterialComponents/ActivityIndicator', '~> 109.2.0'
   pod 'Kingfisher', '~> 5.13.4'
+  pod 'Agrume', '~> 5.6.8'
 end

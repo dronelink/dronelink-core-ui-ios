@@ -26,4 +26,5 @@ Pod::Spec.new do |s|
   s.dependency "MaterialComponents/Snackbar", "~> 109.2.0"
   s.dependency "MaterialComponents/ActivityIndicator", "~> 109.2.0"
   s.dependency "Kingfisher", "~> 5.13.4"
+  s.dependency "Agrume", "~> 5.6.8"
 end
