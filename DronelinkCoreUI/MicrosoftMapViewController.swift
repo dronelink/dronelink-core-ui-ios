@@ -305,7 +305,7 @@ public class MicrosoftMapViewController: UIViewController {
             let polygon = MSMapPolygon()
             polygon.strokeColor = MDCPalette.orange.accent200!.withAlphaComponent(0.5)
             polygon.strokeWidth = 1
-            polygon.fillColor = MDCPalette.orange.accent400!.withAlphaComponent(0.3)
+            polygon.fillColor = MDCPalette.orange.accent400!.withAlphaComponent(0.25)
             polygon.shapes = [
                 MSGeocircle(
                     center: MSGeoposition(coordinates: requiredTakeoffArea.coordinate.coordinate),

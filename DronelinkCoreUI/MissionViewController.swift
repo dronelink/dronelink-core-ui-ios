@@ -270,10 +270,10 @@ public class MissionViewController: UIViewController {
         if missionExecutor.engagementCount > 0,
             let confirmationMessage = missionExecutor.reengagementRules.confirmationMessage {
             var actions = [
-                MDCAlertAction(title: "yes".localized, emphasis: .high, handler: { action in
+                MDCAlertAction(title: "resume".localized, emphasis: .high, handler: { action in
                     self.promptTakeoffLocationWarning()
                 }),
-                MDCAlertAction(title: "no".localized, emphasis: .medium, handler: { action in
+                MDCAlertAction(title: "cancel".localized, emphasis: .medium, handler: { action in
                 })
             ]
             

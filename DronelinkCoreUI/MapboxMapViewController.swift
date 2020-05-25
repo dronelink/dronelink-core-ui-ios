@@ -312,7 +312,7 @@ extension MapboxMapViewController: MGLMapViewDelegate {
 
     public func mapView(_ mapView: MGLMapView, alphaForShapeAnnotation annotation: MGLShape) -> CGFloat {
         if (annotation === missionRequiredTakeoffAreaAnnotation) {
-            return 0.75
+            return 0.25
         }
 
         return 1.0

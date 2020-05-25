@@ -12,6 +12,7 @@
 "cancel" = "Cancel";
 "back" = "Back";
 "next" = "Next";
+"resume" = "Resume";
 "learnMore" = "Learn More";
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";

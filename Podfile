@@ -5,7 +5,7 @@ use_frameworks!
 target 'DronelinkCoreUI' do
   pod 'DronelinkCore', '~> 1.6.0'
   pod 'SnapKit', '~> 5.0.1'
-  pod 'MicrosoftMapsSDK', '~> 1.1.3'
+  pod 'MicrosoftMapsSDK', '~> 1.1.4'
   pod 'Mapbox-iOS-SDK', '~> 5.9.0'
   pod 'MaterialComponents/Palettes', '~> 109.2.0'
   pod 'MaterialComponents/Buttons', '~> 109.2.0'

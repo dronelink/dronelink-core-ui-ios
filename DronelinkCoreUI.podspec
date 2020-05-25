@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
 
   s.dependency "DronelinkCore", "~> 1.6.0"
   s.dependency "SnapKit", "~> 5.0.1"
-  s.dependency "MicrosoftMapsSDK", "~> 1.1.3"
+  s.dependency "MicrosoftMapsSDK", "~> 1.1.4"
   s.dependency "Mapbox-iOS-SDK", "~> 5.9.0"
   s.dependency "MaterialComponents/Palettes", "~> 109.2.0"
   s.dependency "MaterialComponents/Buttons", "~> 109.2.0"
