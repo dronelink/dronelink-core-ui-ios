@@ -49,8 +49,8 @@
 "DroneOffsetsViewController.position" = "POSITION";
 "DroneOffsetsViewController.more" = "Gimbal Options";
 "DroneOffsetsViewController.resetGimbal" = "Reset";
-"DroneOffsetsViewController.levelGimbal" = "Level";
-"DroneOffsetsViewController.nadirGimbal" = "Nadir";
+"DroneOffsetsViewController.levelGimbal" = "0° (Level)";
+"DroneOffsetsViewController.nadirGimbal" = "-90° (Nadir)";
 
 "TelemetryViewController.distance.prefix" = "D";
 "TelemetryViewController.altitude.prefix" = "A";

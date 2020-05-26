@@ -226,11 +226,6 @@ public class DroneOffsetsViewController: UIViewController {
     @objc func onMore(sender: Any) {
         let alert = UIAlertController(title: "DroneOffsetsViewController.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
-
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.resetGimbal".localized, style: .default , handler:{ _ in
-            self.session?.drone.gimbal(channel: 0)?.reset()
-        }))
-        
         alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.levelGimbal".localized, style: .default , handler:{ _ in
             var command = Mission.OrientationGimbalCommand()
             command.orientation.x = 0
@@ -242,7 +237,11 @@ public class DroneOffsetsViewController: UIViewController {
             command.orientation.x = -90.convertDegreesToRadians
             try? self.session?.add(command: command)
         }))
-
+        
+        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.resetGimbal".localized, style: .default , handler:{ _ in
+            self.session?.drone.gimbal(channel: 0)?.reset()
+        }))
+        
         alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
             
         }))
