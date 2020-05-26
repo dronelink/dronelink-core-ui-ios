@@ -58,7 +58,6 @@ public class MicrosoftMapViewController: UIViewController {
     private var droneSessionPositions: [MSGeoposition] = []
     private var droneMissionExecutedPolyline: MSMapPolyline?
     private var droneMissionExecutedPositions: [MSGeoposition] = []
-    private let missionStaticLayer = MSMapElementLayer()
     private let missionLayer = MSMapElementLayer()
     private let updateDroneElementsInterval: TimeInterval = 0.1
     private var updateDroneElementsTimer: Timer?
@@ -312,7 +311,7 @@ public class MicrosoftMapViewController: UIViewController {
                     radius: requiredTakeoffArea.distanceTolerance.horizontal
                 )
             ]
-            missionStaticLayer.elements.add(polygon)
+            missionLayer.elements.add(polygon)
         }
         
         if let restrictionZones = missionExecutor?.restrictionZones {
