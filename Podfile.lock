@@ -1,5 +1,7 @@
 PODS:
-  - DronelinkCore (1.5.0)
+  - Agrume (5.6.8):
+    - SwiftyGif
+  - DronelinkCore (1.6.0)
   - Kingfisher (5.13.4):
     - Kingfisher/Core (= 5.13.4)
   - Kingfisher/Core (5.13.4)
@@ -147,14 +149,16 @@ PODS:
     - MaterialComponents/private/Math
   - MDFInternationalization (2.0.0)
   - MDFTextAccessibility (2.0.0)
-  - MicrosoftMapsSDK (1.1.3)
+  - MicrosoftMapsSDK (1.1.4)
   - MotionAnimator (2.8.1):
     - MotionInterchange (~> 1.6)
   - MotionInterchange (1.6.0)
   - SnapKit (5.0.1)
+  - SwiftyGif (5.3.0)
 
 DEPENDENCIES:
-  - DronelinkCore (~> 1.5.0)
+  - Agrume (~> 5.6.8)
+  - DronelinkCore (~> 1.6.0)
   - Kingfisher (~> 5.13.4)
   - Mapbox-iOS-SDK (~> 5.9.0)
   - MaterialComponents/ActivityIndicator (~> 109.2.0)
@@ -166,11 +170,12 @@ DEPENDENCIES:
   - MaterialComponents/ProgressView (~> 109.2.0)
   - MaterialComponents/Snackbar (~> 109.2.0)
   - MaterialComponents/TextFields (~> 109.2.0)
-  - MicrosoftMapsSDK (~> 1.1.3)
+  - MicrosoftMapsSDK (~> 1.1.4)
   - SnapKit (~> 5.0.1)
 
 SPEC REPOS:
   trunk:
+    - Agrume
     - DronelinkCore
     - Kingfisher
     - Mapbox-iOS-SDK
@@ -182,20 +187,23 @@ SPEC REPOS:
     - MotionAnimator
     - MotionInterchange
     - SnapKit
+    - SwiftyGif
 
 SPEC CHECKSUMS:
-  DronelinkCore: 2bd4841779b2bef180d0f9bf307e2ab1972965d0
+  Agrume: 53c2be9b06caef4b4996a2886a56b9e901bcc6c0
+  DronelinkCore: 366cc887b5362f9cef35632426554a484d66324f
   Kingfisher: d2279a7abece3c7f25a80cd2b7f363ca5cf3f44c
   Mapbox-iOS-SDK: a5915700ec84bc1a7f8b3e746d474789e35b7956
   MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
   MaterialComponents: 59bfbfe08fc1ac204b21ba69100beabb932e3699
   MDFInternationalization: 010097556d6b09d2c4ea38e0820ea6d37be6a314
   MDFTextAccessibility: 85c09a1bd9c321f494348e632a25063bcda35a53
-  MicrosoftMapsSDK: fc934c1b607d58a3c2acefa3644a6d9f9c1801e7
+  MicrosoftMapsSDK: 64317bb343e3ef26507f61617889a6918a1b59d4
   MotionAnimator: ee16aa30567c5bae0fb2750c132915829cfaaf8a
   MotionInterchange: ead0e3ae1f3a5fb539e289debbc7ae036160a10d
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
+  SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
 
-PODFILE CHECKSUM: b583cb733ef7a8c6bddfbfd8799add0fe5938aa0
+PODFILE CHECKSUM: 9cfb4c20a0aff4e404c69042e7bf6d8cf55ba239
 
-COCOAPODS: 1.9.1
+COCOAPODS: 1.9.2

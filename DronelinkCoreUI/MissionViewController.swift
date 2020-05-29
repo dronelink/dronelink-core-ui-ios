@@ -265,7 +265,7 @@ public class MissionViewController: UIViewController {
     }
     
     private func promptConfirmation() {
-        guard let missionExecutor = missionExecutor, let session = session else { return }
+        guard let missionExecutor = missionExecutor else { return }
         
         if missionExecutor.engagementCount > 0,
             let confirmationMessage = missionExecutor.reengagementRules.confirmationMessage {
