@@ -786,12 +786,9 @@ extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
 extension FuncViewController: DronelinkDelegate {
     public func onRegistered(error: String?) {}
     
-    public func onMissionLoaded(executor: MissionExecutor) {
-        Dronelink.shared.unloadFunc()
-    }
+    public func onMissionLoaded(executor: MissionExecutor) {}
     
-    public func onMissionUnloaded(executor: MissionExecutor) {
-    }
+    public func onMissionUnloaded(executor: MissionExecutor) {}
     
     public func onFuncLoaded(executor: FuncExecutor) {
         funcExecutor = executor

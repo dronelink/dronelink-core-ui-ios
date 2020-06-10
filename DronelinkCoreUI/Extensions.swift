@@ -91,7 +91,7 @@ extension UIColor {
         }
     }
     
-    func interpolate(_ end: UIColor?, percent: CGFloat) -> UIColor? {
+    public func interpolate(_ end: UIColor?, percent: CGFloat) -> UIColor? {
         guard let end = end else {
             return self
         }

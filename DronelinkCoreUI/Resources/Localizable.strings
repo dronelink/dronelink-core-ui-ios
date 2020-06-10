@@ -52,6 +52,8 @@
 "DroneOffsetsViewController.levelGimbal" = "0° (Level)";
 "DroneOffsetsViewController.nadirGimbal" = "-90° (Nadir)";
 
+"InstrumentsViewController.empty" = "--";
+
 "TelemetryViewController.distance.prefix" = "D";
 "TelemetryViewController.altitude.prefix" = "A";
 "TelemetryViewController.horizontalSpeed.prefix" = "H/S";
