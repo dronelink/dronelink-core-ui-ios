@@ -283,7 +283,7 @@ public class MissionViewController: UIViewController {
                     doneButton.tintColor = .white
                     let agrume = Agrume(
                         url: URL(string: confirmationInstructionsImageUrl)!,
-                        background: .blurred(.regular),
+                        background: .blurred(.dark),
                         dismissal: .withButton(doneButton))
                     agrume.statusBarStyle = .lightContent
                     agrume.show(from: self)

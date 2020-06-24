@@ -12,6 +12,7 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
 import MaterialComponents.MaterialTextFields
 import Kingfisher
+import Agrume
 
 public protocol FuncViewControllerDelegate {
     func onFuncExpanded(value: Bool)
@@ -33,6 +34,7 @@ public class FuncViewController: UIViewController {
     private var funcExecutor: FuncExecutor?
     private let imagePlaceholder = MDCActivityIndicator()
     private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    private let headerBackgroundView = UIView()
     private let primaryButton = MDCRaisedButton()
     private let backButton = MDCFlatButton()
     private let nextButton = MDCRaisedButton()
@@ -45,9 +47,8 @@ public class FuncViewController: UIViewController {
     private let variableTextField = MDCTextField()
     private let variablePickerView = UIPickerView()
     private let variableDroneMarkButton = MDCButton()
-    private let variableDroneTextView = UITextView()
-    private let variableDroneClearButton = UIButton(type: .custom)
-    private let variableSummaryTextView = UITextView()
+    private let variableDroneViewController = FuncDroneTableViewController()
+    private let variableSummaryViewController = FuncSummaryTableViewController()
     private let progressLabel = UILabel()
     private let dismissButton = UIButton(type: .custom)
     private let primaryColor = MDCPalette.deepPurple.tint800
@@ -55,6 +56,7 @@ public class FuncViewController: UIViewController {
     private let cancelImage = DronelinkUI.loadImage(named: "baseline_close_white_36pt")
     private let droneImage = DronelinkUI.loadImage(named: "baseline_navigation_white_36pt")
     
+    private var tablet: Bool { return UIDevice.current.userInterfaceIdiom == .pad }
     private let segmentedMaxOptions = 2
     private var intro = true
     private var inputIndex = 0
@@ -90,6 +92,10 @@ public class FuncViewController: UIViewController {
         
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
+        view.clipsToBounds = true
+        
+        headerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        view.addSubview(headerBackgroundView)
         
         titleImageView.image = funcImage
         titleImageView.tintColor = UIColor.white
@@ -118,6 +124,8 @@ public class FuncViewController: UIViewController {
         view.addSubview(variableDescriptionTextView)
         
         variableImageView.contentMode = .scaleAspectFit
+        variableImageView.isUserInteractionEnabled = true
+        variableImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onImageView(sender:))))
         view.addSubview(variableImageView)
         
         variableSegmentedControl.tintColor = primaryColor
@@ -135,36 +143,31 @@ public class FuncViewController: UIViewController {
 
         let scheme = MDCContainerScheme()
         scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
-        scheme.colorScheme.primaryColor = .white
-        variableDroneMarkButton.applyOutlinedTheme(withScheme: scheme)
+        scheme.colorScheme.primaryColor = UIColor.white.withAlphaComponent(0.35)
+        variableDroneMarkButton.applyContainedTheme(withScheme: scheme)
         variableDroneMarkButton.translatesAutoresizingMaskIntoConstraints = false
         variableDroneMarkButton.setImage(droneImage?.withRenderingMode(.alwaysTemplate), for: .normal)
         variableDroneMarkButton.imageView?.contentMode = .scaleAspectFit
-        variableDroneMarkButton.tintColor = UIColor.white
+        variableDroneMarkButton.setImageTintColor(.white, for: .normal)
+        variableDroneMarkButton.setTitleColor(.white, for: .normal)
         variableDroneMarkButton.setTitle("FuncViewController.input.drone".localized, for: .normal)
         variableDroneMarkButton.addTarget(self, action: #selector(onDroneMark(sender:)), for: .touchUpInside)
         view.addSubview(variableDroneMarkButton)
         
-        variableDroneTextView.textContainerInset = .zero
-        variableDroneTextView.backgroundColor = UIColor.clear
-        variableDroneTextView.font = UIFont.boldSystemFont(ofSize: 10)
-        variableDroneTextView.textColor = UIColor.white.withAlphaComponent(0.85)
-        variableDroneTextView.isScrollEnabled = true
-        variableDroneTextView.isEditable = false
-        view.addSubview(variableDroneTextView)
+        variableDroneViewController.funcExecutor = { self.funcExecutor }
+        variableDroneViewController.onClear = { index in
+            self.funcExecutor?.clearValue(index: self.inputIndex, arrayIndex: index)
+            self.readValue()
+        }
+        addChild(variableDroneViewController)
+        view.addSubview(variableDroneViewController.view)
+        variableDroneViewController.didMove(toParent: self)
         
-        variableDroneClearButton.tintColor = UIColor.white.withAlphaComponent(0.85)
-        variableDroneClearButton.setImage(DronelinkUI.loadImage(named: "baseline_cancel_white_36pt"), for: .normal)
-        variableDroneClearButton.addTarget(self, action: #selector(onDroneClear), for: .touchUpInside)
-        view.addSubview(variableDroneClearButton)
-        
-        variableSummaryTextView.textContainerInset = .zero
-        variableSummaryTextView.backgroundColor = UIColor.clear
-        variableSummaryTextView.font = UIFont.boldSystemFont(ofSize: 12)
-        variableSummaryTextView.textColor = UIColor.white.withAlphaComponent(0.85)
-        variableSummaryTextView.isScrollEnabled = true
-        variableSummaryTextView.isEditable = false
-        view.addSubview(variableSummaryTextView)
+        variableSummaryViewController.funcExecutor = { self.funcExecutor }
+        variableSummaryViewController.onSelect = backTo
+        addChild(variableSummaryViewController)
+        view.addSubview(variableSummaryViewController.view)
+        variableSummaryViewController.didMove(toParent: self)
         
         progressLabel.font = UIFont.boldSystemFont(ofSize: 12)
         progressLabel.textColor = UIColor.white
@@ -218,6 +221,13 @@ public class FuncViewController: UIViewController {
             make.edges.equalToSuperview()
         }
         
+        headerBackgroundView.snp.remakeConstraints { make in
+            make.top.equalToSuperview()
+            make.left.equalToSuperview()
+            make.right.equalToSuperview()
+            make.height.equalTo(43)
+        }
+        
         titleImageView.snp.remakeConstraints { make in
             make.height.equalTo(24)
             make.width.equalTo(titleImageView.snp.height)
@@ -247,82 +257,35 @@ public class FuncViewController: UIViewController {
         }
         
         variableDescriptionTextView.snp.remakeConstraints { make in
+            make.top.equalToSuperview().offset(52)
             make.left.equalTo(variableNameLabel.snp.left)
             make.right.equalToSuperview().offset(-defaultPadding)
-            if intro {
-                make.top.equalTo(titleLabel.snp.bottom).offset(defaultPadding)
-            }
-            else {
-                make.top.equalTo(variableNameLabel.snp.bottom).offset(4)
-            }
             make.height.equalTo(28)
         }
         
         variableImageView.snp.remakeConstraints { make in
-            var offset = defaultPadding
-            if !(input?.descriptors.description?.isEmpty ?? true) {
-                offset += 28
+            make.top.equalToSuperview().offset(45)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            switch input?.variable.valueType ?? .null {
+            case .null:
+                make.bottom.equalToSuperview().offset(tablet ? -115 : -95)
+                break
+            case .boolean, .number, .string:
+                make.bottom.equalToSuperview().offset(tablet ? -150 : -115)
+                break
+            case .drone:
+                make.bottom.equalToSuperview().offset(tablet ? -200 : -150)
+                break
             }
-            
-            if input?.variable.valueType != .null {
-                offset += 40
-            }
-            
-            make.top.equalTo(variableNameLabel.snp.bottom).offset(offset)
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalToSuperview().offset(-50)
         }
         
-        let variableControl = !intro && (input?.descriptors.description?.isEmpty ?? true) ? variableNameLabel : variableDescriptionTextView
-        
-        variableSegmentedControl.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.top.equalTo(variableControl.snp.bottom).offset(defaultPadding)
-            make.height.equalTo(30)
+        var variableTopControl: UIView = variableDescriptionTextView
+        if !intro, let imageUrl = input?.imageUrl, !imageUrl.isEmpty {
+            variableTopControl = variableImageView
         }
-        
-        variableTextField.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.top.equalTo(variableControl.snp.bottom).offset(-5)
-            make.height.equalTo(40)
-        }
-        
-        variablePickerView.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.top.equalTo(variableControl.snp.bottom).offset(-5)
-            make.height.equalTo(80)
-        }
-        
-        variableDroneMarkButton.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.width.equalTo(110)
-            make.top.equalTo(variableControl.snp.bottom).offset(defaultPadding)
-            make.height.equalTo(40)
-        }
-        
-        variableDroneClearButton.snp.remakeConstraints { make in
-            make.height.equalTo(25)
-            make.width.equalTo(variableDroneClearButton.snp.height)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.top.equalTo(variableDroneMarkButton)
-        }
-        
-        variableDroneTextView.snp.remakeConstraints { make in
-            make.left.equalTo(variableDroneMarkButton.snp.right).offset(5)
-            make.right.equalTo(variableDroneClearButton.snp.left).offset(5)
-            make.top.equalTo(variableDroneMarkButton)
-            make.height.equalTo(variableDroneMarkButton)
-        }
-        
-        variableSummaryTextView.snp.remakeConstraints { make in
-            make.left.equalTo(variableDescriptionTextView)
-            make.right.equalTo(variableDescriptionTextView)
-            make.top.equalTo(variableNameLabel.snp.bottom).offset(defaultPadding)
-            make.bottom.equalTo(backButton.snp.top).offset(-defaultPadding)
+        else if !(input?.descriptors.description?.isEmpty ?? true) {
+            variableTopControl = variableNameLabel
         }
         
         backButton.snp.remakeConstraints { make in
@@ -332,18 +295,20 @@ public class FuncViewController: UIViewController {
             make.width.equalTo(85)
         }
         
+        let variableBottomControl = backButton
+
         progressLabel.snp.remakeConstraints { make in
             make.left.equalTo(backButton.snp.right).offset(defaultPadding)
             make.right.equalTo(nextButton.snp.left).offset(-defaultPadding)
-            make.top.equalTo(backButton)
-            make.bottom.equalTo(backButton)
+            make.top.equalTo(variableBottomControl)
+            make.bottom.equalTo(variableBottomControl)
         }
-        
+
         nextButton.snp.remakeConstraints { make in
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(backButton)
             make.width.equalTo(last ? 200 : 85)
-            make.bottom.equalTo(backButton)
+            make.bottom.equalTo(variableBottomControl)
         }
         
         primaryButton.snp.remakeConstraints { make in
@@ -351,6 +316,48 @@ public class FuncViewController: UIViewController {
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
+        }
+        
+        variableSummaryViewController.view.snp.remakeConstraints { make in
+            make.top.equalToSuperview().offset(50)
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(-defaultPadding)
+        }
+
+        variableSegmentedControl.snp.remakeConstraints { make in
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -25 : -15)
+            make.height.equalTo(30)
+        }
+
+        variableTextField.snp.remakeConstraints { make in
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -25 : -15)
+            make.height.equalTo(40)
+        }
+
+        variablePickerView.snp.remakeConstraints { make in
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(15)
+            make.height.equalTo(80)
+        }
+
+        variableDroneMarkButton.snp.remakeConstraints { make in
+            make.left.equalToSuperview().offset(defaultPadding * 2)
+            make.right.equalToSuperview().offset(-defaultPadding * 2)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -15 : -10)
+            make.height.equalTo(tablet ? 35 : 30)
+        }
+
+        variableDroneViewController.view.snp.remakeConstraints { make in
+            make.left.equalToSuperview().offset(defaultPadding)
+            make.right.equalToSuperview().offset(-defaultPadding)
+            make.top.equalTo(variableTopControl.snp.bottom).offset(3)
+            make.bottom.equalTo(variableDroneMarkButton.snp.top).offset(-5)
         }
         
         update()
@@ -411,7 +418,11 @@ public class FuncViewController: UIViewController {
     }
     
     @objc func onBack(sender: Any) {
-        inputIndex -= 1
+        backTo(index: inputIndex -  1)
+    }
+    
+    func backTo(index: Int) {
+        inputIndex = index
         if inputIndex < (funcExecutor?.inputCount ?? 0) - 1 {
             funcExecutor?.removeLastDynamicInput()
         }
@@ -437,6 +448,21 @@ public class FuncViewController: UIViewController {
         view.setNeedsUpdateConstraints()
     }
     
+    @objc func onImageView(sender: Any) {
+        guard let imageUrl = input?.imageUrl, !imageUrl.isEmpty else {
+            return
+        }
+
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
+        doneButton.tintColor = .white
+        let agrume = Agrume(
+            url: URL(string: imageUrl)!,
+            background: .blurred(.dark),
+            dismissal: .withButton(doneButton))
+        agrume.statusBarStyle = .lightContent
+        agrume.show(from: self)
+    }
+    
     @objc func onDroneMark(sender: Any) {
         guard let session = self.session else {
             DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.drone.unavailable".localized)
@@ -448,11 +474,6 @@ public class FuncViewController: UIViewController {
         }
         
         writeValue()
-        readValue()
-    }
-    
-    @objc func onDroneClear(sender: Any) {
-        funcExecutor?.clearValue(index: inputIndex)
         readValue()
     }
     
@@ -523,7 +544,7 @@ public class FuncViewController: UIViewController {
                 
             case .drone:
                 if next {
-                    if funcExecutor?.readValue(index: inputIndex) == nil && !input.optional {
+                    if funcExecutor?.readValue(inputIndex: inputIndex) == nil && !input.optional {
                         DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.required".localized)
                         return false
                     }
@@ -550,7 +571,6 @@ public class FuncViewController: UIViewController {
         variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
         variableSegmentedControl.removeAllSegments()
         variablePickerView.reloadAllComponents()
-        variableDroneTextView.text = ""
         
         guard let input = input else {
             self.value = nil
@@ -569,7 +589,7 @@ public class FuncViewController: UIViewController {
             }
         }
         
-        guard let value = funcExecutor?.readValue(index: inputIndex) else {
+        guard let value = funcExecutor?.readValue(inputIndex: inputIndex) else {
             self.value = nil
             update()
             return
@@ -578,20 +598,8 @@ public class FuncViewController: UIViewController {
         update()
         
         if input.variable.valueType == .drone {
-            if let valueString = value as? String {
-                variableDroneTextView.text = valueString
-            }
-            
-            if let valueArray = value as? [Any] {
-                let valueArrayStrings = valueArray.reversed().enumerated().map { value -> String in
-                    if let valueString = value.element as? String {
-                        return "\(valueArray.count - value.offset). \(valueString)"
-                    }
-                    return ""
-                }
-                
-                variableDroneTextView.text = valueArrayStrings.joined(separator: "\n")
-            }
+            variableDroneViewController.inputIndex = inputIndex
+            variableDroneViewController.refresh()
             return
         }
         
@@ -614,31 +622,6 @@ public class FuncViewController: UIViewController {
         }
     }
     
-    var summary: String {
-        guard let funcExecutor = funcExecutor else {
-            return ""
-        }
-        
-        var summary: [String] = []
-        for index in 0..<funcExecutor.inputCount {
-            if let input = funcExecutor.input(index: index) {
-                var details = "FuncViewController.input.none".localized
-                if let value = funcExecutor.readValue(index: index, formatted: true) as? String {
-                    details = value
-                }
-                
-                var name = input.descriptors.name ?? ""
-                if let valueNumberMeasurementTypeDisplay = self.valueNumberMeasurementTypeDisplay(index: index) {
-                    name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
-                }
-                
-                summary.append("\(index + 1). \(name)\n\(details)")
-            }
-        }
-        
-        return summary.joined(separator: "\n\n")
-    }
-    
     func update() {
         guard let funcExecutor = funcExecutor else {
             return
@@ -653,9 +636,8 @@ public class FuncViewController: UIViewController {
         variableTextField.isHidden = true
         variablePickerView.isHidden = true
         variableDroneMarkButton.isHidden = true
-        variableDroneClearButton.isHidden = true
-        variableDroneTextView.isHidden = true
-        variableSummaryTextView.isHidden = true
+        variableDroneViewController.view.isHidden = true
+        variableSummaryViewController.view.isHidden = true
         
         if intro {
             titleImageView.isHidden = false
@@ -692,15 +674,14 @@ public class FuncViewController: UIViewController {
             }
             variableNameLabel.text = name
             
-            if !(input.descriptors.description?.isEmpty ?? true) {
-                variableDescriptionTextView.isHidden = false
-                variableDescriptionTextView.text = input.descriptors.description
-            }
-            
             if let imageUrl = input.imageUrl, !imageUrl.isEmpty {
                 variableImageView.image = nil
                 variableImageView.kf.setImage(with: URL(string: imageUrl), placeholder: imagePlaceholder)
                 variableImageView.isHidden = false
+            }
+            else if !(input.descriptors.description?.isEmpty ?? true) {
+                variableDescriptionTextView.isHidden = false
+                variableDescriptionTextView.text = input.descriptors.description
             }
 
             switch input.variable.valueType {
@@ -729,8 +710,7 @@ public class FuncViewController: UIViewController {
                 
             case .drone:
                 variableDroneMarkButton.isHidden = false
-                variableDroneTextView.isHidden = false
-                variableDroneClearButton.isHidden = value == nil
+                variableDroneViewController.view.isHidden = false
                 break
             
             @unknown default:
@@ -744,9 +724,8 @@ public class FuncViewController: UIViewController {
         if last {
             variableNameLabel.isHidden = false
             variableNameLabel.text = "FuncViewController.input.summary".localized
-            variableSummaryTextView.isHidden = false
-            variableSummaryTextView.text = summary
-
+            variableSummaryViewController.view.isHidden = false
+            variableSummaryViewController.refresh()
             delegate?.onFuncExpanded(value: funcExecutor.inputCount > 3)
             return
         }
@@ -835,5 +814,157 @@ extension FuncViewController: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
+    }
+}
+
+class FuncDroneTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    var funcExecutor: (() -> FuncExecutor?)?
+    var inputIndex: Int = 0
+    var onClear: ((Int) -> ())?
+    
+    private let tableView = UITableView()
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView.register(DroneTableViewCell.self, forCellReuseIdentifier: "drone")
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.backgroundColor = UIColor.clear
+        tableView.allowsSelection = false
+        tableView.setEditing(true, animated: false)
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    func refresh() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return funcExecutor == nil ? 0 : 1
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if let value = funcExecutor?()?.readValue(inputIndex: inputIndex) as? [Any] {
+            return value.count
+        }
+        return 1
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "drone", for: indexPath) as UITableViewCell
+        if let funcExecutor = funcExecutor?(), let value = funcExecutor.readValue(inputIndex: inputIndex) {
+            let count = (value as? [Any])?.count ?? 0
+            let variableValueIndex = count == 0 ? 0 : count - indexPath.row - 1
+            let value = funcExecutor.readValue(inputIndex: inputIndex, variableValueIndex: variableValueIndex, formatted: true) as? String
+            cell.textLabel?.text = value
+            cell.detailTextLabel?.text = count > 0 ? "\(variableValueIndex + 1)" : nil
+        }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 37
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            onClear?(indexPath.row)
+        }
+    }
+    
+//    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+//        return (funcExecutor?()?.readValue(inputIndex: inputIndex) as? [Any])?.count ?? 0 > 0
+//    }
+//
+//    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+//
+//    }
+    
+    private class DroneTableViewCell: UITableViewCell {
+        override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+            super.init(style: .value1, reuseIdentifier: reuseIdentifier)
+            backgroundColor = .clear
+            textLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+            detailTextLabel?.font = UIFont.boldSystemFont(ofSize: 12)
+        }
+
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+    }
+}
+
+class FuncSummaryTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+    var funcExecutor: (() -> FuncExecutor?)?
+    var onSelect: ((Int) -> ())?
+    
+    private let tableView = UITableView()
+    
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView.register(InputTableViewCell.self, forCellReuseIdentifier: "input")
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.backgroundColor = UIColor.clear
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    func refresh() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return funcExecutor == nil ? 0 : 1
+    }
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return funcExecutor?()?.inputCount ?? 0
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "input", for: indexPath) as UITableViewCell
+        if let funcExecutor = funcExecutor?(), let input = funcExecutor.input(index: indexPath.row) {
+            var name = input.descriptors.name ?? ""
+            if let valueNumberMeasurementTypeDisplay = funcExecutor.readValueNumberMeasurementTypeDisplay(index: indexPath.row) {
+                name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
+            }
+            var details = "FuncViewController.input.none".localized
+            if let value = funcExecutor.readValue(inputIndex: indexPath.row, formatted: true) as? String {
+                details = value
+            }
+            
+            cell.textLabel?.text = "\(indexPath.row + 1). \(name)"
+            cell.detailTextLabel?.text = details
+        }
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        onSelect?(indexPath.row)
+    }
+    
+    private class InputTableViewCell: UITableViewCell {
+        override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+            super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
+            backgroundColor = UIColor.clear
+            accessoryType = .disclosureIndicator
+            textLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+            textLabel?.textColor = UIColor.white.withAlphaComponent(0.55)
+            detailTextLabel?.font = UIFont.boldSystemFont(ofSize: 14)
+        }
+
+        required init?(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
     }
 }
