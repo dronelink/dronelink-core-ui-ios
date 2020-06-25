@@ -18,4 +18,5 @@ target 'DronelinkCoreUI' do
   pod 'MaterialComponents/ActivityIndicator', '~> 109.7.0'
   pod 'Kingfisher', '~> 5.14.0'
   pod 'Agrume', '~> 5.6.8'
+  pod 'IQKeyboardManager', '~> 6.5.5'
 end

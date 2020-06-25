@@ -27,4 +27,5 @@ Pod::Spec.new do |s|
   s.dependency "MaterialComponents/ActivityIndicator", "~> 109.7.0"
   s.dependency "Kingfisher", "~> 5.14.0"
   s.dependency "Agrume", "~> 5.6.8"
+  s.dependency "IQKeyboardManager", "~> 6.5.5"
 end

@@ -13,6 +13,7 @@ import MaterialComponents.MaterialButtons_Theming
 import MaterialComponents.MaterialTextFields
 import Kingfisher
 import Agrume
+import IQKeyboardManager
 
 public protocol FuncViewControllerDelegate {
     func onFuncExpanded(value: Bool)
@@ -35,6 +36,7 @@ public class FuncViewController: UIViewController {
     private let imagePlaceholder = MDCActivityIndicator()
     private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let headerBackgroundView = UIView()
+    private let footerBackgroundView = UIView()
     private let primaryButton = MDCRaisedButton()
     private let backButton = MDCFlatButton()
     private let nextButton = MDCRaisedButton()
@@ -75,6 +77,8 @@ public class FuncViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        IQKeyboardManager.shared().isEnabled = true
+        
         imagePlaceholder.radius = 20
         imagePlaceholder.strokeWidth = 5
         imagePlaceholder.cycleColors = [DronelinkUI.Constants.secondaryColor!]
@@ -96,6 +100,9 @@ public class FuncViewController: UIViewController {
         
         headerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
         view.addSubview(headerBackgroundView)
+        
+        footerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        view.addSubview(footerBackgroundView)
         
         titleImageView.image = funcImage
         titleImageView.tintColor = UIColor.white
@@ -228,6 +235,13 @@ public class FuncViewController: UIViewController {
             make.height.equalTo(43)
         }
         
+        footerBackgroundView.snp.remakeConstraints { make in
+            make.bottom.equalToSuperview()
+            make.left.equalToSuperview()
+            make.right.equalToSuperview()
+            make.height.equalTo(52)
+        }
+        
         titleImageView.snp.remakeConstraints { make in
             make.height.equalTo(24)
             make.width.equalTo(titleImageView.snp.height)
@@ -269,33 +283,36 @@ public class FuncViewController: UIViewController {
             make.right.equalToSuperview().offset(-defaultPadding)
             switch input?.variable.valueType ?? .null {
             case .null:
-                make.bottom.equalToSuperview().offset(tablet ? -115 : -95)
+                make.bottom.equalToSuperview().offset(tablet ? -120 : -115)
                 break
             case .boolean, .number, .string:
-                make.bottom.equalToSuperview().offset(tablet ? -150 : -115)
+                make.bottom.equalToSuperview().offset(tablet ? -155 : -125)
                 break
             case .drone:
-                make.bottom.equalToSuperview().offset(tablet ? -200 : -150)
+                make.bottom.equalToSuperview().offset(tablet ? -205 : -160)
                 break
             }
         }
         
+        var expanded = false
         var variableTopControl: UIView = variableDescriptionTextView
         if !intro, let imageUrl = input?.imageUrl, !imageUrl.isEmpty {
+            expanded = true
             variableTopControl = variableImageView
         }
         else if !(input?.descriptors.description?.isEmpty ?? true) {
             variableTopControl = variableNameLabel
         }
         
+        let variableBottomControl = backButton
+        let buttonHeight = 32
+        
         backButton.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
-            make.height.equalTo(35)
+            make.height.equalTo(buttonHeight)
             make.width.equalTo(85)
         }
-        
-        let variableBottomControl = backButton
 
         progressLabel.snp.remakeConstraints { make in
             make.left.equalTo(backButton.snp.right).offset(defaultPadding)
@@ -306,13 +323,13 @@ public class FuncViewController: UIViewController {
 
         nextButton.snp.remakeConstraints { make in
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.height.equalTo(backButton)
+            make.height.equalTo(buttonHeight)
             make.width.equalTo(last ? 200 : 85)
             make.bottom.equalTo(variableBottomControl)
         }
         
         primaryButton.snp.remakeConstraints { make in
-            make.height.equalTo(35)
+            make.height.equalTo(buttonHeight)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
@@ -320,22 +337,22 @@ public class FuncViewController: UIViewController {
         
         variableSummaryViewController.view.snp.remakeConstraints { make in
             make.top.equalToSuperview().offset(50)
-            make.left.equalToSuperview().offset(defaultPadding)
+            make.left.equalToSuperview().offset(5)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(-defaultPadding)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(-15)
         }
 
         variableSegmentedControl.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -25 : -15)
-            make.height.equalTo(30)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(-26)
+            make.height.equalTo(tablet ? 30 : 28)
         }
 
         variableTextField.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -25 : -15)
+            make.left.equalToSuperview().offset(15)
+            make.right.equalToSuperview().offset(-15)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(-28)
             make.height.equalTo(40)
         }
 
@@ -348,16 +365,30 @@ public class FuncViewController: UIViewController {
 
         variableDroneMarkButton.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding * 2)
-            make.right.equalToSuperview().offset(-defaultPadding * 2)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -15 : -10)
-            make.height.equalTo(tablet ? 35 : 30)
+            if expanded {
+                make.right.equalToSuperview().offset(-defaultPadding * 2)
+                make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -30 : -25)
+            }
+            else {
+                make.width.equalTo(115)
+                make.bottom.equalTo(variableBottomControl.snp.top).offset(-25)
+            }
+            make.height.equalTo(buttonHeight)
         }
 
         variableDroneViewController.view.snp.remakeConstraints { make in
-            make.left.equalToSuperview().offset(defaultPadding)
-            make.right.equalToSuperview().offset(-defaultPadding)
-            make.top.equalTo(variableTopControl.snp.bottom).offset(3)
-            make.bottom.equalTo(variableDroneMarkButton.snp.top).offset(-5)
+            if expanded {
+                make.left.equalToSuperview().offset(defaultPadding)
+                make.right.equalToSuperview().offset(-defaultPadding * 2)
+                make.top.equalTo(variableTopControl.snp.bottom).offset(3)
+                make.bottom.equalTo(variableDroneMarkButton.snp.top).offset(-5)
+            }
+            else {
+                make.left.equalTo(variableDroneMarkButton.snp.right)
+                make.right.equalToSuperview().offset(-5)
+                make.top.equalTo(variableDroneMarkButton).offset(-5)
+                make.bottom.equalTo(variableDroneMarkButton).offset(15)
+            }
         }
         
         update()
@@ -591,6 +622,7 @@ public class FuncViewController: UIViewController {
         
         guard let value = funcExecutor?.readValue(inputIndex: inputIndex) else {
             self.value = nil
+            variableDroneViewController.refresh()
             update()
             return
         }
@@ -638,6 +670,7 @@ public class FuncViewController: UIViewController {
         variableDroneMarkButton.isHidden = true
         variableDroneViewController.view.isHidden = true
         variableSummaryViewController.view.isHidden = true
+        footerBackgroundView.isHidden = intro
         
         if intro {
             titleImageView.isHidden = false
@@ -805,6 +838,8 @@ extension FuncViewController: DroneSessionManagerDelegate {
 }
 
 extension FuncViewController: FuncExecutorDelegate {
+    public func onFuncInputsChanged(executor: FuncExecutor) {}
+    
     public func onFuncExecuted(executor: FuncExecutor) {
         FuncViewController.mostRecentExecuted = executor
     }
@@ -849,10 +884,13 @@ class FuncDroneTableViewController: UIViewController, UITableViewDelegate, UITab
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let value = funcExecutor?()?.readValue(inputIndex: inputIndex) as? [Any] {
-            return value.count
+        if let value = funcExecutor?()?.readValue(inputIndex: inputIndex) {
+            if let array = value as? [Any] {
+                return array.count
+            }
+            return 1
         }
-        return 1
+        return 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -873,7 +911,7 @@ class FuncDroneTableViewController: UIViewController, UITableViewDelegate, UITab
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            onClear?(indexPath.row)
+            onClear?(tableView.numberOfRows(inSection: 0) - indexPath.row - 1)
         }
     }
     

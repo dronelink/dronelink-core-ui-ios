@@ -159,7 +159,7 @@ PODS:
 
 DEPENDENCIES:
   - Agrume (~> 5.6.8)
-  - DronelinkCore (from `../../private/dronelink-core-ios`)
+  - DronelinkCore (~> 1.6.1)
   - Kingfisher (~> 5.14.0)
   - Mapbox-iOS-SDK (~> 5.9.0)
   - MaterialComponents/ActivityIndicator (~> 109.7.0)
@@ -177,6 +177,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Agrume
+    - DronelinkCore
     - Kingfisher
     - Mapbox-iOS-SDK
     - MapboxMobileEvents
@@ -189,13 +190,9 @@ SPEC REPOS:
     - SnapKit
     - SwiftyGif
 
-EXTERNAL SOURCES:
-  DronelinkCore:
-    :path: "../../private/dronelink-core-ios"
-
 SPEC CHECKSUMS:
   Agrume: 53c2be9b06caef4b4996a2886a56b9e901bcc6c0
-  DronelinkCore: 32d0a806cf2b995eacaf009c55ebe8bf067db706
+  DronelinkCore: fef54a9697062e444477ea5c2b14434bf5f33446
   Kingfisher: 7b64389a43139c903ec434788344c288217c792d
   Mapbox-iOS-SDK: a5915700ec84bc1a7f8b3e746d474789e35b7956
   MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
@@ -208,6 +205,6 @@ SPEC CHECKSUMS:
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
 
-PODFILE CHECKSUM: 02487e4df78a32156d8d77437f34b3b9ead19d36
+PODFILE CHECKSUM: 8be502ae393bec1e0a4fe4b8a8a597cf95cd308f
 
-COCOAPODS: 1.9.2
+COCOAPODS: 1.9.3

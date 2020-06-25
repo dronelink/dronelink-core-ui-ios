@@ -50,6 +50,7 @@ public class MicrosoftMapViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
+    private var funcExecutor: FuncExecutor?
     private let mapView = MSMapView()
     private let droneLayer = MSMapElementLayer()
     private let droneIcon = MSMapIcon()
@@ -59,6 +60,9 @@ public class MicrosoftMapViewController: UIViewController {
     private var droneMissionExecutedPolyline: MSMapPolyline?
     private var droneMissionExecutedPositions: [MSGeoposition] = []
     private let missionLayer = MSMapElementLayer()
+    private let funcLayer = MSMapElementLayer()
+    private var funcInputDroneIcons: [MSMapIcon] = []
+    private let funcInputDroneImage = MSMapImage(uiImage: DronelinkUI.loadImage(named: "func-input-drone", renderingMode: .alwaysOriginal)!)
     private let updateDroneElementsInterval: TimeInterval = 0.1
     private var updateDroneElementsTimer: Timer?
     private var droneTakeoffAltitude: Double?
@@ -115,6 +119,9 @@ public class MicrosoftMapViewController: UIViewController {
         missionLayer.zIndex = 1
         mapView.layers.add(missionLayer)
         
+        funcLayer.zIndex = 1
+        mapView.layers.add(funcLayer)
+        
         updateDroneElements()
     }
     
@@ -133,6 +140,7 @@ public class MicrosoftMapViewController: UIViewController {
         Dronelink.shared.remove(delegate: self)
         session?.remove(delegate: self)
         missionExecutor?.remove(delegate: self)
+        funcExecutor?.remove(delegate: self)
     }
     
     public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
@@ -390,6 +398,63 @@ public class MicrosoftMapViewController: UIViewController {
         }
     }
     
+    private func updateFuncElements() {
+        var iconIndex = 0
+        var inputIndex = 0
+        while let input = funcExecutor?.input(index: inputIndex) {
+            if input.variable.valueType == .drone {
+                if let value = funcExecutor?.readValue(inputIndex: inputIndex) {
+                    var spatials: [Mission.GeoSpatial] = []
+                    if let array = value as? [Mission.GeoSpatial?] {
+                        array.forEach { spatial in
+                            if let spatial = spatial {
+                                spatials.append(spatial)
+                            }
+                        }
+                    }
+                    else if let spatial = value as? Mission.GeoSpatial {
+                        spatials.append(spatial)
+                    }
+                    
+                    spatials.enumerated().forEach { (variableValueIndex, spatial) in
+                        var inputIcon = funcInputDroneIcons[safeIndex: iconIndex]
+                        if inputIcon == nil {
+                            inputIcon = MSMapIcon()
+                            inputIcon?.image = funcInputDroneImage
+                            inputIcon?.flat = true
+                            inputIcon?.desiredCollisionBehavior = .remainVisible
+                            inputIcon?.flyout = MSMapFlyout()
+                            funcInputDroneIcons.append(inputIcon!)
+                        }
+                        
+                        inputIcon?.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: spatial.coordinate.coordinate, altitude: spatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
+                        inputIcon?.flyout?.title = "\(inputIndex + 1). \(input.descriptors.name ?? "")"
+                        if let value = funcExecutor?.readValue(inputIndex: inputIndex, variableValueIndex: variableValueIndex, formatted: true) as? String {
+                            inputIcon?.flyout?.description = "\(value)\(((value as? [Mission.GeoSpatial?])?.count ?? 0) > 1 ? " (\(variableValueIndex + 1))" : "")"
+                        }
+                        else {
+                            inputIcon?.flyout?.description = nil
+                        }
+                        iconIndex += 1
+                    }
+                }
+            }
+            inputIndex += 1
+        }
+        
+        while iconIndex < funcInputDroneIcons.count {
+            funcInputDroneIcons.removeLast()
+        }
+        
+        while funcLayer.elements.count > funcInputDroneIcons.count {
+            funcLayer.elements.removeMapElement(at: funcLayer.elements.count - 1)
+        }
+        
+        while funcLayer.elements.count < funcInputDroneIcons.count {
+            funcLayer.elements.add(funcInputDroneIcons[Int(funcLayer.elements.count)])
+        }
+    }
+    
     private func updateDroneTakeoffAltitude() {
         var point: MSGeopoint?
         if let takeoffLocation = session?.state?.value.takeoffLocation {
@@ -521,9 +586,23 @@ extension MicrosoftMapViewController: DronelinkDelegate {
         }
     }
     
-    public func onFuncLoaded(executor: FuncExecutor) {}
+    public func onFuncLoaded(executor: FuncExecutor) {
+        funcExecutor = executor
+        executor.add(delegate: self)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
+    }
     
-    public func onFuncUnloaded(executor: FuncExecutor) {}
+    public func onFuncUnloaded(executor: FuncExecutor) {
+        funcExecutor = nil
+        executor.remove(delegate: self)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
+    }
 }
 
 extension MicrosoftMapViewController: DroneSessionManagerDelegate {
@@ -589,6 +668,16 @@ extension MicrosoftMapViewController: MissionExecutorDelegate {
     public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {
         droneMissionExecutedPositions.removeAll()
     }
+}
+
+extension MicrosoftMapViewController: FuncExecutorDelegate {
+    public func onFuncInputsChanged(executor: FuncExecutor) {
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
+    }
+    
+    public func onFuncExecuted(executor: FuncExecutor) {}
 }
 
 extension MSGeoposition {
