@@ -602,6 +602,7 @@ public class FuncViewController: UIViewController {
         variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
         variableSegmentedControl.removeAllSegments()
         variablePickerView.reloadAllComponents()
+        variableDroneViewController.inputIndex = inputIndex
         
         guard let input = input else {
             self.value = nil
@@ -630,7 +631,6 @@ public class FuncViewController: UIViewController {
         update()
         
         if input.variable.valueType == .drone {
-            variableDroneViewController.inputIndex = inputIndex
             variableDroneViewController.refresh()
             return
         }
@@ -895,6 +895,8 @@ class FuncDroneTableViewController: UIViewController, UITableViewDelegate, UITab
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "drone", for: indexPath) as UITableViewCell
+        cell.textLabel?.text = nil
+        cell.detailTextLabel?.text = nil
         if let funcExecutor = funcExecutor?(), let value = funcExecutor.readValue(inputIndex: inputIndex) {
             let count = (value as? [Any])?.count ?? 0
             let variableValueIndex = count == 0 ? 0 : count - indexPath.row - 1
