@@ -30,6 +30,9 @@ public class CameraOffsetsViewController: UIViewController {
     
     private let updateInterval: TimeInterval = 0.25
     private var updateTimer: Timer?
+    private var evStepsPending: Int?
+    private var evStepsTimer: Timer?
+    
     private var offsets: DroneOffsets {
         get { Dronelink.shared.droneOffsets }
         set (newOffsets) { Dronelink.shared.droneOffsets = newOffsets }
@@ -130,16 +133,32 @@ public class CameraOffsetsViewController: UIViewController {
     }
     
     private func onEV(steps: Int) {
-        guard let session = session else {
-            return
+        evStepsTimer?.invalidate()
+        
+        if let evStepsPending = self.evStepsPending {
+            self.evStepsPending = evStepsPending + steps
+        }
+        else {
+            evStepsPending = steps
         }
         
-        do {
-            let exposureCommand = Mission.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
-            try? session.add(command: exposureCommand)
-            offsets.cameraExposureCompensationSteps += steps
-            self.exposureCommand = exposureCommand
-            update()
+        evStepsTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in
+            guard let session = self.session, let steps = self.evStepsPending else {
+                return
+            }
+            
+            self.evStepsPending = nil
+            if steps == 0 {
+                return
+            }
+            
+            do {
+                let exposureCommand = Mission.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
+                try? session.add(command: exposureCommand)
+                self.offsets.cameraExposureCompensationSteps += steps
+                self.exposureCommand = exposureCommand
+                self.update()
+            }
         }
     }
     
