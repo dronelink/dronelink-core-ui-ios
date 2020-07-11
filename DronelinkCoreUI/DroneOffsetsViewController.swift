@@ -480,6 +480,33 @@ public class DroneOffsetsViewController: UIViewController {
             c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
             break
         }
+        
+        if let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
+            let deadband = 0.1
+            
+            let yawPercent = remoteControllerState.leftStickState.horizontal
+            if abs(yawPercent) > deadband {
+                offsets.droneYaw += (1.0 * yawPercent).convertDegreesToRadians
+            }
+
+            let altitudePercent = remoteControllerState.leftStickState.vertical
+            if abs(altitudePercent) > deadband {
+                offsets.droneAltitude += (0.25 * altitudePercent).convertFeetToMeters
+            }
+            
+            
+            let positionPercent = remoteControllerState.rightStickState.vertical
+            if abs(positionPercent) > deadband {
+                guard let state = session?.state?.value else {
+                    return
+                }
+                
+                offsets.droneCoordinate = offsets.droneCoordinate.add(
+                    vector: Mission.Vector2(
+                        direction: state.missionOrientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
+                        magnitude: (0.25 * abs(positionPercent)).convertFeetToMeters))
+            }
+        }
     }
     
     func display(vector: Mission.Vector2) -> String {

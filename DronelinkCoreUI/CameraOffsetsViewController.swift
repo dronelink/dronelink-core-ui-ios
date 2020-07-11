@@ -151,6 +151,16 @@ public class CameraOffsetsViewController: UIViewController {
         c2Button.isEnabled = c1Button.isEnabled
         
         cLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
+        
+        if exposureCommand == nil, let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
+            if remoteControllerState.c1ButtonState.pressed {
+                onEV(steps: -1)
+            }
+            
+            if remoteControllerState.c2ButtonState.pressed {
+                onEV(steps: 1)
+            }
+        }
     }
 }
 
