@@ -481,8 +481,9 @@ public class DroneOffsetsViewController: UIViewController {
             break
         }
         
-        if let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
-            let deadband = 0.1
+        if Dronelink.shared.missionExecutor?.engaged ?? false,
+            let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
+            let deadband = 0.2
             
             let yawPercent = remoteControllerState.leftStickState.horizontal
             if abs(yawPercent) > deadband {

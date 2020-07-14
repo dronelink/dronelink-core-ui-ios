@@ -20,6 +20,9 @@ public class CameraOffsetsViewController: UIViewController {
         return cameraOffsetsViewController
     }
     
+    private let c1Image = DronelinkUI.loadImage(named: "baseline_remove_white_24pt")
+    private let c2Image = DronelinkUI.loadImage(named: "baseline_add_white_24pt")
+    
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var exposureCommand: Mission.ExposureCompensationStepCameraCommand?
@@ -28,7 +31,7 @@ public class CameraOffsetsViewController: UIViewController {
     private let c2Button = MDCFloatingButton()
     private let cLabel = UILabel()
     
-    private let updateInterval: TimeInterval = 0.25
+    private let updateInterval: TimeInterval = 0.2
     private var updateTimer: Timer?
     private var evStepsPending: Int?
     private var evStepsTimer: Timer?
@@ -49,8 +52,8 @@ public class CameraOffsetsViewController: UIViewController {
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         
-        configureButton(button: c1Button, image: "baseline_remove_white_24pt", action: #selector(onC1(sender:)))
-        configureButton(button: c2Button, image: "baseline_add_white_24pt", action: #selector(onC2(sender:)))
+        configureButton(button: c1Button, action: #selector(onC1(sender:)))
+        configureButton(button: c2Button, action: #selector(onC2(sender:)))
         
         cLabel.textAlignment = .center
         cLabel.font = UIFont.boldSystemFont(ofSize: 14)
@@ -75,10 +78,9 @@ public class CameraOffsetsViewController: UIViewController {
         droneSessionManager.remove(delegate: self)
     }
     
-    private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector) {
+    private func configureButton(button: MDCFloatingButton, color: UIColor? = nil, action: Selector) {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundColor((color ?? UIColor.darkGray).withAlphaComponent(0.85))
-        button.setImage(DronelinkUI.loadImage(named: image), for: .normal)
         button.tintColor = UIColor.white
         button.addTarget(self, action: action, for: .touchUpInside)
         if button.superview == nil {
@@ -142,7 +144,7 @@ public class CameraOffsetsViewController: UIViewController {
             evStepsPending = steps
         }
         
-        evStepsTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { timer in
+        evStepsTimer = Timer.scheduledTimer(withTimeInterval: 0.75, repeats: false) { timer in
             guard let session = self.session, let steps = self.evStepsPending else {
                 return
             }
@@ -168,6 +170,27 @@ public class CameraOffsetsViewController: UIViewController {
         c1Button.isEnabled = exposureCompensation != nil
         c2Button.tintColor = c1Button.tintColor
         c2Button.isEnabled = c1Button.isEnabled
+        
+        if let evStepsPending = evStepsPending, evStepsPending != 0 {
+            if evStepsPending > 0 {
+                c1Button.setTitle(nil, for: .normal)
+                c1Button.setImage(c1Image, for: .normal)
+                c2Button.setTitle("+\(evStepsPending)", for: .normal)
+                c2Button.setImage(nil, for: .normal)
+            }
+            else {
+                c1Button.setTitle("\(evStepsPending)", for: .normal)
+                c1Button.setImage(nil, for: .normal)
+                c2Button.setTitle(nil, for: .normal)
+                c2Button.setImage(c2Image, for: .normal)
+            }
+        }
+        else {
+            c1Button.setImage(c1Image, for: .normal)
+            c1Button.setTitle(nil, for: .normal)
+            c2Button.setImage(c2Image, for: .normal)
+            c2Button.setTitle(nil, for: .normal)
+        }
         
         cLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
         
