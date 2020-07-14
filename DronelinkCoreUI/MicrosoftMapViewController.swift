@@ -385,16 +385,27 @@ public class MicrosoftMapViewController: UIViewController {
             missionLayer.elements.add(polyline)
         }
 
-        if let reengagementEstimateSpatials = missionExecutor?.estimate?.reengagementSpatials, reengagementEstimateSpatials.count > 0 {
-            var positions: [MSGeoposition] = []
-            reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
-            let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
+        if missionExecutor?.engaged ?? false {
+            if let reengagementEstimateSpatials = missionExecutor?.estimate?.reengagementSpatials, reengagementEstimateSpatials.count > 0 {
+                if let reengagementEstimateSpatial = reengagementEstimateSpatials.last {
+                    let reengagementIcon = MSMapIcon()
+                    reengagementIcon.image = MSMapImage(uiImage: DronelinkUI.loadImage(named: "reengagement", renderingMode: .alwaysOriginal)!)
+                    reengagementIcon.flat = true
+                    reengagementIcon.desiredCollisionBehavior = .remainVisible
+                    reengagementIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: reengagementEstimateSpatial.coordinate.coordinate, altitude: reengagementEstimateSpatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
+                    missionLayer.elements.add(reengagementIcon)
+                }
+            
+                var positions: [MSGeoposition] = []
+                reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
+                let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
 
-            let polyline = MSMapPolyline()
-            polyline.strokeColor = MDCPalette.purple.accent200!
-            polyline.strokeWidth = 1
-            polyline.path = path
-            missionLayer.elements.add(polyline)
+                let polyline = MSMapPolyline()
+                polyline.strokeColor = MDCPalette.purple.accent200!
+                polyline.strokeWidth = 1
+                polyline.path = path
+                missionLayer.elements.add(polyline)
+            }
         }
     }
     
@@ -667,6 +678,9 @@ extension MicrosoftMapViewController: MissionExecutorDelegate {
     
     public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {
         droneMissionExecutedPositions.removeAll()
+        DispatchQueue.main.async {
+            self.updateMissionElements()
+        }
     }
 }
 

@@ -51,6 +51,7 @@
 "DroneOffsetsViewController.resetGimbal" = "Reset";
 "DroneOffsetsViewController.levelGimbal" = "0° (Level)";
 "DroneOffsetsViewController.nadirGimbal" = "-90° (Nadir)";
+"DroneOffsetsViewController.rollTrim" = "Roll Trim";
 
 "InstrumentsViewController.empty" = "--";
 

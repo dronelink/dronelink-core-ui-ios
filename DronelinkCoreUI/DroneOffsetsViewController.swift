@@ -51,6 +51,8 @@ public class DroneOffsetsViewController: UIViewController {
     
     private let updateInterval: TimeInterval = 0.25
     private var updateTimer: Timer?
+    private var rollVisible = false
+    private var rollValue = 0
     private var style: Style { styles[styleSegmentedControl!.selectedSegmentIndex] }
     private var offsets: DroneOffsets {
         get { Dronelink.shared.droneOffsets }
@@ -218,9 +220,30 @@ public class DroneOffsetsViewController: UIViewController {
     }
         
     @objc func onStyleChanged(sender: Any) {
-        configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
-        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
+        updateRoll(visible: false)
+    }
+    
+    func updateRoll(visible: Bool) {
+        rollVisible = visible
+        if rollVisible {
+            configureButton(button: leftButton, image: "baseline_rotate_left_white_36pt", action: #selector(onLeft(sender:)))
+            configureButton(button: rightButton, image: "baseline_rotate_right_white_36pt", action: #selector(onRight(sender:)))
+            configureButton(button: c2Button, image: "baseline_check_white_24pt", color: MDCPalette.lightBlue.accent400, action: #selector(onC2(sender:)))
+        }
+        else {
+            configureButton(button: leftButton, image: "baseline_arrow_left_white_36pt", action: #selector(onLeft(sender:)))
+            configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt", action: #selector(onRight(sender:)))
+            configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
+            configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
+        }
         update()
+    }
+    
+    func updateRoll(value: Int) {
+        rollValue = value
+        var command = Mission.OrientationGimbalCommand()
+        command.orientation.y = Double(rollValue).convertDegreesToRadians
+        try? session?.add(command: command)
     }
     
     @objc func onMore(sender: Any) {
@@ -242,6 +265,10 @@ public class DroneOffsetsViewController: UIViewController {
             self.session?.drone.gimbal(channel: 0)?.reset()
         }))
         
+        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.rollTrim".localized, style: .default , handler:{ _ in
+            self.updateRoll(visible: true)
+        }))
+        
         alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
             
         }))
@@ -250,15 +277,20 @@ public class DroneOffsetsViewController: UIViewController {
     }
     
     @objc func onClear(sender: Any) {
-        switch style {
-        case .altYaw:
-            offsets.droneAltitude = 0
-            offsets.droneYaw = 0
-            break
-        
-        case .position:
-            offsets.droneCoordinate = Mission.Vector2()
-            break
+        if rollVisible {
+            updateRoll(value: 0)
+        }
+        else {
+            switch style {
+            case .altYaw:
+                offsets.droneAltitude = 0
+                offsets.droneYaw = 0
+                break
+            
+            case .position:
+                offsets.droneCoordinate = Mission.Vector2()
+                break
+            }
         }
 
         update()
@@ -269,21 +301,26 @@ public class DroneOffsetsViewController: UIViewController {
             return
         }
         
-        switch style {
-        case .altYaw:
-            offsets.droneYaw += -3.0.convertDegreesToRadians
-            break
-        
-        case .position:
-            guard let state = session.state?.value else {
-                return
-            }
+        if rollVisible {
+            updateRoll(value: rollValue - 1)
+        }
+        else {
+            switch style {
+            case .altYaw:
+                offsets.droneYaw += -3.0.convertDegreesToRadians
+                break
             
-            offsets.droneCoordinate = offsets.droneCoordinate.add(
-                vector: Mission.Vector2(
-                    direction: state.missionOrientation.yaw - (Double.pi / 2),
-                    magnitude: 1.0.convertFeetToMeters))
-            break
+            case .position:
+                guard let state = session.state?.value else {
+                    return
+                }
+                
+                offsets.droneCoordinate = offsets.droneCoordinate.add(
+                    vector: Mission.Vector2(
+                        direction: state.missionOrientation.yaw - (Double.pi / 2),
+                        magnitude: 1.0.convertFeetToMeters))
+                break
+            }
         }
         
         update()
@@ -294,23 +331,27 @@ public class DroneOffsetsViewController: UIViewController {
             return
         }
         
-        switch style {
-        case .altYaw:
-            offsets.droneYaw += 3.0.convertDegreesToRadians
-            break
-        
-        case .position:
-            guard let state = session.state?.value else {
-                return
-            }
-            
-            offsets.droneCoordinate = offsets.droneCoordinate.add(
-                vector: Mission.Vector2(
-                    direction: state.missionOrientation.yaw + (Double.pi / 2),
-                    magnitude: 1.0.convertFeetToMeters))
-            break
+        if rollVisible {
+            updateRoll(value: rollValue + 1)
         }
-        
+        else {
+            switch style {
+            case .altYaw:
+                offsets.droneYaw += 3.0.convertDegreesToRadians
+                break
+            
+            case .position:
+                guard let state = session.state?.value else {
+                    return
+                }
+                
+                offsets.droneCoordinate = offsets.droneCoordinate.add(
+                    vector: Mission.Vector2(
+                        direction: state.missionOrientation.yaw + (Double.pi / 2),
+                        magnitude: 1.0.convertFeetToMeters))
+                break
+            }
+        }
         update()
     }
     
@@ -386,33 +427,38 @@ public class DroneOffsetsViewController: UIViewController {
     }
     
     @objc func onC2(sender: Any) {
-        switch style {
-        case .altYaw:
-            guard
-                let session = session,
-                let reference = offsets.droneAltitudeReference,
-                let current = session.state?.value.altitude
-            else {
-                return
-            }
+        if rollVisible {
+            updateRoll(visible: false)
+        }
+        else {
+            switch style {
+            case .altYaw:
+                guard
+                    let session = session,
+                    let reference = offsets.droneAltitudeReference,
+                    let current = session.state?.value.altitude
+                else {
+                    return
+                }
+                
+                offsets.droneAltitude = reference - current
+                break
             
-            offsets.droneAltitude = reference - current
-            break
-        
-        case .position:
-            guard
-                let session = session,
-                let reference = offsets.droneCoordinateReference,
-                let current = session.state?.value.location?.coordinate
-            else {
-                return
+            case .position:
+                guard
+                    let session = session,
+                    let reference = offsets.droneCoordinateReference,
+                    let current = session.state?.value.location?.coordinate
+                else {
+                    return
+                }
+                
+                offsets.droneCoordinate = Mission.Vector2(
+                    direction: reference.bearing(to: current),
+                    magnitude: reference.distance(to: current)
+                )
+                break
             }
-            
-            offsets.droneCoordinate = Mission.Vector2(
-                direction: reference.bearing(to: current),
-                magnitude: reference.distance(to: current)
-            )
-            break
         }
         update()
     }
@@ -423,62 +469,80 @@ public class DroneOffsetsViewController: UIViewController {
         leftButton.isEnabled = upButton.isEnabled
         rightButton.isEnabled = upButton.isEnabled
 
-        switch style {
-        case .altYaw:
-            c1Button.isHidden = !debug
-            c2Button.isHidden = !debug
+        if rollVisible {
+            c1Button.isHidden = true
+            c2Button.isHidden = false
             leftButton.isHidden = false
             rightButton.isHidden = false
-            
-            var details: [String] = []
-            if offsets.droneYaw != 0 {
-                details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw, extraParams: [false]))
+            upButton.isHidden = true
+            downButton.isHidden = true
+            moreButton.isHidden = true
+            clearButton.isHidden = rollValue == 0
+            detailsLabel.text = clearButton.isHidden ? "" : Dronelink.shared.format(formatter: "angle", value: Double(rollValue).convertDegreesToRadians, extraParams: [false])
+            c2Button.isEnabled = true
+        }
+        else {
+            switch style {
+            case .altYaw:
+                c1Button.isHidden = !debug
+                c2Button.isHidden = !debug
+                leftButton.isHidden = false
+                rightButton.isHidden = false
+                upButton.isHidden = false
+                downButton.isHidden = false
+                
+                var details: [String] = []
+                if offsets.droneYaw != 0 {
+                    details.append(Dronelink.shared.format(formatter: "angle", value: offsets.droneYaw, extraParams: [false]))
+                }
+
+                if offsets.droneAltitude != 0 {
+                    details.append(Dronelink.shared.format(formatter: "altitude", value: offsets.droneAltitude))
+                }
+
+                moreButton.isHidden = session == nil
+                clearButton.isHidden = details.count == 0
+                detailsLabel.text = details.joined(separator: " / ")
+
+                if let session = session,
+                    let reference = offsets.droneAltitudeReference,
+                    let current = session.state?.value.altitude {
+                    cLabel.text = Dronelink.shared.format(formatter: "distance", value: reference - current)
+                }
+                else {
+                    cLabel.text = nil
+                }
+
+                c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
+                c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
+                break
+
+            case .position:
+                c1Button.isHidden = !debug
+                c2Button.isHidden = false
+                leftButton.isHidden = true
+                rightButton.isHidden = true
+                upButton.isHidden = false
+                downButton.isHidden = false
+                moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
+                clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
+                detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
+
+                if let session = session,
+                    let reference = offsets.droneCoordinateReference,
+                    let current = session.state?.value.location?.coordinate {
+                    cLabel.text = display(vector: Mission.Vector2(
+                        direction: reference.bearing(to: current),
+                        magnitude: reference.distance(to: current)))
+                }
+                else {
+                    cLabel.text = nil
+                }
+
+                c1Button.isEnabled = session?.state?.value.location != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
+                c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
+                break
             }
-
-            if offsets.droneAltitude != 0 {
-                details.append(Dronelink.shared.format(formatter: "altitude", value: offsets.droneAltitude))
-            }
-
-            moreButton.isHidden = session == nil
-            clearButton.isHidden = details.count == 0
-            detailsLabel.text = details.joined(separator: " / ")
-
-            if let session = session,
-                let reference = offsets.droneAltitudeReference,
-                let current = session.state?.value.altitude {
-                cLabel.text = Dronelink.shared.format(formatter: "distance", value: reference - current)
-            }
-            else {
-                cLabel.text = nil
-            }
-
-            c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
-            c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
-            break
-
-        case .position:
-            c1Button.isHidden = !debug
-            c2Button.isHidden = false
-            leftButton.isHidden = true
-            rightButton.isHidden = true
-            moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
-            clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
-            detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
-
-            if let session = session,
-                let reference = offsets.droneCoordinateReference,
-                let current = session.state?.value.location?.coordinate {
-                cLabel.text = display(vector: Mission.Vector2(
-                    direction: reference.bearing(to: current),
-                    magnitude: reference.distance(to: current)))
-            }
-            else {
-                cLabel.text = nil
-            }
-
-            c1Button.isEnabled = session?.state?.value.location != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
-            c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
-            break
         }
         
         if Dronelink.shared.missionExecutor?.engaged ?? false,
