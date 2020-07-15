@@ -236,14 +236,17 @@ public class DroneOffsetsViewController: UIViewController {
             configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
             configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
         }
+        
+        if style == .altYaw {
+            styleSegmentedControl.setTitle(rollVisible ? "DroneOffsetsViewController.rollTrim".localized.uppercased() : style.display, forSegmentAt: style.rawValue)
+        }
+        
         update()
     }
     
     func updateRoll(value: Int) {
         rollValue = value
-        var command = Mission.OrientationGimbalCommand()
-        command.orientation.y = Double(rollValue).convertDegreesToRadians
-        try? session?.add(command: command)
+        session?.drone.gimbal(channel: 0)?.fineTune(roll: (Double(rollValue) / 10).convertDegreesToRadians)
     }
     
     @objc func onMore(sender: Any) {
@@ -478,8 +481,8 @@ public class DroneOffsetsViewController: UIViewController {
             downButton.isHidden = true
             moreButton.isHidden = true
             clearButton.isHidden = rollValue == 0
-            detailsLabel.text = clearButton.isHidden ? "" : Dronelink.shared.format(formatter: "angle", value: Double(rollValue).convertDegreesToRadians, extraParams: [false])
-            c2Button.isEnabled = true
+            detailsLabel.text = clearButton.isHidden ? "" : "\(Double(rollValue) / 10)"
+            c2Button.isEnabled = upButton.isEnabled
         }
         else {
             switch style {
