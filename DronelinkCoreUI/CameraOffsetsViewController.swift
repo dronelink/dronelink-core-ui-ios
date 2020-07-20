@@ -31,8 +31,12 @@ public class CameraOffsetsViewController: UIViewController {
     private let c2Button = MDCFloatingButton()
     private let cLabel = UILabel()
     
-    private let updateInterval: TimeInterval = 0.2
+    private let updateInterval: TimeInterval = 0.25
     private var updateTimer: Timer?
+    private let updateCButtonsInterval: TimeInterval = 0.1
+    private var updateCButtonsTimer: Timer?
+    private var c1PressedPrevious = false
+    private var c2PressedPrevious = false
     private var evStepsPending: Int?
     private var evStepsTimer: Timer?
     
@@ -69,12 +73,15 @@ public class CameraOffsetsViewController: UIViewController {
         super.viewWillAppear(animated)
         droneSessionManager.add(delegate: self)
         updateTimer = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
+        updateCButtonsTimer = Timer.scheduledTimer(timeInterval: updateCButtonsInterval, target: self, selector: #selector(updateCButtons), userInfo: nil, repeats: true)
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         updateTimer?.invalidate()
         updateTimer = nil
+        updateCButtonsTimer?.invalidate()
+        updateCButtonsTimer = nil
         droneSessionManager.remove(delegate: self)
     }
     
@@ -193,16 +200,22 @@ public class CameraOffsetsViewController: UIViewController {
         }
         
         cLabel.text = exposureCompensation == nil ? "" : Dronelink.shared.formatEnum(name: "CameraExposureCompensation", value: exposureCompensation!.rawValue)
-        
+    }
+    
+    @objc func updateCButtons() {
         if exposureCommand == nil, let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
-            if remoteControllerState.c1ButtonState.pressed {
+            if c1PressedPrevious, !remoteControllerState.c1ButtonState.pressed {
                 onEV(steps: -1)
             }
             
-            if remoteControllerState.c2ButtonState.pressed {
+            if c2PressedPrevious, !remoteControllerState.c2ButtonState.pressed {
                 onEV(steps: 1)
             }
         }
+        
+        let remoteControllerState = session?.remoteControllerState(channel: 0)?.value
+        c1PressedPrevious = remoteControllerState?.c1ButtonState.pressed ?? false
+        c2PressedPrevious = remoteControllerState?.c2ButtonState.pressed ?? false
     }
 }
 

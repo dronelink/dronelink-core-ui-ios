@@ -39,6 +39,7 @@ public class DroneOffsetsViewController: UIViewController {
     private let debug = false
     private var styleSegmentedControl: UISegmentedControl!
     private let detailsLabel = UILabel()
+    private let rcInputsToggleButton = UIButton(type: .custom)
     private let moreButton = UIButton(type: .custom)
     private let clearButton = UIButton(type: .custom)
     private let leftButton = MDCFloatingButton()
@@ -51,6 +52,7 @@ public class DroneOffsetsViewController: UIViewController {
     
     private let updateInterval: TimeInterval = 0.25
     private var updateTimer: Timer?
+    private var rcInputsEnabled = false
     private var rollVisible = false
     private var rollValue = 0
     private var style: Style { styles[styleSegmentedControl!.selectedSegmentIndex] }
@@ -82,8 +84,13 @@ public class DroneOffsetsViewController: UIViewController {
         detailsLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(detailsLabel)
         
+        rcInputsToggleButton.tintColor = UIColor.white.withAlphaComponent(0.85)
+        rcInputsToggleButton.setImage(DronelinkUI.loadImage(named: "baseline_games_white_36pt"), for: .normal)
+        rcInputsToggleButton.addTarget(self, action: #selector(onRCInputsToggle), for: .touchUpInside)
+        view.addSubview(rcInputsToggleButton)
+        
         moreButton.tintColor = UIColor.white.withAlphaComponent(0.85)
-        moreButton.setImage(DronelinkUI.loadImage(named: "outline_more_white_36pt"), for: .normal)
+        moreButton.setImage(DronelinkUI.loadImage(named: "baseline_more_horiz_white_36pt"), for: .normal)
         moreButton.addTarget(self, action: #selector(onMore), for: .touchUpInside)
         view.addSubview(moreButton)
         
@@ -146,11 +153,18 @@ public class DroneOffsetsViewController: UIViewController {
             make.top.equalToSuperview().offset(8)
         }
         
-        moreButton.snp.remakeConstraints { make in
+        rcInputsToggleButton.snp.remakeConstraints { make in
             make.height.equalTo(styleSegmentedControl)
             make.width.equalTo(moreButton.snp.height)
             make.left.equalTo(styleSegmentedControl)
             make.top.equalTo(styleSegmentedControl.snp.bottom).offset(defaultPadding)
+        }
+        
+        moreButton.snp.remakeConstraints { make in
+            make.height.equalTo(styleSegmentedControl)
+            make.width.equalTo(moreButton.snp.height)
+            make.left.equalTo(rcInputsToggleButton)
+            make.top.equalTo(rcInputsToggleButton.snp.bottom).offset(defaultPadding)
         }
         
         clearButton.snp.remakeConstraints { make in
@@ -247,6 +261,11 @@ public class DroneOffsetsViewController: UIViewController {
     func updateRoll(value: Int) {
         rollValue = value
         session?.drone.gimbal(channel: 0)?.fineTune(roll: (Double(rollValue) / 10).convertDegreesToRadians)
+    }
+    
+    @objc func onRCInputsToggle(sender: Any) {
+        rcInputsEnabled = !rcInputsEnabled
+        update()
     }
     
     @objc func onMore(sender: Any) {
@@ -471,6 +490,7 @@ public class DroneOffsetsViewController: UIViewController {
         downButton.isEnabled = upButton.isEnabled
         leftButton.isEnabled = upButton.isEnabled
         rightButton.isEnabled = upButton.isEnabled
+        rcInputsToggleButton.tintColor = rcInputsEnabled ? DronelinkUI.Constants.secondaryColor : UIColor.white
 
         if rollVisible {
             c1Button.isHidden = true
@@ -479,6 +499,7 @@ public class DroneOffsetsViewController: UIViewController {
             rightButton.isHidden = false
             upButton.isHidden = true
             downButton.isHidden = true
+            rcInputsToggleButton.isHidden = true
             moreButton.isHidden = true
             clearButton.isHidden = rollValue == 0
             detailsLabel.text = clearButton.isHidden ? "" : "\(Double(rollValue) / 10)"
@@ -503,6 +524,7 @@ public class DroneOffsetsViewController: UIViewController {
                     details.append(Dronelink.shared.format(formatter: "altitude", value: offsets.droneAltitude))
                 }
 
+                rcInputsToggleButton.isHidden = session == nil
                 moreButton.isHidden = session == nil
                 clearButton.isHidden = details.count == 0
                 detailsLabel.text = details.joined(separator: " / ")
@@ -527,6 +549,7 @@ public class DroneOffsetsViewController: UIViewController {
                 rightButton.isHidden = true
                 upButton.isHidden = false
                 downButton.isHidden = false
+                rcInputsToggleButton.isHidden = session == nil
                 moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
                 clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
                 detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
@@ -548,9 +571,9 @@ public class DroneOffsetsViewController: UIViewController {
             }
         }
         
-        if Dronelink.shared.missionExecutor?.engaged ?? false,
+        if rcInputsEnabled, Dronelink.shared.missionExecutor?.engaged ?? false,
             let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
-            let deadband = 0.2
+            let deadband = 0.15
             
             let yawPercent = remoteControllerState.leftStickState.horizontal
             if abs(yawPercent) > deadband {
@@ -559,7 +582,7 @@ public class DroneOffsetsViewController: UIViewController {
 
             let altitudePercent = remoteControllerState.leftStickState.vertical
             if abs(altitudePercent) > deadband {
-                offsets.droneAltitude += (0.25 * altitudePercent).convertFeetToMeters
+                offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
             }
             
             
@@ -572,7 +595,7 @@ public class DroneOffsetsViewController: UIViewController {
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
                     vector: Mission.Vector2(
                         direction: state.missionOrientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
-                        magnitude: (0.25 * abs(positionPercent)).convertFeetToMeters))
+                        magnitude: (0.4 * abs(positionPercent)).convertFeetToMeters))
             }
         }
     }
