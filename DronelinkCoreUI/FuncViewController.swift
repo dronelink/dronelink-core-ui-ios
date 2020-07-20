@@ -34,7 +34,6 @@ public class FuncViewController: UIViewController {
     private var session: DroneSession?
     private var funcExecutor: FuncExecutor?
     private let imagePlaceholder = MDCActivityIndicator()
-    private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let headerBackgroundView = UIView()
     private let footerBackgroundView = UIView()
     private let primaryButton = MDCRaisedButton()
@@ -88,15 +87,11 @@ public class FuncViewController: UIViewController {
             overrideUserInterfaceStyle = .dark
         }
         
-        blurEffectView.frame = view.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        blurEffectView.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
-        blurEffectView.clipsToBounds = true
-        view.addSubview(blurEffectView)
         
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.clipsToBounds = true
+        view.backgroundColor = DronelinkUI.Constants.overlayColor
         
         headerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
         view.addSubview(headerBackgroundView)
@@ -223,10 +218,6 @@ public class FuncViewController: UIViewController {
         super.updateViewConstraints()
         
         let defaultPadding = 10
-        
-        blurEffectView.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
-        }
         
         headerBackgroundView.snp.remakeConstraints { make in
             make.top.equalToSuperview()

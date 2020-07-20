@@ -33,7 +33,6 @@ public class MissionViewController: UIViewController {
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
     
-    private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
     private let activityIndicator = MDCActivityIndicator()
     private let primaryButton = MDCFloatingButton()
     private let expandToggleButton = UIButton()
@@ -67,14 +66,9 @@ public class MissionViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        blurEffectView.frame = view.bounds
-        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        blurEffectView.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
-        blurEffectView.clipsToBounds = true
-        view.addSubview(blurEffectView)
-        
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
+        view.backgroundColor = DronelinkUI.Constants.overlayColor
         
         countdownProgressView.trackTintColor = UIColor.white.withAlphaComponent(0.75)
         countdownProgressView.isHidden = true
@@ -153,10 +147,6 @@ public class MissionViewController: UIViewController {
         
         let defaultPadding = 10
         let labelHeight = 30
-        
-        blurEffectView.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
-        }
         
         primaryButton.snp.remakeConstraints { make in
             make.height.equalTo(60)

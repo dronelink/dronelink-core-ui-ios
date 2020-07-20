@@ -22,7 +22,7 @@ extension DronelinkUI {
     
     public static let Constants = (
         cornerRadius: CGFloat(10.0),
-        overlayColor: UIColor.black.withAlphaComponent(0.6),
+        overlayColor: UIColor.black.withAlphaComponent(0.5),
         primaryColor: MDCPalette.deepPurple.tint800,
         secondaryColor: MDCPalette.pink.accent400
     )

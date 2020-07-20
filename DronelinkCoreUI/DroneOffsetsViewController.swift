@@ -70,7 +70,7 @@ public class DroneOffsetsViewController: UIViewController {
         
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.backgroundColor = DronelinkUI.Constants.overlayColor
         
         styleSegmentedControl = UISegmentedControl(items: styles.map({ $0.display }))
         styleSegmentedControl.selectedSegmentIndex = 0
@@ -85,7 +85,7 @@ public class DroneOffsetsViewController: UIViewController {
         view.addSubview(detailsLabel)
         
         rcInputsToggleButton.tintColor = UIColor.white.withAlphaComponent(0.85)
-        rcInputsToggleButton.setImage(DronelinkUI.loadImage(named: "baseline_games_white_36pt"), for: .normal)
+        rcInputsToggleButton.setImage(DronelinkUI.loadImage(named: "rc"), for: .normal)
         rcInputsToggleButton.addTarget(self, action: #selector(onRCInputsToggle), for: .touchUpInside)
         view.addSubview(rcInputsToggleButton)
         
@@ -265,6 +265,9 @@ public class DroneOffsetsViewController: UIViewController {
     
     @objc func onRCInputsToggle(sender: Any) {
         rcInputsEnabled = !rcInputsEnabled
+        if rcInputsEnabled {
+            DronelinkUI.shared.showSnackbar(text: "DroneOffsetsViewController.rc.inputs".localized)
+        }
         update()
     }
     

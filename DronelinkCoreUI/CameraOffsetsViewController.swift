@@ -54,7 +54,7 @@ public class CameraOffsetsViewController: UIViewController {
         
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.backgroundColor = DronelinkUI.Constants.overlayColor
         
         configureButton(button: c1Button, action: #selector(onC1(sender:)))
         configureButton(button: c2Button, action: #selector(onC2(sender:)))
