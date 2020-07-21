@@ -440,8 +440,8 @@ public class MicrosoftMapViewController: UIViewController {
                         
                         inputIcon?.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: spatial.coordinate.coordinate, altitude: spatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
                         inputIcon?.flyout?.title = "\(inputIndex + 1). \(input.descriptors.name ?? "")"
-                        if let value = funcExecutor?.readValue(inputIndex: inputIndex, variableValueIndex: variableValueIndex, formatted: true) as? String {
-                            inputIcon?.flyout?.description = "\(value)\(((value as? [Mission.GeoSpatial?])?.count ?? 0) > 1 ? " (\(variableValueIndex + 1))" : "")"
+                        if let valueFormatted = funcExecutor?.readValue(inputIndex: inputIndex, variableValueIndex: variableValueIndex, formatted: true) as? String {
+                            inputIcon?.flyout?.description = "\(valueFormatted)\(((value as? [Mission.GeoSpatial?])?.count ?? 0) > 1 ? " (\(variableValueIndex + 1))" : "")"
                         }
                         else {
                             inputIcon?.flyout?.description = nil

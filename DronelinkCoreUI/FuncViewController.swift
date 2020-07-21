@@ -87,16 +87,15 @@ public class FuncViewController: UIViewController {
             overrideUserInterfaceStyle = .dark
         }
         
-        
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.clipsToBounds = true
         view.backgroundColor = DronelinkUI.Constants.overlayColor
         
-        headerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        headerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         view.addSubview(headerBackgroundView)
         
-        footerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.25)
+        footerBackgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         view.addSubview(footerBackgroundView)
         
         titleImageView.image = funcImage
@@ -145,7 +144,7 @@ public class FuncViewController: UIViewController {
 
         let scheme = MDCContainerScheme()
         scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
-        scheme.colorScheme.primaryColor = UIColor.white.withAlphaComponent(0.35)
+        scheme.colorScheme.primaryColor = UIColor.darkGray
         variableDroneMarkButton.applyContainedTheme(withScheme: scheme)
         variableDroneMarkButton.translatesAutoresizingMaskIntoConstraints = false
         variableDroneMarkButton.setImage(droneImage?.withRenderingMode(.alwaysTemplate), for: .normal)
@@ -286,13 +285,13 @@ public class FuncViewController: UIViewController {
         }
         
         var expanded = false
-        var variableTopControl: UIView = variableDescriptionTextView
+        var variableTopControl: UIView = variableNameLabel
         if !intro, let imageUrl = input?.imageUrl, !imageUrl.isEmpty {
             expanded = true
             variableTopControl = variableImageView
         }
         else if !(input?.descriptors.description?.isEmpty ?? true) {
-            variableTopControl = variableNameLabel
+            variableTopControl = variableDescriptionTextView
         }
         
         let variableBottomControl = backButton
@@ -333,24 +332,26 @@ public class FuncViewController: UIViewController {
             make.bottom.equalTo(variableBottomControl.snp.top).offset(-15)
         }
 
+        let additionalBottomOffset: CGFloat = variableTopControl == variableNameLabel ? -20 : 0
+
         variableSegmentedControl.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(-26)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(-26 + additionalBottomOffset)
             make.height.equalTo(tablet ? 30 : 28)
         }
-
+        
         variableTextField.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(15)
             make.right.equalToSuperview().offset(-15)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(-28)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(-28 + additionalBottomOffset)
             make.height.equalTo(40)
         }
 
         variablePickerView.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(15)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(15 + additionalBottomOffset)
             make.height.equalTo(80)
         }
 
@@ -358,11 +359,11 @@ public class FuncViewController: UIViewController {
             make.left.equalToSuperview().offset(defaultPadding * 2)
             if expanded {
                 make.right.equalToSuperview().offset(-defaultPadding * 2)
-                make.bottom.equalTo(variableBottomControl.snp.top).offset(tablet ? -30 : -25)
+                make.bottom.equalTo(variableBottomControl.snp.top).offset((tablet ? -30 : -25) + additionalBottomOffset)
             }
             else {
                 make.width.equalTo(115)
-                make.bottom.equalTo(variableBottomControl.snp.top).offset(-25)
+                make.bottom.equalTo(variableBottomControl.snp.top).offset(-25 + (variableTopControl == variableNameLabel ? -35 : 0))
             }
             make.height.equalTo(buttonHeight)
         }
@@ -378,7 +379,7 @@ public class FuncViewController: UIViewController {
                 make.left.equalTo(variableDroneMarkButton.snp.right)
                 make.right.equalToSuperview().offset(-5)
                 make.top.equalTo(variableDroneMarkButton).offset(-5)
-                make.bottom.equalTo(variableDroneMarkButton).offset(15)
+                make.bottom.equalTo(variableBottomControl.snp.top).offset(-15)
             }
         }
         
@@ -572,6 +573,12 @@ public class FuncViewController: UIViewController {
                     }
                     return true
                 }
+                
+                if session?.state?.value.location == nil {
+                    DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.location.unavailable".localized)
+                    return false
+                }
+                
                 value = session
                 break
             
