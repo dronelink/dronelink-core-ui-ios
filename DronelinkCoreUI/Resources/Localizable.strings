@@ -24,10 +24,10 @@
 "FuncViewController.primary.intro" = "Get Started";
 "FuncViewController.primary.execute" = "Generate Mission";
 "FuncViewController.primary.executing" = "Generating...";
-"FuncViewController.input.required" = "This input is required.";
-"FuncViewController.input.location.unavailable" = "Drone location unavailable.";
+"FuncViewController.input.required" = "This input is required";
+"FuncViewController.input.location.unavailable" = "Drone location unavailable";
 "FuncViewController.input.drone" = "Mark";
-"FuncViewController.input.drone.unavailable" = "Please connect a drone";
+"FuncViewController.input.drone.unavailable" = "Please connect a drone.";
 "FuncViewController.input.summary" = "Input Summary";
 "FuncViewController.input.none" = "No Input";
 "FuncViewController.input.choose" = "Choose...";

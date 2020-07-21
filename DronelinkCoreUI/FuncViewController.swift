@@ -72,6 +72,10 @@ public class FuncViewController: UIViewController {
     private func valueNumberMeasurementTypeDisplay(index: Int? = nil) -> String? { funcExecutor?.readValueNumberMeasurementTypeDisplay(index: index ?? inputIndex) }
     private var executing = false
     private var value: Any?
+    private let listenRCButtonsInterval: TimeInterval = 0.1
+    private var listenRCButtonsTimer: Timer?
+    private var c1PressedPrevious = false
+    private var c2PressedPrevious = false
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -203,6 +207,7 @@ public class FuncViewController: UIViewController {
         super.viewWillAppear(animated)
         Dronelink.shared.add(delegate: self)
         droneSessionManager.add(delegate: self)
+        listenRCButtonsTimer = Timer.scheduledTimer(timeInterval: listenRCButtonsInterval, target: self, selector: #selector(listenRCButtons), userInfo: nil, repeats: true)
         update()
     }
     
@@ -211,6 +216,29 @@ public class FuncViewController: UIViewController {
         Dronelink.shared.remove(delegate: self)
         droneSessionManager.remove(delegate: self)
         funcExecutor?.remove(delegate: self)
+        listenRCButtonsTimer?.invalidate()
+        listenRCButtonsTimer = nil
+    }
+    
+    @objc func listenRCButtons() {
+        if let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
+            if c1PressedPrevious, !remoteControllerState.c1ButtonState.pressed, !variableDroneMarkButton.isHidden {
+                DispatchQueue.main.async {
+                    self.onDroneMark(sender: self)
+                }
+            }
+            
+            if c2PressedPrevious, !remoteControllerState.c2ButtonState.pressed, !variableDroneMarkButton.isHidden {
+                DispatchQueue.main.async {
+                    self.funcExecutor?.clearValue(index: self.inputIndex)
+                    self.readValue()
+                }
+            }
+        }
+        
+        let remoteControllerState = session?.remoteControllerState(channel: 0)?.value
+        c1PressedPrevious = remoteControllerState?.c1ButtonState.pressed ?? false
+        c2PressedPrevious = remoteControllerState?.c2ButtonState.pressed ?? false
     }
     
     public override func updateViewConstraints() {
@@ -351,7 +379,7 @@ public class FuncViewController: UIViewController {
         variablePickerView.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.bottom.equalTo(variableBottomControl.snp.top).offset(15 + additionalBottomOffset)
+            make.bottom.equalTo(variableBottomControl.snp.top).offset(15 + (variableTopControl == variableNameLabel ? -35 : 0))
             make.height.equalTo(80)
         }
 
@@ -492,6 +520,11 @@ public class FuncViewController: UIViewController {
             return
         }
         
+        if session.state?.value.location == nil {
+            DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.location.unavailable".localized)
+            return
+        }
+        
         if input?.extensions?.droneOffsetsCoordinateReference ?? false {
             Dronelink.shared.droneOffsets.droneCoordinateReference = session.state?.value.location?.coordinate
         }
@@ -572,11 +605,6 @@ public class FuncViewController: UIViewController {
                         return false
                     }
                     return true
-                }
-                
-                if session?.state?.value.location == nil {
-                    DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.location.unavailable".localized)
-                    return false
                 }
                 
                 value = session
