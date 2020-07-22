@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "DronelinkCoreUI"
-  s.version = "1.4.1"
+  s.version = "1.4.2"
   s.summary = "Dronelink core UI components"
   s.homepage = "https://dronelink.com/"
   s.license = { :type => "MIT", :file => "LICENSE" }
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.source_files  = "DronelinkCoreUI/**/*.swift"
   s.resources = "DronelinkCoreUI/**/*.{strings,xcassets}"
 
-  s.dependency "DronelinkCore", "~> 1.6.1"
+  s.dependency "DronelinkCore", "~> 1.6.2"
   s.dependency "SnapKit", "~> 5.0.1"
   s.dependency "MicrosoftMapsSDK", "~> 1.1.4"
   s.dependency "Mapbox-iOS-SDK", "~> 5.9.0"
