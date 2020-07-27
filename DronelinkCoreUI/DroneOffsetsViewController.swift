@@ -25,6 +25,8 @@ public class DroneOffsetsViewController: UIViewController {
         }
     }
     
+    public static var autoYawOffset: ((_ complete: @escaping (_ cancelled: Bool) -> ()) -> ())?
+    
     public static func create(droneSessionManager: DroneSessionManager, styles: [Style] = Style.allCases) -> DroneOffsetsViewController {
         let droneOffsetsViewController = DroneOffsetsViewController()
         droneOffsetsViewController.styles = styles
@@ -36,7 +38,7 @@ public class DroneOffsetsViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     
-    private let debug = false
+    private let debug = true
     private var styleSegmentedControl: UISegmentedControl!
     private let detailsLabel = UILabel()
     private let rcInputsToggleButton = UIButton(type: .custom)
@@ -104,7 +106,7 @@ public class DroneOffsetsViewController: UIViewController {
         configureButton(button: upButton, image: "baseline_arrow_drop_up_white_36pt", action: #selector(onUp(sender:)))
         configureButton(button: downButton, image: "baseline_arrow_drop_down_white_36pt", action: #selector(onDown(sender:)))
         configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
-        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
+        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)), actionSecondary: #selector(onC2Secondary(sender:)))
         
         cLabel.textAlignment = .center
         cLabel.font = UIFont.boldSystemFont(ofSize: 14)
@@ -129,12 +131,24 @@ public class DroneOffsetsViewController: UIViewController {
         droneSessionManager.remove(delegate: self)
     }
     
-    private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector) {
+    private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector? = nil, actionSecondary: Selector? = nil) {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundColor((color ?? UIColor.darkGray).withAlphaComponent(0.85))
         button.setImage(DronelinkUI.loadImage(named: image), for: .normal)
         button.tintColor = UIColor.white
-        button.addTarget(self, action: action, for: .touchUpInside)
+        if let action = action {
+            if let actionSecondary = actionSecondary {
+                let primaryGesture = UITapGestureRecognizer(target: self, action: action)
+                let secondaryGesture = UILongPressGestureRecognizer(target: self, action: actionSecondary)
+                primaryGesture.numberOfTapsRequired = 1
+                button.addGestureRecognizer(primaryGesture)
+                button.addGestureRecognizer(secondaryGesture)
+            }
+            else {
+                button.addTarget(self, action: action, for: .touchUpInside)
+            }
+        }
+        
         if button.superview == nil {
             view.addSubview(button)
         }
@@ -240,15 +254,15 @@ public class DroneOffsetsViewController: UIViewController {
     func updateRoll(visible: Bool) {
         rollVisible = visible
         if rollVisible {
-            configureButton(button: leftButton, image: "baseline_rotate_left_white_36pt", action: #selector(onLeft(sender:)))
-            configureButton(button: rightButton, image: "baseline_rotate_right_white_36pt", action: #selector(onRight(sender:)))
-            configureButton(button: c2Button, image: "baseline_check_white_24pt", color: MDCPalette.lightBlue.accent400, action: #selector(onC2(sender:)))
+            configureButton(button: leftButton, image: "baseline_rotate_left_white_36pt")
+            configureButton(button: rightButton, image: "baseline_rotate_right_white_36pt")
+            configureButton(button: c2Button, image: "baseline_check_white_24pt", color: MDCPalette.lightBlue.accent400)
         }
         else {
-            configureButton(button: leftButton, image: "baseline_arrow_left_white_36pt", action: #selector(onLeft(sender:)))
-            configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt", action: #selector(onRight(sender:)))
-            configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
-            configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
+            configureButton(button: leftButton, image: "baseline_arrow_left_white_36pt")
+            configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt")
+            configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400)
+            configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400)
         }
         
         if style == .altYaw {
@@ -488,6 +502,23 @@ public class DroneOffsetsViewController: UIViewController {
         update()
     }
     
+    @objc func onC2Secondary(sender: UILongPressGestureRecognizer) {
+        guard sender.state == .began else {
+            return
+        }
+        
+        switch style {
+        case .altYaw:
+            DroneOffsetsViewController.autoYawOffset?() { cancelled in
+                
+            }
+            break
+        
+        case .position:
+            break
+        }
+    }
+    
     @objc func update() {
         upButton.isEnabled = session != nil
         downButton.isEnabled = upButton.isEnabled
@@ -542,7 +573,7 @@ public class DroneOffsetsViewController: UIViewController {
                 }
 
                 c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
-                c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
+                c2Button.isEnabled = true //c1Button.isEnabled && cLabel.text != nil
                 break
 
             case .position:

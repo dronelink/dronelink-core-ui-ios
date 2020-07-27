@@ -22,6 +22,8 @@ public protocol FuncViewControllerDelegate {
 public class FuncViewController: UIViewController {
     private static var mostRecentExecuted: FuncExecutor?
     
+    public static var droneMarkAutoAlignment: ((_ input: Mission.FuncInput, _ complete: @escaping (_ cancelled: Bool) -> ()) -> ())?
+    
     public static func create(droneSessionManager: DroneSessionManager, delegate: FuncViewControllerDelegate? = nil) -> FuncViewController {
         let funcViewController = FuncViewController()
         funcViewController.droneSessionManager = droneSessionManager
@@ -156,7 +158,12 @@ public class FuncViewController: UIViewController {
         variableDroneMarkButton.setImageTintColor(.white, for: .normal)
         variableDroneMarkButton.setTitleColor(.white, for: .normal)
         variableDroneMarkButton.setTitle("FuncViewController.input.drone".localized, for: .normal)
-        variableDroneMarkButton.addTarget(self, action: #selector(onDroneMark(sender:)), for: .touchUpInside)
+        let droneMarkGesture = UITapGestureRecognizer(target: self, action: #selector(onDroneMark(sender:)))
+        droneMarkGesture.numberOfTapsRequired = 1
+        let droneMarkAutoGesture = UILongPressGestureRecognizer(target: self, action: #selector(onDroneMarkAuto(sender:)))
+        variableDroneMarkButton.addGestureRecognizer(droneMarkGesture)
+        variableDroneMarkButton.addGestureRecognizer(droneMarkAutoGesture)
+        
         view.addSubview(variableDroneMarkButton)
         
         variableDroneViewController.funcExecutor = { self.funcExecutor }
@@ -308,6 +315,9 @@ public class FuncViewController: UIViewController {
                 break
             case .drone:
                 make.bottom.equalToSuperview().offset(tablet ? -205 : -160)
+                break
+            @unknown default:
+                make.bottom.equalToSuperview().offset(tablet ? -120 : -115)
                 break
             }
         }
@@ -531,6 +541,18 @@ public class FuncViewController: UIViewController {
         
         writeValue()
         readValue()
+    }
+    
+    @objc func onDroneMarkAuto(sender: UILongPressGestureRecognizer) {
+        guard sender.state == .began, let input = input else {
+            return
+        }
+        
+        FuncViewController.droneMarkAutoAlignment?(input) { cancelled in
+            if !cancelled {
+                self.onDroneMark(sender: sender)
+            }
+        }
     }
     
     @objc func onDismiss() {

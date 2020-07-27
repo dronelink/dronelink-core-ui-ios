@@ -49,6 +49,13 @@ public extension UIView {
             self.layoutIfNeeded()
         })
     }
+    
+    var image: UIImage? {
+        UIGraphicsBeginImageContextWithOptions(bounds.size, isOpaque, 0.0)
+        defer { UIGraphicsEndImageContext() }
+        drawHierarchy(in: bounds, afterScreenUpdates: true)
+        return UIGraphicsGetImageFromCurrentImageContext()
+    }
 }
 
 extension UIColor {
