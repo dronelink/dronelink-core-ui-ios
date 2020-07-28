@@ -25,7 +25,8 @@ public class DroneOffsetsViewController: UIViewController {
         }
     }
     
-    public static var autoYawOffset: ((_ complete: @escaping (_ cancelled: Bool) -> ()) -> ())?
+    public static var coordinateAutoAlignment: ((_ complete: @escaping (_ cancelled: Bool) -> ()) -> ())?
+    public static var altitudeYawAutoAdjustment: ((_ complete: @escaping (_ cancelled: Bool) -> ()) -> ())?
     
     public static func create(droneSessionManager: DroneSessionManager, styles: [Style] = Style.allCases) -> DroneOffsetsViewController {
         let droneOffsetsViewController = DroneOffsetsViewController()
@@ -38,7 +39,7 @@ public class DroneOffsetsViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     
-    private let debug = true
+    private let debug = false
     private var styleSegmentedControl: UISegmentedControl!
     private let detailsLabel = UILabel()
     private let rcInputsToggleButton = UIButton(type: .custom)
@@ -77,6 +78,9 @@ public class DroneOffsetsViewController: UIViewController {
         styleSegmentedControl = UISegmentedControl(items: styles.map({ $0.display }))
         styleSegmentedControl.selectedSegmentIndex = 0
         styleSegmentedControl.addTarget(self, action:  #selector(onStyleChanged(sender:)), for: .valueChanged)
+        let secondaryGesture = UILongPressGestureRecognizer(target: self, action: #selector(onStyleLongPress(sender:)))
+        styleSegmentedControl.addGestureRecognizer(secondaryGesture)
+        
         view.addSubview(styleSegmentedControl)
         
         detailsLabel.textAlignment = .center
@@ -106,7 +110,7 @@ public class DroneOffsetsViewController: UIViewController {
         configureButton(button: upButton, image: "baseline_arrow_drop_up_white_36pt", action: #selector(onUp(sender:)))
         configureButton(button: downButton, image: "baseline_arrow_drop_down_white_36pt", action: #selector(onDown(sender:)))
         configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
-        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)), actionSecondary: #selector(onC2Secondary(sender:)))
+        configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
         
         cLabel.textAlignment = .center
         cLabel.font = UIFont.boldSystemFont(ofSize: 14)
@@ -131,22 +135,13 @@ public class DroneOffsetsViewController: UIViewController {
         droneSessionManager.remove(delegate: self)
     }
     
-    private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector? = nil, actionSecondary: Selector? = nil) {
+    private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector? = nil) {
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setBackgroundColor((color ?? UIColor.darkGray).withAlphaComponent(0.85))
         button.setImage(DronelinkUI.loadImage(named: image), for: .normal)
         button.tintColor = UIColor.white
         if let action = action {
-            if let actionSecondary = actionSecondary {
-                let primaryGesture = UITapGestureRecognizer(target: self, action: action)
-                let secondaryGesture = UILongPressGestureRecognizer(target: self, action: actionSecondary)
-                primaryGesture.numberOfTapsRequired = 1
-                button.addGestureRecognizer(primaryGesture)
-                button.addGestureRecognizer(secondaryGesture)
-            }
-            else {
-                button.addTarget(self, action: action, for: .touchUpInside)
-            }
+            button.addTarget(self, action: action, for: .touchUpInside)
         }
         
         if button.superview == nil {
@@ -245,6 +240,32 @@ public class DroneOffsetsViewController: UIViewController {
         }
         
         update()
+    }
+    
+    @objc func onStyleLongPress(sender: UILongPressGestureRecognizer) {
+        guard sender.state == .began, session != nil else {
+            return
+        }
+        
+        switch style {
+        case .altYaw:
+            if !(Dronelink.shared.missionExecutor?.engaged ?? false) {
+                return
+            }
+            
+            DroneOffsetsViewController.altitudeYawAutoAdjustment?() { cancelled in }
+            break
+        
+        case .position:
+            if Dronelink.shared.missionExecutor?.engaged ?? false {
+                return
+            }
+        
+            DroneOffsetsViewController.coordinateAutoAlignment?() { cancelled in
+                self.onC2(sender: self)
+            }
+            break
+        }
     }
         
     @objc func onStyleChanged(sender: Any) {
@@ -472,15 +493,7 @@ public class DroneOffsetsViewController: UIViewController {
         else {
             switch style {
             case .altYaw:
-                guard
-                    let session = session,
-                    let reference = offsets.droneAltitudeReference,
-                    let current = session.state?.value.altitude
-                else {
-                    return
-                }
-                
-                offsets.droneAltitude = reference - current
+                DroneOffsetsViewController.altitudeYawAutoAdjustment?() { cancelled in }
                 break
             
             case .position:
@@ -500,23 +513,6 @@ public class DroneOffsetsViewController: UIViewController {
             }
         }
         update()
-    }
-    
-    @objc func onC2Secondary(sender: UILongPressGestureRecognizer) {
-        guard sender.state == .began else {
-            return
-        }
-        
-        switch style {
-        case .altYaw:
-            DroneOffsetsViewController.autoYawOffset?() { cancelled in
-                
-            }
-            break
-        
-        case .position:
-            break
-        }
     }
     
     @objc func update() {
@@ -573,7 +569,7 @@ public class DroneOffsetsViewController: UIViewController {
                 }
 
                 c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
-                c2Button.isEnabled = true //c1Button.isEnabled && cLabel.text != nil
+                c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
                 break
 
             case .position:
