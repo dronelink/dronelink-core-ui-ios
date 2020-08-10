@@ -30,13 +30,17 @@ public class TelemetryViewController: UIViewController {
     private var updateTimer: Timer?
     
     private let distancePrefix = "TelemetryViewController.distance.prefix".localized
-    private let distanceSuffix = "TelemetryViewController.unit.distance.\(Dronelink.UnitSystem)".localized
+    private let distanceSuffixMetric = "TelemetryViewController.unit.distance.metric".localized
+    private let distanceSuffixImperial = "TelemetryViewController.unit.distance.imperial".localized
     private let altitudePrefix = "TelemetryViewController.altitude.prefix".localized
-    private let altitudeSuffix = "TelemetryViewController.unit.distance.\(Dronelink.UnitSystem)".localized
+    private let altitudeSuffixMetric = "TelemetryViewController.unit.distance.metric".localized
+    private let altitudeSuffixImperial = "TelemetryViewController.unit.distance.imperial".localized
     private let horizontalSpeedPrefix = "TelemetryViewController.horizontalSpeed.prefix".localized
-    private let horizontalSpeedSuffix = "TelemetryViewController.unit.horizontalSpeed.\(Dronelink.UnitSystem)".localized
+    private let horizontalSpeedSuffixMetric = "TelemetryViewController.unit.horizontalSpeed.metric".localized
+    private let horizontalSpeedSuffixImperial = "TelemetryViewController.unit.horizontalSpeed.imperial".localized
     private let verticalSpeedPrefix = "TelemetryViewController.verticalSpeed.prefix".localized
-    private let verticalSpeedSuffix = "TelemetryViewController.unit.verticalSpeed.\(Dronelink.UnitSystem)".localized
+    private let verticalSpeedSuffixMetric = "TelemetryViewController.unit.verticalSpeed.metric".localized
+    private let verticalSpeedSuffixImperial = "TelemetryViewController.unit.verticalSpeed.imperial".localized
     
     private let defaultPadding = 10
     private var tablet: Bool { return UIDevice.current.userInterfaceIdiom == .pad }
@@ -105,7 +109,7 @@ public class TelemetryViewController: UIViewController {
             verticalSpeed = state.verticalSpeed
         }
         
-        switch Dronelink.UnitSystem {
+        switch Dronelink.shared.unitSystem {
         case .imperial:
             distance = distance.convertMetersToFeet
             altitude = altitude.convertMetersToFeet
@@ -126,10 +130,10 @@ public class TelemetryViewController: UIViewController {
         horizontalSpeed = horizontalSpeed.rounded(toPlaces: horizontalSpeed > 10 ? 0 : 1)
         verticalSpeed = verticalSpeed.rounded(toPlaces: verticalSpeed > 10 ? 0 : 1)
         
-        distanceLabel.text = "\(distancePrefix) \(NumberFormatter.localizedString(from: distance as NSNumber, number: .decimal)) \(distanceSuffix)"
-        altitudeLabel.text = "\(altitudePrefix) \(NumberFormatter.localizedString(from: altitude as NSNumber, number: .decimal)) \(altitudeSuffix)"
-        horizontalSpeedLabel.text = "\(horizontalSpeedPrefix) \(NumberFormatter.localizedString(from: horizontalSpeed as NSNumber, number: .decimal)) \(horizontalSpeedSuffix)"
-        verticalSpeedLabel.text = "\(verticalSpeedPrefix) \(NumberFormatter.localizedString(from: verticalSpeed as NSNumber, number: .decimal)) \(verticalSpeedSuffix)"
+        distanceLabel.text = "\(distancePrefix) \(NumberFormatter.localizedString(from: distance as NSNumber, number: .decimal)) \(Dronelink.shared.unitSystem == .metric ? distanceSuffixMetric : distanceSuffixImperial)"
+        altitudeLabel.text = "\(altitudePrefix) \(NumberFormatter.localizedString(from: altitude as NSNumber, number: .decimal)) \(Dronelink.shared.unitSystem == .metric ? altitudeSuffixMetric : altitudeSuffixImperial)"
+        horizontalSpeedLabel.text = "\(horizontalSpeedPrefix) \(NumberFormatter.localizedString(from: horizontalSpeed as NSNumber, number: .decimal)) \(Dronelink.shared.unitSystem == .metric ? horizontalSpeedSuffixMetric : horizontalSpeedSuffixImperial)"
+        verticalSpeedLabel.text = "\(verticalSpeedPrefix) \(NumberFormatter.localizedString(from: verticalSpeed as NSNumber, number: .decimal)) \(Dronelink.shared.unitSystem == .metric ? verticalSpeedSuffixMetric : verticalSpeedSuffixImperial)"
     }
     
     func updateConstraints() {

@@ -309,6 +309,8 @@ public class FuncViewController: UIViewController {
             case .drone:
                 make.bottom.equalToSuperview().offset(tablet ? -205 : -160)
                 break
+            @unknown default:
+                make.bottom.equalToSuperview().offset(tablet ? -120 : -115)
             }
         }
         
@@ -610,7 +612,7 @@ public class FuncViewController: UIViewController {
                 value = session
                 break
             
-        @unknown default:
+            @unknown default:
                 break
         }
         
