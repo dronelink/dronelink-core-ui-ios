@@ -3,10 +3,10 @@ inhibit_all_warnings!
 use_frameworks!
 
 target 'DronelinkCoreUI' do
-  pod 'DronelinkCore', '~> 1.7.0'
+  pod 'DronelinkCore', :path => '../../private/dronelink-core-ios'
   pod 'SnapKit', '~> 5.0.1'
   pod 'MicrosoftMapsSDK', '~> 1.1.4'
-  pod 'Mapbox-iOS-SDK', '~> 5.9.0'
+  pod 'Mapbox-iOS-SDK', '~> 6.2.1'
   pod 'MaterialComponents/Palettes', '~> 115.0.0'
   pod 'MaterialComponents/Buttons', '~> 115.0.0'
   pod 'MaterialComponents/Buttons+Theming', '~> 115.0.0'
@@ -16,7 +16,7 @@ target 'DronelinkCoreUI' do
   pod 'MaterialComponents/Dialogs+Theming', '~> 115.0.0'
   pod 'MaterialComponents/Snackbar', '~> 115.0.0'
   pod 'MaterialComponents/ActivityIndicator', '~> 115.0.0'
-  pod 'Kingfisher', '~> 5.15.4'
-  pod 'Agrume', '~> 5.6.9'
+  pod 'Kingfisher', '~> 5.15.6'
+  pod 'Agrume', '~> 5.6.10'
   pod 'IQKeyboardManager', '~> 6.5.6'
 end

@@ -25,7 +25,7 @@ public class CameraOffsetsViewController: UIViewController {
     
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
-    private var exposureCommand: Mission.ExposureCompensationStepCameraCommand?
+    private var exposureCommand: Kernel.ExposureCompensationStepCameraCommand?
     
     private let c1Button = MDCFloatingButton()
     private let c2Button = MDCFloatingButton()
@@ -162,7 +162,7 @@ public class CameraOffsetsViewController: UIViewController {
             }
             
             do {
-                let exposureCommand = Mission.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
+                let exposureCommand = Kernel.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
                 try? session.add(command: exposureCommand)
                 self.offsets.cameraExposureCompensationSteps += steps
                 self.exposureCommand = exposureCommand
@@ -242,9 +242,9 @@ extension CameraOffsetsViewController: DroneSessionDelegate {
     
     public func onMotorsChanged(session: DroneSession, value: Bool) {}
     
-    public func onCommandExecuted(session: DroneSession, command: MissionCommand) {}
+    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
     
-    public func onCommandFinished(session: DroneSession, command: MissionCommand, error: Error?) {
+    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {
         guard let exposureCommand = self.exposureCommand else {
             return
         }

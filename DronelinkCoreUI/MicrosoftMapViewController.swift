@@ -415,15 +415,15 @@ public class MicrosoftMapViewController: UIViewController {
         while let input = funcExecutor?.input(index: inputIndex) {
             if input.variable.valueType == .drone {
                 if let value = funcExecutor?.readValue(inputIndex: inputIndex) {
-                    var spatials: [Mission.GeoSpatial] = []
-                    if let array = value as? [Mission.GeoSpatial?] {
+                    var spatials: [Kernel.GeoSpatial] = []
+                    if let array = value as? [Kernel.GeoSpatial?] {
                         array.forEach { spatial in
                             if let spatial = spatial {
                                 spatials.append(spatial)
                             }
                         }
                     }
-                    else if let spatial = value as? Mission.GeoSpatial {
+                    else if let spatial = value as? Kernel.GeoSpatial {
                         spatials.append(spatial)
                     }
                     
@@ -441,7 +441,7 @@ public class MicrosoftMapViewController: UIViewController {
                         inputIcon?.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: spatial.coordinate.coordinate, altitude: spatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
                         inputIcon?.flyout?.title = "\(inputIndex + 1). \(input.descriptors.name ?? "")"
                         if let valueFormatted = funcExecutor?.readValue(inputIndex: inputIndex, variableValueIndex: variableValueIndex, formatted: true) as? String {
-                            inputIcon?.flyout?.description = "\(valueFormatted)\(((value as? [Mission.GeoSpatial?])?.count ?? 0) > 1 ? " (\(variableValueIndex + 1))" : "")"
+                            inputIcon?.flyout?.description = "\(valueFormatted)\(((value as? [Kernel.GeoSpatial?])?.count ?? 0) > 1 ? " (\(variableValueIndex + 1))" : "")"
                         }
                         else {
                             inputIcon?.flyout?.description = nil
@@ -649,9 +649,9 @@ extension MicrosoftMapViewController: DroneSessionDelegate {
     
     public func onMotorsChanged(session: DroneSession, value: Bool) {}
     
-    public func onCommandExecuted(session: DroneSession, command: MissionCommand) {}
+    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
     
-    public func onCommandFinished(session: DroneSession, command: MissionCommand, error: Error?) {}
+    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {}
     
     public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
 }
@@ -676,7 +676,7 @@ extension MicrosoftMapViewController: MissionExecutorDelegate {
         }
     }
     
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {
+    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
         droneMissionExecutedPositions.removeAll()
         DispatchQueue.main.async {
             self.updateMissionElements()

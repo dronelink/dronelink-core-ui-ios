@@ -237,7 +237,7 @@ public class MissionViewController: UIViewController {
         }
         
         if missionExecutor.engaged {
-            missionExecutor.disengage(reason: Mission.Message(title: "MissionDisengageReason.user.disengaged".localized))
+            missionExecutor.disengage(reason: Kernel.Message(title: "MissionDisengageReason.user.disengaged".localized))
             return
         }
 
@@ -582,9 +582,9 @@ extension MissionViewController: DroneSessionDelegate {
     
     public func onMotorsChanged(session: DroneSession, value: Bool) {}
     
-    public func onCommandExecuted(session: DroneSession, command: MissionCommand) {}
+    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
     
-    public func onCommandFinished(session: DroneSession, command: MissionCommand, error: Error?) {}
+    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {}
     
     public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
 }
@@ -629,7 +629,7 @@ extension MissionViewController: MissionExecutorDelegate {
         }
     }
     
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {
+    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
         if (reason.title != "MissionDisengageReason.user.disengaged".localized) {
             DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
         }

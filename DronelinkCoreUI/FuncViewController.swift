@@ -68,7 +68,7 @@ public class FuncViewController: UIViewController {
         return inputIndex == inputCount
     }
     private var hasInputs: Bool { funcExecutor?.inputCount ?? 0 > 0 || funcExecutor?.dynamicInputs != nil }
-    private var input: Mission.FuncInput? { funcExecutor?.input(index: inputIndex) }
+    private var input: Kernel.FuncInput? { funcExecutor?.input(index: inputIndex) }
     private func valueNumberMeasurementTypeDisplay(index: Int? = nil) -> String? { funcExecutor?.readValueNumberMeasurementTypeDisplay(index: index ?? inputIndex) }
     private var executing = false
     private var value: Any?

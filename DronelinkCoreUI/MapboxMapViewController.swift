@@ -234,7 +234,7 @@ extension MapboxMapViewController: MissionExecutorDelegate {
     
     public func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {}
     
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Mission.Message) {}
+    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {}
 }
 
 extension MapboxMapViewController: MGLMapViewDelegate {

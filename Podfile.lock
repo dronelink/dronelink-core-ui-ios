@@ -1,14 +1,14 @@
 PODS:
-  - Agrume (5.6.9):
+  - Agrume (5.6.10):
     - SwiftyGif
-  - DronelinkCore (1.7.0)
+  - DronelinkCore (2.0.0)
   - IQKeyboardManager (6.5.6)
-  - Kingfisher (5.15.4):
-    - Kingfisher/Core (= 5.15.4)
-  - Kingfisher/Core (5.15.4)
-  - Mapbox-iOS-SDK (5.9.0):
-    - MapboxMobileEvents (= 0.10.2)
-  - MapboxMobileEvents (0.10.2)
+  - Kingfisher (5.15.6):
+    - Kingfisher/Core (= 5.15.6)
+  - Kingfisher/Core (5.15.6)
+  - Mapbox-iOS-SDK (6.2.1):
+    - MapboxMobileEvents (~> 0.10.4)
+  - MapboxMobileEvents (0.10.5)
   - MaterialComponents/ActivityIndicator (115.0.0):
     - MaterialComponents/Palettes
     - MaterialComponents/private/Application
@@ -161,10 +161,10 @@ PODS:
 
 DEPENDENCIES:
   - Agrume (~> 5.6.9)
-  - DronelinkCore (~> 1.7.0)
+  - DronelinkCore (from `../../private/dronelink-core-ios`)
   - IQKeyboardManager (~> 6.5.6)
   - Kingfisher (~> 5.15.4)
-  - Mapbox-iOS-SDK (~> 5.9.0)
+  - Mapbox-iOS-SDK (~> 6.2.1)
   - MaterialComponents/ActivityIndicator (~> 115.0.0)
   - MaterialComponents/Buttons (~> 115.0.0)
   - "MaterialComponents/Buttons+Theming (~> 115.0.0)"
@@ -180,7 +180,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Agrume
-    - DronelinkCore
     - IQKeyboardManager
     - Kingfisher
     - Mapbox-iOS-SDK
@@ -194,13 +193,17 @@ SPEC REPOS:
     - SnapKit
     - SwiftyGif
 
+EXTERNAL SOURCES:
+  DronelinkCore:
+    :path: "../../private/dronelink-core-ios"
+
 SPEC CHECKSUMS:
-  Agrume: 4c6fc502f4a4aa8b3dd69c8c2e22bcb282be1032
-  DronelinkCore: 6e8940b4b5a0afcc698e23daa3e8d5c6b433f42b
+  Agrume: bed8984d8644d9f9228e65ca22cfc5f6ab95947f
+  DronelinkCore: 8dfac69d2405686dd13cfc518e60214069ba7632
   IQKeyboardManager: 2a6e97afdafc7becf0cb17a9a8d795e3a980717f
-  Kingfisher: 657dc1077e5bbbfff864194c79f29e35b722d062
-  Mapbox-iOS-SDK: a5915700ec84bc1a7f8b3e746d474789e35b7956
-  MapboxMobileEvents: 2bc0ca2eedb627b73cf403258dce2b2fa98074a6
+  Kingfisher: b3554e7bf6106115b44e8795300bad580ef2fdc7
+  Mapbox-iOS-SDK: c5a2ec3a3a0a77ee0ba78f91380e83898cb6aa41
+  MapboxMobileEvents: 7f6fb7fb0360302f524d198d36ccec3a0beae523
   MaterialComponents: 0048689c8afeaae0b83f2ae26057fa1433c4e02f
   MDFInternationalization: 010097556d6b09d2c4ea38e0820ea6d37be6a314
   MDFTextAccessibility: 85c09a1bd9c321f494348e632a25063bcda35a53
@@ -210,6 +213,6 @@ SPEC CHECKSUMS:
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   SwiftyGif: e466e86c660d343357ab944a819a101c4127cb40
 
-PODFILE CHECKSUM: 13f2d77b8b5ef037cd2e1703bcb72bf151b93d71
+PODFILE CHECKSUM: babd1823b3ffdae83c038a1207df6615923e7633
 
 COCOAPODS: 1.10.0.rc.1

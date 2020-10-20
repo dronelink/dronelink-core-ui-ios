@@ -275,13 +275,13 @@ public class DroneOffsetsViewController: UIViewController {
         let alert = UIAlertController(title: "DroneOffsetsViewController.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
         alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.levelGimbal".localized, style: .default , handler:{ _ in
-            var command = Mission.OrientationGimbalCommand()
+            var command = Kernel.OrientationGimbalCommand()
             command.orientation.x = 0
             try? self.session?.add(command: command)
         }))
         
         alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.nadirGimbal".localized, style: .default , handler:{ _ in
-            var command = Mission.OrientationGimbalCommand()
+            var command = Kernel.OrientationGimbalCommand()
             command.orientation.x = -90.convertDegreesToRadians
             try? self.session?.add(command: command)
         }))
@@ -313,7 +313,7 @@ public class DroneOffsetsViewController: UIViewController {
                 break
             
             case .position:
-                offsets.droneCoordinate = Mission.Vector2()
+                offsets.droneCoordinate = Kernel.Vector2()
                 break
             }
         }
@@ -341,7 +341,7 @@ public class DroneOffsetsViewController: UIViewController {
                 }
                 
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
-                    vector: Mission.Vector2(
+                    vector: Kernel.Vector2(
                         direction: state.missionOrientation.yaw - (Double.pi / 2),
                         magnitude: 1.0.convertFeetToMeters))
                 break
@@ -371,7 +371,7 @@ public class DroneOffsetsViewController: UIViewController {
                 }
                 
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
-                    vector: Mission.Vector2(
+                    vector: Kernel.Vector2(
                         direction: state.missionOrientation.yaw + (Double.pi / 2),
                         magnitude: 1.0.convertFeetToMeters))
                 break
@@ -396,7 +396,7 @@ public class DroneOffsetsViewController: UIViewController {
             }
             
             offsets.droneCoordinate = offsets.droneCoordinate.add(
-                vector: Mission.Vector2(
+                vector: Kernel.Vector2(
                     direction: state.missionOrientation.yaw,
                     magnitude: 1.0.convertFeetToMeters))
             break
@@ -421,7 +421,7 @@ public class DroneOffsetsViewController: UIViewController {
             }
             
             offsets.droneCoordinate = offsets.droneCoordinate.add(
-                vector: Mission.Vector2(
+                vector: Kernel.Vector2(
                     direction: state.missionOrientation.yaw + Double.pi,
                     magnitude: 1.0.convertFeetToMeters))
             break
@@ -478,7 +478,7 @@ public class DroneOffsetsViewController: UIViewController {
                     return
                 }
                 
-                offsets.droneCoordinate = Mission.Vector2(
+                offsets.droneCoordinate = Kernel.Vector2(
                     direction: reference.bearing(to: current),
                     magnitude: reference.distance(to: current)
                 )
@@ -560,7 +560,7 @@ public class DroneOffsetsViewController: UIViewController {
                 if let session = session,
                     let reference = offsets.droneCoordinateReference,
                     let current = session.state?.value.location?.coordinate {
-                    cLabel.text = display(vector: Mission.Vector2(
+                    cLabel.text = display(vector: Kernel.Vector2(
                         direction: reference.bearing(to: current),
                         magnitude: reference.distance(to: current)))
                 }
@@ -596,14 +596,14 @@ public class DroneOffsetsViewController: UIViewController {
                 }
                 
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
-                    vector: Mission.Vector2(
+                    vector: Kernel.Vector2(
                         direction: state.missionOrientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
                         magnitude: (0.4 * abs(positionPercent)).convertFeetToMeters))
             }
         }
     }
     
-    func display(vector: Mission.Vector2) -> String {
+    func display(vector: Kernel.Vector2) -> String {
         return "\(Dronelink.shared.format(formatter: "angle", value: vector.direction)) → \(Dronelink.shared.format(formatter: "distance", value: vector.magnitude))"
     }
 }
