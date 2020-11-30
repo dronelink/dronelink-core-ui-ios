@@ -92,7 +92,7 @@ public class TelemetryViewController: UIViewController {
         var verticalSpeed = 0.0
         if let state = session?.state?.value {
             if let droneLocation = state.location {
-                if let userLocation = Dronelink.shared.locationManager.location {
+                if let userLocation = Dronelink.shared.location?.value {
                     distance = userLocation.distance(from: droneLocation)
                 }
                 else if let homeLocation = state.homeLocation {
@@ -119,9 +119,6 @@ public class TelemetryViewController: UIViewController {
             
         case .metric:
             horizontalSpeed = horizontalSpeed.convertMetersPerSecondToKilometersPerHour
-            break
-            
-        @unknown default:
             break
         }
         

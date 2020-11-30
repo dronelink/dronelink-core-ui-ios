@@ -12,6 +12,8 @@ import MaterialComponents.MaterialDialogs
 import MaterialComponents.MaterialSnackbar
 import MaterialComponents.MaterialPalettes
 import DronelinkCore
+import Agrume
+import Kingfisher
 
 extension DronelinkUI {
     public static let shared = DronelinkUI()
@@ -47,6 +49,19 @@ public class DronelinkUI: NSObject {
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        
+        AgrumeServiceLocator.shared.setDownloadHandler { url, completion in
+            KingfisherManager.shared.retrieveImage(with: url) {
+                if let image = try? $0.get().image {
+                    completion(image)
+                    return
+                }
+                
+                KingfisherManager.shared.downloader.downloadImage(with: url, options: [], completionHandler:  {
+                    completion(try? $0.get().image)
+                })
+            }
+        }
     }
     
     @objc func willEnterForeground(_ notification: Notification) {
@@ -55,6 +70,10 @@ public class DronelinkUI: NSObject {
     
     @objc func didEnterBackground(_ notification: Notification) {
         background = true
+    }
+    
+    public func cacheImages(urls: [URL]) {
+        ImagePrefetcher(urls: urls).start()
     }
 
     public func showDialog(title: String, details: String? = nil, actions: [MDCAlertAction]? = nil, emphasis: MDCActionEmphasis = .medium) {
@@ -91,7 +110,7 @@ public class DronelinkUI: NSObject {
             }
             action.title = "dismiss".localized
             message.action = action
-            MDCSnackbarManager.show(message)
+            MDCSnackbarManager.default.show(message)
         }
     }
     

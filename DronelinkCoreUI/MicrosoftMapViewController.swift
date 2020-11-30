@@ -50,6 +50,7 @@ public class MicrosoftMapViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
+    private var modeExecutor: ModeExecutor?
     private var funcExecutor: FuncExecutor?
     private let mapView = MSMapView()
     private let droneLayer = MSMapElementLayer()
@@ -63,6 +64,8 @@ public class MicrosoftMapViewController: UIViewController {
     private let funcLayer = MSMapElementLayer()
     private var funcInputDroneIcons: [MSMapIcon] = []
     private let funcInputDroneImage = MSMapImage(uiImage: DronelinkUI.loadImage(named: "func-input-drone", renderingMode: .alwaysOriginal)!)
+    private let modeLayer = MSMapElementLayer()
+    private let modeTargetIcon = MSMapIcon()
     private let updateDroneElementsInterval: TimeInterval = 0.1
     private var updateDroneElementsTimer: Timer?
     private var droneTakeoffAltitude: Double?
@@ -122,6 +125,14 @@ public class MicrosoftMapViewController: UIViewController {
         funcLayer.zIndex = 1
         mapView.layers.add(funcLayer)
         
+        modeLayer.zIndex = 1
+        modeTargetIcon.image = MSMapImage(uiImage: DronelinkUI.loadImage(named: "drone", renderingMode: .alwaysOriginal)!)
+        modeTargetIcon.flat = true
+        modeTargetIcon.opacity = 0.5
+        modeTargetIcon.desiredCollisionBehavior = .remainVisible
+        modeLayer.elements.add(modeTargetIcon)
+        mapView.layers.add(modeLayer)
+        
         updateDroneElements()
     }
     
@@ -141,6 +152,7 @@ public class MicrosoftMapViewController: UIViewController {
         session?.remove(delegate: self)
         missionExecutor?.remove(delegate: self)
         funcExecutor?.remove(delegate: self)
+        modeExecutor?.remove(delegate: self)
     }
     
     public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
@@ -212,7 +224,7 @@ public class MicrosoftMapViewController: UIViewController {
         
         let engaged = missionExecutor?.engaged ?? false
         if droneTakeoffAltitude != nil, session?.located ?? false, let state = session?.state?.value, let location = state.location {
-            var rotation = Int(-state.missionOrientation.yaw.convertRadiansToDegrees) % 360
+            var rotation = Int(-state.kernelOrientation.yaw.convertRadiansToDegrees) % 360
             if (rotation < 0) {
                 rotation += 360;
             }
@@ -277,10 +289,10 @@ public class MicrosoftMapViewController: UIViewController {
                 trackingScene = MSMapScene(camera: MSMapCamera(
                     location: MSGeopoint(
                         position: positionAboveDroneTakeoffLocation(
-                            coordinate: location.coordinate.coordinate(bearing: state.missionOrientation.yaw + Double.pi, distance: 15),
+                            coordinate: location.coordinate.coordinate(bearing: state.kernelOrientation.yaw + Double.pi, distance: 15),
                             altitude: state.altitude + 14),
                         altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
-                    heading: state.missionOrientation.yaw.convertRadiansToDegrees,
+                    heading: state.kernelOrientation.yaw.convertRadiansToDegrees,
                     pitch: 45))
                 break
                 
@@ -290,8 +302,8 @@ public class MicrosoftMapViewController: UIViewController {
                         location: MSGeopoint(
                             position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude),
                             altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
-                        heading: state.missionOrientation.yaw.convertRadiansToDegrees,
-                        pitch: min((session?.gimbalState(channel: 0)?.value.missionOrientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
+                        heading: state.kernelOrientation.yaw.convertRadiansToDegrees,
+                        pitch: min((session?.gimbalState(channel: 0)?.value.kernelOrientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
                 break
             }
             
@@ -363,9 +375,6 @@ public class MicrosoftMapViewController: UIViewController {
                         //    altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem
                         //)
                     ]
-                    break
-                    
-                @unknown default:
                     break
                 }
 
@@ -466,6 +475,37 @@ public class MicrosoftMapViewController: UIViewController {
         }
     }
     
+    private func updateModeElements() {
+        guard modeExecutor?.engaged ?? false else {
+            modeTargetIcon.visible = false
+            return
+        }
+        
+        if let modeTarget = modeExecutor?.target {
+            var rotation = Int(-modeTarget.orientation.yaw.convertRadiansToDegrees) % 360
+            if (rotation < 0) {
+                rotation += 360;
+            }
+            modeTargetIcon.rotation = Float(rotation)
+            modeTargetIcon.location = MSGeopoint(latitude: modeTarget.coordinate.latitude, longitude: modeTarget.coordinate.longitude)
+            modeTargetIcon.visible = true
+        }
+        else {
+            modeTargetIcon.visible = false
+        }
+        
+        if let visibleCoordinates = modeExecutor?.visibleCoordinates, visibleCoordinates.count > 0 {
+            tracking = .none
+            let boundingBox = MSGeoboundingBox(positions: visibleCoordinates.map { MSGeoposition(coordinates: $0.coordinate) })
+            let radius = boundingBox.northWestCorner.coordinate.distance(to: boundingBox.southEastCorner.coordinate) * 0.5
+            let center = boundingBox.northWestCorner.coordinate.coordinate(
+                bearing: boundingBox.northWestCorner.coordinate.bearing(to: boundingBox.southEastCorner.coordinate),
+                distance: radius)
+            //using the bounding box directly isn't great
+            mapView.setScene(MSMapScene(location: MSGeopoint(latitude: center.latitude, longitude: center.longitude), radius: radius * 2.0, heading: 0, pitch: 0), with: .none)
+        }
+    }
+    
     private func updateDroneTakeoffAltitude() {
         var point: MSGeopoint?
         if let takeoffLocation = session?.state?.value.takeoffLocation {
@@ -512,7 +552,7 @@ public class MicrosoftMapViewController: UIViewController {
         
         var positions: [MSGeoposition] = []
         if elements.contains(.user),
-            let location = Dronelink.shared.locationManager.location {
+            let location = Dronelink.shared.location?.value {
             positions.append(MSGeoposition(coordinates: location.coordinate))
         }
         
@@ -614,6 +654,16 @@ extension MicrosoftMapViewController: DronelinkDelegate {
             self.updateFuncElements()
         }
     }
+    
+    public func onModeLoaded(executor: ModeExecutor) {
+        modeExecutor = executor
+        executor.add(delegate: self)
+    }
+    
+    public func onModeUnloaded(executor: ModeExecutor) {
+        modeExecutor = nil
+        executor.remove(delegate: self)
+    }
 }
 
 extension MicrosoftMapViewController: DroneSessionManagerDelegate {
@@ -692,6 +742,24 @@ extension MicrosoftMapViewController: FuncExecutorDelegate {
     }
     
     public func onFuncExecuted(executor: FuncExecutor) {}
+}
+
+extension MicrosoftMapViewController: ModeExecutorDelegate {
+    public func onModeEngaging(executor: ModeExecutor) {}
+    
+    public func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {}
+    
+    public func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
+        DispatchQueue.main.async {
+            self.updateModeElements()
+        }
+    }
+    
+    public func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        DispatchQueue.main.async {
+            self.updateModeElements()
+        }
+    }
 }
 
 extension MSGeoposition {

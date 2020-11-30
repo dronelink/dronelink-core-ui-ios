@@ -172,7 +172,7 @@ public class CameraOffsetsViewController: UIViewController {
     }
     
     @objc func update() {
-        let exposureCompensation = session?.cameraState(channel: 0)?.value.missionExposureCompensation
+        let exposureCompensation = session?.cameraState(channel: 0)?.value.kernelExposureCompensation
         c1Button.tintColor = exposureCommand == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
         c1Button.isEnabled = exposureCompensation != nil
         c2Button.tintColor = c1Button.tintColor
@@ -208,18 +208,18 @@ public class CameraOffsetsViewController: UIViewController {
         }
         
         if exposureCommand == nil, let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
-            if c1PressedPrevious, !remoteControllerState.c1ButtonState.pressed {
+            if c1PressedPrevious, !remoteControllerState.kernelC1Button.pressed {
                 onEV(steps: -1)
             }
             
-            if c2PressedPrevious, !remoteControllerState.c2ButtonState.pressed {
+            if c2PressedPrevious, !remoteControllerState.kernelC2Button.pressed {
                 onEV(steps: 1)
             }
         }
         
         let remoteControllerState = session?.remoteControllerState(channel: 0)?.value
-        c1PressedPrevious = remoteControllerState?.c1ButtonState.pressed ?? false
-        c2PressedPrevious = remoteControllerState?.c2ButtonState.pressed ?? false
+        c1PressedPrevious = remoteControllerState?.kernelC1Button.pressed ?? false
+        c2PressedPrevious = remoteControllerState?.kernelC2Button.pressed ?? false
     }
 }
 

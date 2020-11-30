@@ -16,7 +16,7 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 import MaterialComponents.MDCActivityIndicator
 
-public protocol MissionViewControllerDelegate {
+public protocol MissionViewControllerDelegate: class {
     func onMissionExpandToggle()
 }
 
@@ -28,7 +28,7 @@ public class MissionViewController: UIViewController {
         return missionViewController
     }
     
-    private var delegate: MissionViewControllerDelegate?
+    private weak var delegate: MissionViewControllerDelegate?
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
@@ -298,7 +298,7 @@ public class MissionViewController: UIViewController {
             let actualTakeoffLocation = session.state?.value.takeoffLocation,
             let suggestedTakeoffLocation = missionExecutor.takeoffCoordinate?.location,
             actualTakeoffLocation.distance(from: suggestedTakeoffLocation) > 50.convertFeetToMeters {
-            if let deviceLocation = Dronelink.shared.locationManager.location, deviceLocation.verticalAccuracy >= 0 {
+            if let deviceLocation = Dronelink.shared.location?.value, deviceLocation.verticalAccuracy >= 0 {
                 missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
             }
 
@@ -357,7 +357,7 @@ public class MissionViewController: UIViewController {
         countdownTimer = nil
         update()
         if (aborted) {
-            Dronelink.shared.announce(message: "MissionViewController.start.cancelled".localized)
+            Dronelink.shared.announce(message: "ExecutableViewController.start.cancelled".localized)
         }
     }
     
@@ -380,7 +380,7 @@ public class MissionViewController: UIViewController {
                 }
             }
             catch DronelinkError.droneSerialNumberUnavailable {
-                DronelinkUI.shared.showDialog(title: "MissionViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "MissionViewController.start.engage.droneSerialNumberUnavailable.message".localized)
+                DronelinkUI.shared.showDialog(title: "ExecutableViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableViewController.start.engage.droneSerialNumberUnavailable.message".localized)
                 self.update()
             }
             catch {
@@ -441,7 +441,7 @@ public class MissionViewController: UIViewController {
             primaryButton.isEnabled = true
             primaryButton.setBackgroundColor(primaryDisengagedColor.interpolate(primaryEngagedColor, percent: CGFloat(progress)))
             primaryButton.setImage(cancelImage, for: .normal)
-            titleLabel.text = String(format: "MissionViewController.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
+            titleLabel.text = String(format: "ExecutableViewController.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
             countdownProgressView.setProgress(progress, animated: true)
             countdownProgressView.progressTintColor = progressDisengagedColor?.interpolate(progressEngagedColor, percent: CGFloat(progress))
             return
@@ -459,7 +459,7 @@ public class MissionViewController: UIViewController {
             dismissButton.isHidden = true
             messagesTextView.isHidden = true
 
-            subtitleLabel.text = "MissionViewController.start.engaging".localized
+            subtitleLabel.text = "ExecutableViewController.start.engaging".localized
             return
         }
 
@@ -482,8 +482,8 @@ public class MissionViewController: UIViewController {
             executionDuration = missionExecutor.executionDuration
         }
         let timeRemaining = max(estimateTime - executionDuration, 0)
-        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "MissionViewController.executionDuration.empty".localized)
-        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "MissionViewController.executionDuration.empty".localized)
+        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableViewController.executionDuration.empty".localized)
+        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "ExecutableViewController.executionDuration.empty".localized)
         progressView.setProgress(Float(min(estimateTime == 0 ? 0 : executionDuration / estimateTime, 1)), animated: true)
 
         if missionExecutor.engaged {
@@ -551,6 +551,10 @@ extension MissionViewController: DronelinkDelegate {
     public func onFuncLoaded(executor: FuncExecutor) {}
     
     public func onFuncUnloaded(executor: FuncExecutor) {}
+    
+    public func onModeLoaded(executor: ModeExecutor) {}
+    
+    public func onModeUnloaded(executor: ModeExecutor) {}
 }
 
 extension MissionViewController: DroneSessionManagerDelegate {

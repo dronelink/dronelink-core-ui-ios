@@ -21,6 +21,7 @@ public class MapboxMapViewController: UIViewController {
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var missionExecutor: MissionExecutor?
+    private var modeExecutor: ModeExecutor?
     private let mapView = MGLMapView()
     private let droneHomeAnnotation = MGLPointAnnotation()
     private var droneHomeAnnotationView: MGLAnnotationView?
@@ -32,6 +33,8 @@ public class MapboxMapViewController: UIViewController {
     private var missionEstimateForegroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateBackgroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateForegroundAnnotation: MGLAnnotation?
+    private var modeTargetAnnotation = MGLPointAnnotation()
+    private var modeTargetAnnotationView: MGLAnnotationView?
     private let updateInterval: TimeInterval = 0.1
     private var updateTimer: Timer?
     private var lastUpdated = Date()
@@ -47,7 +50,7 @@ public class MapboxMapViewController: UIViewController {
         mapView.showsHeading = false
         mapView.clipsToBounds = true
         mapView.attributionButton.tintColor = UIColor.white
-        if let location = Dronelink.shared.locationManager.location {
+        if let location = Dronelink.shared.location?.value {
             mapView.setCenter(location.coordinate, zoomLevel: 15, animated: false)
         }
         mapView.addAnnotation(droneHomeAnnotation)
@@ -56,6 +59,7 @@ public class MapboxMapViewController: UIViewController {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        mapView.addAnnotation(modeTargetAnnotation)
         update()
     }
     
@@ -73,6 +77,7 @@ public class MapboxMapViewController: UIViewController {
         droneSessionManager.remove(delegate: self)
         Dronelink.shared.remove(delegate: self)
         missionExecutor?.remove(delegate: self)
+        modeExecutor?.remove(delegate: self)
     }
     
     public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
@@ -100,7 +105,7 @@ public class MapboxMapViewController: UIViewController {
         if let state = session?.state?.value, let droneLocation = state.location {
             droneAnnotation.coordinate = droneLocation.coordinate
             if let droneAnnotationView = droneAnnotationView {
-                droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.missionOrientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
+                droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.kernelOrientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
             }
             droneAnnotationView?.isHidden = false
         }
@@ -175,6 +180,37 @@ public class MapboxMapViewController: UIViewController {
                 edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
         }
     }
+    
+    private func updateModeElements() {
+        guard modeExecutor?.engaged ?? false else {
+            modeTargetAnnotationView?.isHidden = true
+            return
+        }
+        
+        if let modeTarget = modeExecutor?.target {
+            modeTargetAnnotation.coordinate = modeTarget.coordinate.coordinate
+            if let modeTargetAnnotationView = modeTargetAnnotationView {
+                modeTargetAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((modeTarget.orientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
+            }
+            modeTargetAnnotationView?.isHidden = false
+        }
+        else {
+            modeTargetAnnotationView?.isHidden = true
+        }
+        
+        if let visibleCoordinates = modeExecutor?.visibleCoordinates, visibleCoordinates.count > 0 {
+            let inset: CGFloat = 0.2
+            mapView.setVisibleCoordinates(
+                visibleCoordinates.map { $0.coordinate },
+                count: UInt(visibleCoordinates.count),
+                edgePadding: UIEdgeInsets(
+                    top: mapView.frame.height * (mapView.frame.height > 300 ? 0.25 : inset),
+                    left: mapView.frame.width * inset,
+                    bottom: mapView.frame.height * (mapView.frame.height > 300 ? 0.38 : inset),
+                    right: mapView.frame.width * inset),
+                animated: true)
+        }
+    }
 }
 
 extension MapboxMapViewController: DronelinkDelegate {
@@ -202,10 +238,22 @@ extension MapboxMapViewController: DronelinkDelegate {
         }
     }
     
-    public func onFuncLoaded(executor: FuncExecutor) {
+    public func onFuncLoaded(executor: FuncExecutor) {}
+    
+    public func onFuncUnloaded(executor: FuncExecutor) {}
+    
+    public func onModeLoaded(executor: ModeExecutor) {
+        DispatchQueue.main.async {
+            self.modeExecutor = executor
+            executor.add(delegate: self)
+        }
     }
     
-    public func onFuncUnloaded(executor: FuncExecutor) {
+    public func onModeUnloaded(executor: ModeExecutor) {
+        DispatchQueue.main.async {
+            self.modeExecutor = nil
+            executor.remove(delegate: self)
+        }
     }
 }
 
@@ -237,6 +285,24 @@ extension MapboxMapViewController: MissionExecutorDelegate {
     public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {}
 }
 
+extension MapboxMapViewController: ModeExecutorDelegate {
+    public func onModeEngaging(executor: ModeExecutor) {}
+    
+    public func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {}
+    
+    public func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
+        DispatchQueue.main.async {
+            self.updateModeElements()
+        }
+    }
+    
+    public func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        DispatchQueue.main.async {
+            self.updateModeElements()
+        }
+    }
+}
+
 extension MapboxMapViewController: MGLMapViewDelegate {
     public func mapView(_ mapView: MGLMapView, viewFor annotation: MGLAnnotation) -> MGLAnnotationView? {
         if (annotation === droneHomeAnnotation) {
@@ -261,6 +327,19 @@ extension MapboxMapViewController: MGLMapViewDelegate {
             }
 
             return drone
+        }
+        
+        if (annotation === modeTargetAnnotation) {
+            var modeTarget = mapView.dequeueReusableAnnotationView(withIdentifier: "mode-target")
+            if modeTarget == nil {
+                modeTarget = MGLAnnotationView(reuseIdentifier: "mode-target")
+                modeTarget?.addSubview(UIImageView(image: DronelinkUI.loadImage(named: "drone", renderingMode: .alwaysOriginal)))
+                modeTarget?.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+                modeTarget?.alpha = 0.5
+                modeTargetAnnotationView = modeTarget
+            }
+
+            return modeTarget
         }
 
         return nil

@@ -17,12 +17,14 @@
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
 
+"ModeDisengageReason.user.disengaged" = "Mode Paused";
+
 "FuncViewController.cachedInputs.title" = "Previous Inputs Available";
 "FuncViewController.cachedInputs.message" = "Do you want to load the previous inputs or start over?";
 "FuncViewController.cachedInputs.action.new" = "Start Over";
 "FuncViewController.cachedInputs.action.previous" = "Load Previous";
 "FuncViewController.primary.intro" = "Get Started";
-"FuncViewController.primary.execute" = "Generate Mission";
+"FuncViewController.primary.execute" = "Continue";
 "FuncViewController.primary.executing" = "Generating...";
 "FuncViewController.input.required" = "This input is required";
 "FuncViewController.input.location.unavailable" = "Drone location unavailable";
@@ -32,19 +34,24 @@
 "FuncViewController.input.none" = "No Input";
 "FuncViewController.input.choose" = "Choose...";
 
-"MissionViewController.executionDuration.empty" = "--:--";
+"ExecutableViewController.start.countdown" = "Starting in %d";
+"ExecutableViewController.start.engaging" = "Preparing to execute...";
+"ExecutableViewController.start.cancelled" = "Countdown Stopped";
+"ExecutableViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
+"ExecutableViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
+"ExecutableViewController.executionDuration.empty" = "--:--";
+
 "MissionViewController.estimating" = "Estimating flight path and time...";
-"MissionViewController.start.countdown" = "Starting in %d";
-"MissionViewController.start.countdown" = "Starting in %d";
-"MissionViewController.start.engaging" = "Preparing to execute...";
-"MissionViewController.start.cancelled" = "Countdown Stopped";
 "MissionViewController.start.takeoffLocationWarning.title" = "Confirm Takeoff Location";
 "MissionViewController.start.takeoffLocationWarning.message.device.altitude.available" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.";
 "MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.";
-"MissionViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
-"MissionViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
 "MissionViewController.engaging" = "Starting Mission";
 "MissionViewController.disengaged" = "Mission Stopped";
+
+"ModeViewController.disconnected" = "Waiting for drone...";
+"ModeViewController.ready" = "Ready to start";
+"ModeViewController.engaging" = "Starting Mode";
+"ModeViewController.disengaged" = "Mode Stopped";
 
 "DroneOffsetsViewController.altitudeYaw" = "ALT/YAW";
 "DroneOffsetsViewController.position" = "POSITION";

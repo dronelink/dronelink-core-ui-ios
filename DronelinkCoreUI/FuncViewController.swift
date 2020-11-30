@@ -15,7 +15,7 @@ import Kingfisher
 import Agrume
 import IQKeyboardManager
 
-public protocol FuncViewControllerDelegate {
+public protocol FuncViewControllerDelegate: class {
     func onFuncExpanded(value: Bool)
 }
 
@@ -29,7 +29,7 @@ public class FuncViewController: UIViewController {
         return funcViewController
     }
     
-    private var delegate: FuncViewControllerDelegate?
+    private weak var delegate: FuncViewControllerDelegate?
     private var droneSessionManager: DroneSessionManager!
     private var session: DroneSession?
     private var funcExecutor: FuncExecutor?
@@ -222,13 +222,13 @@ public class FuncViewController: UIViewController {
     
     @objc func listenRCButtons() {
         if let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
-            if c1PressedPrevious, !remoteControllerState.c1ButtonState.pressed, !variableDroneMarkButton.isHidden {
+            if c1PressedPrevious, !remoteControllerState.kernelC1Button.pressed, !variableDroneMarkButton.isHidden {
                 DispatchQueue.main.async {
                     self.onDroneMark(sender: self)
                 }
             }
             
-            if c2PressedPrevious, !remoteControllerState.c2ButtonState.pressed, !variableDroneMarkButton.isHidden {
+            if c2PressedPrevious, !remoteControllerState.kernelC2Button.pressed, !variableDroneMarkButton.isHidden {
                 DispatchQueue.main.async {
                     self.funcExecutor?.clearValue(index: self.inputIndex)
                     self.readValue()
@@ -237,8 +237,8 @@ public class FuncViewController: UIViewController {
         }
         
         let remoteControllerState = session?.remoteControllerState(channel: 0)?.value
-        c1PressedPrevious = remoteControllerState?.c1ButtonState.pressed ?? false
-        c2PressedPrevious = remoteControllerState?.c2ButtonState.pressed ?? false
+        c1PressedPrevious = remoteControllerState?.kernelC1Button.pressed ?? false
+        c2PressedPrevious = remoteControllerState?.kernelC2Button.pressed ?? false
     }
     
     public override func updateViewConstraints() {
@@ -309,8 +309,6 @@ public class FuncViewController: UIViewController {
             case .drone:
                 make.bottom.equalToSuperview().offset(tablet ? -205 : -160)
                 break
-            @unknown default:
-                make.bottom.equalToSuperview().offset(tablet ? -120 : -115)
             }
         }
         
@@ -437,7 +435,7 @@ public class FuncViewController: UIViewController {
             }
             
             if let mostRecentExecuted = FuncViewController.mostRecentExecuted,
-                mostRecentExecuted.funcID == funcExecutor.funcID {
+                mostRecentExecuted.id == funcExecutor.id {
                 DronelinkUI.shared.showDialog(
                     title: "FuncViewController.cachedInputs.title".localized,
                     details: "FuncViewController.cachedInputs.message".localized,
@@ -611,9 +609,6 @@ public class FuncViewController: UIViewController {
                 
                 value = session
                 break
-            
-            @unknown default:
-                break
         }
         
         if !input.optional && value == nil && input.variable.valueType != .null {
@@ -773,9 +768,6 @@ public class FuncViewController: UIViewController {
                 variableDroneMarkButton.isHidden = false
                 variableDroneViewController.view.isHidden = false
                 break
-            
-            @unknown default:
-                break
             }
 
             delegate?.onFuncExpanded(value: !(input.imageUrl?.isEmpty ?? true))
@@ -837,6 +829,10 @@ extension FuncViewController: DronelinkDelegate {
             self.inputIndex = 0
             self.intro = true
             self.view.setNeedsUpdateConstraints()
+            
+            if let urls = executor.urls {
+                DronelinkUI.shared.cacheImages(urls: urls)
+            }
         }
     }
     
@@ -847,6 +843,10 @@ extension FuncViewController: DronelinkDelegate {
             self.view.setNeedsUpdateConstraints()
         }
     }
+    
+    public func onModeLoaded(executor: ModeExecutor) {}
+    
+    public func onModeUnloaded(executor: ModeExecutor) {}
 }
 
 extension FuncViewController: DroneSessionManagerDelegate {

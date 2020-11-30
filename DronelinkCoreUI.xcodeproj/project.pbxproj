@@ -19,6 +19,7 @@
 		247E09EA244F407500D002A2 /* MicrosoftMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247E09E9244F407500D002A2 /* MicrosoftMapViewController.swift */; };
 		24A53CC7248ED29000A0014F /* InstrumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A53CC6248ED29000A0014F /* InstrumentsViewController.swift */; };
 		24B92C7923E314A2007A42DD /* FuncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B92C7823E314A2007A42DD /* FuncViewController.swift */; };
+		24BEBF8325408343001AE3EF /* ModeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeViewController.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +39,7 @@
 		247E09E9244F407500D002A2 /* MicrosoftMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrosoftMapViewController.swift; sourceTree = "<group>"; };
 		24A53CC6248ED29000A0014F /* InstrumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentsViewController.swift; sourceTree = "<group>"; };
 		24B92C7823E314A2007A42DD /* FuncViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuncViewController.swift; sourceTree = "<group>"; };
+		24BEBF8225408343001AE3EF /* ModeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModeViewController.swift; sourceTree = "<group>"; };
 		24C355C2F269DEDDB27438E6 /* Pods-DronelinkCoreUI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.release.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.release.xcconfig"; sourceTree = "<group>"; };
 		63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.debug.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.debug.xcconfig"; sourceTree = "<group>"; };
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +96,7 @@
 				2459752E2367A22D008CAB6B /* MapboxMapViewController.swift */,
 				247E09E9244F407500D002A2 /* MicrosoftMapViewController.swift */,
 				2459751723679DCB008CAB6B /* MissionViewController.swift */,
+				24BEBF8225408343001AE3EF /* ModeViewController.swift */,
 				242AC08523870D4C00438D26 /* TelemetryViewController.swift */,
 				2459750323679A9D008CAB6B /* Info.plist */,
 				2446AF95236A0153001A1C4F /* Resources */,
@@ -157,7 +160,7 @@
 		245974F623679A9D008CAB6B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1110;
+				LastUpgradeCheck = 1210;
 				ORGANIZATIONNAME = Dronelink;
 				TargetAttributes = {
 					245974FE23679A9D008CAB6B = {
@@ -228,6 +231,7 @@
 			files = (
 				2418ACA323ECC18A0099D44C /* DroneOffsetsViewController.swift in Sources */,
 				2459751823679DCB008CAB6B /* MissionViewController.swift in Sources */,
+				24BEBF8325408343001AE3EF /* ModeViewController.swift in Sources */,
 				2475371D24252FAA00FFC696 /* CameraOffsetsViewController.swift in Sources */,
 				247E09EA244F407500D002A2 /* MicrosoftMapViewController.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapboxMapViewController.swift in Sources */,
@@ -268,6 +272,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -331,6 +336,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
