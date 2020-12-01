@@ -105,7 +105,7 @@ public class MapboxMapViewController: UIViewController {
         if let state = session?.state?.value, let droneLocation = state.location {
             droneAnnotation.coordinate = droneLocation.coordinate
             if let droneAnnotationView = droneAnnotationView {
-                droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.kernelOrientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
+                droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.orientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
             }
             droneAnnotationView?.isHidden = false
         }

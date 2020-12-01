@@ -222,13 +222,13 @@ public class FuncViewController: UIViewController {
     
     @objc func listenRCButtons() {
         if let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
-            if c1PressedPrevious, !remoteControllerState.kernelC1Button.pressed, !variableDroneMarkButton.isHidden {
+            if c1PressedPrevious, !remoteControllerState.c1Button.pressed, !variableDroneMarkButton.isHidden {
                 DispatchQueue.main.async {
                     self.onDroneMark(sender: self)
                 }
             }
             
-            if c2PressedPrevious, !remoteControllerState.kernelC2Button.pressed, !variableDroneMarkButton.isHidden {
+            if c2PressedPrevious, !remoteControllerState.c2Button.pressed, !variableDroneMarkButton.isHidden {
                 DispatchQueue.main.async {
                     self.funcExecutor?.clearValue(index: self.inputIndex)
                     self.readValue()
@@ -237,8 +237,8 @@ public class FuncViewController: UIViewController {
         }
         
         let remoteControllerState = session?.remoteControllerState(channel: 0)?.value
-        c1PressedPrevious = remoteControllerState?.kernelC1Button.pressed ?? false
-        c2PressedPrevious = remoteControllerState?.kernelC2Button.pressed ?? false
+        c1PressedPrevious = remoteControllerState?.c1Button.pressed ?? false
+        c2PressedPrevious = remoteControllerState?.c2Button.pressed ?? false
     }
     
     public override func updateViewConstraints() {
@@ -491,10 +491,9 @@ public class FuncViewController: UIViewController {
             return
         }
         
-        addNextDynamicInput()
-        
         inputIndex += 1
         variableTextField.resignFirstResponder()
+        addNextDynamicInput()
         readValue()
         view.setNeedsUpdateConstraints()
     }
