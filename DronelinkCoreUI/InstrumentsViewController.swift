@@ -113,7 +113,7 @@ public class InstrumentsViewController: UIViewController {
         else {
             gpsLabel.text = "InstrumentsViewController.empty".localized
         }
-        signalLabel.text = Dronelink.shared.format(formatter: "percent", value: session?.state?.value.signalStrength, defaultValue: "InstrumentsViewController.empty".localized)
+        signalLabel.text = Dronelink.shared.format(formatter: "percent", value: session?.state?.value.downlinkSignalStrength, defaultValue: "InstrumentsViewController.empty".localized)
         batteryLabel.text = Dronelink.shared.format(formatter: "percent", value: session?.state?.value.batteryPercent, defaultValue: "InstrumentsViewController.empty".localized)
     }
 }
