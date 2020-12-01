@@ -19,4 +19,5 @@ target 'DronelinkCoreUI' do
   pod 'Kingfisher', '~> 5.15.7'
   pod 'Agrume', '~> 5.6.10'
   pod 'IQKeyboardManager', '~> 6.5.6'
+  pod 'MarqueeLabel', '~> 4.0.5'
 end

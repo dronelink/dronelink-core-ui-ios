@@ -82,3 +82,7 @@
 "MicrosoftMapViewController.fpv" = "FPV (Beta)";
 "MicrosoftMapViewController.satellite" = "Satellite";
 "MicrosoftMapViewController.streets" = "Streets & Buildings";
+
+"StatusWidget.disconnected" = "Disconnected";
+"StatusWidget.ready" = "All Systems Go";
+"StatusWidget.manual" = "Manual Flight";

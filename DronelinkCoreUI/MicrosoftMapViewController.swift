@@ -614,6 +614,8 @@ public class MicrosoftMapViewController: UIViewController {
 extension MicrosoftMapViewController: DronelinkDelegate {
     public func onRegistered(error: String?) {}
     
+    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
+    
     public func onMissionLoaded(executor: MissionExecutor) {
         missionExecutor = executor
         executor.add(delegate: self)

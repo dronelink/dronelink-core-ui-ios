@@ -363,6 +363,8 @@ public class ModeViewController: UIViewController {
 extension ModeViewController: DronelinkDelegate {
     public func onRegistered(error: String?) {}
     
+    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
+    
     public func onMissionLoaded(executor: MissionExecutor) {}
     
     public func onMissionUnloaded(executor: MissionExecutor) {}

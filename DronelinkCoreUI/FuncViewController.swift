@@ -817,6 +817,8 @@ extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
 extension FuncViewController: DronelinkDelegate {
     public func onRegistered(error: String?) {}
     
+    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
+    
     public func onMissionLoaded(executor: MissionExecutor) {}
     
     public func onMissionUnloaded(executor: MissionExecutor) {}
