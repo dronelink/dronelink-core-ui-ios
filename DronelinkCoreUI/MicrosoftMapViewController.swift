@@ -224,7 +224,7 @@ public class MicrosoftMapViewController: UIViewController {
         
         let engaged = missionExecutor?.engaged ?? false
         if droneTakeoffAltitude != nil, session?.located ?? false, let state = session?.state?.value, let location = state.location {
-            var rotation = Int(-state.kernelOrientation.yaw.convertRadiansToDegrees) % 360
+            var rotation = Int(-state.orientation.yaw.convertRadiansToDegrees) % 360
             if (rotation < 0) {
                 rotation += 360;
             }
@@ -289,10 +289,10 @@ public class MicrosoftMapViewController: UIViewController {
                 trackingScene = MSMapScene(camera: MSMapCamera(
                     location: MSGeopoint(
                         position: positionAboveDroneTakeoffLocation(
-                            coordinate: location.coordinate.coordinate(bearing: state.kernelOrientation.yaw + Double.pi, distance: 15),
+                            coordinate: location.coordinate.coordinate(bearing: state.orientation.yaw + Double.pi, distance: 15),
                             altitude: state.altitude + 14),
                         altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
-                    heading: state.kernelOrientation.yaw.convertRadiansToDegrees,
+                    heading: state.orientation.yaw.convertRadiansToDegrees,
                     pitch: 45))
                 break
                 
@@ -302,8 +302,8 @@ public class MicrosoftMapViewController: UIViewController {
                         location: MSGeopoint(
                             position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude),
                             altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
-                        heading: state.kernelOrientation.yaw.convertRadiansToDegrees,
-                        pitch: min((session?.gimbalState(channel: 0)?.value.kernelOrientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
+                        heading: state.orientation.yaw.convertRadiansToDegrees,
+                        pitch: min((session?.gimbalState(channel: 0)?.value.orientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
                 break
             }
             
