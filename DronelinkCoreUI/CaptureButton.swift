@@ -8,14 +8,17 @@
 
 import Foundation
 import UIKit
-
-public protocol CaptureButtonProtocol : class {
-    func captureButtonTapped(_ sender: CaptureButton)
-}
+import DronelinkCore
 
 public class CaptureButton: UIButton {
     
-    public weak var delegate: CaptureButtonProtocol?
+    private var droneSessionManager: DroneSessionManager!
+    
+    public static func create(droneSessionManager: DroneSessionManager) -> CaptureButton {
+        let captureButton = CaptureButton()
+        captureButton.droneSessionManager = droneSessionManager
+        return captureButton
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,7 +35,8 @@ public class CaptureButton: UIButton {
     }
     
     @objc func btnClicked (_ sender:UIButton) {
-        delegate?.captureButtonTapped(self)
+        var command = Kernel.StartCaptureCameraCommand()
+        try? self.droneSessionManager.session?.add(command: command)
     }
     
 }
