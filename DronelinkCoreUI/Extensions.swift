@@ -52,14 +52,10 @@ public extension UIView {
 }
 
 extension UIViewController {
-    public func install(inParent: UIViewController) {
-        install(inParent: inParent, insideSubview: inParent.view)
-    }
-    
-    public func install(inParent: UIViewController, insideSubview: UIView) {
+    public func install(inParent: UIViewController, insideSubview: UIView? = nil) {
         willMove(toParent: inParent)
         inParent.addChild(self)
-        insideSubview.addSubview(view)
+        (insideSubview ?? inParent.view).addSubview(view)
         didMove(toParent: inParent)
     }
     
@@ -68,7 +64,6 @@ extension UIViewController {
         view.removeFromSuperview()
     }
 }
-
 
 extension UIColor {
     convenience init(red: Int, green: Int, blue: Int) {

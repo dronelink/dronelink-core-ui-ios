@@ -86,3 +86,9 @@
 "StatusWidget.disconnected" = "Disconnected";
 "StatusWidget.ready" = "All Systems Go";
 "StatusWidget.manual" = "Manual Flight";
+
+"DashboardWidget.device.legacy.title" = "Low Performance Device";
+"DashboardWidget.device.legacy.details" = "Using this device may result in poor flight performance or other unexpected issues. Please consider upgrading to a modern device for a safer and more reliable experience.";
+"DashboardWidget.device.legacy.confirm" = "I Understand";
+"DashboardWidget.device.legacy.confirm.dismiss" = "Don't Warn Again";
+"DashboardWidget.cameraGeneralSettings" = "MENU";

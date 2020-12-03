@@ -8,6 +8,8 @@
 import UIKit
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
+import MaterialComponents.MaterialButtons
+import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
 extension Kernel.MessageLevel {
@@ -28,7 +30,7 @@ extension Kernel.Message {
 }
 
 public class StatusWidget: UpdatableWidget {
-    internal struct Status {
+    public struct Status {
         let message: String
         let color: UIColor?
     }
@@ -43,7 +45,7 @@ public class StatusWidget: UpdatableWidget {
             let droneSessionManager = primaryDroneSessionManager,
             let state = droneSessionManager.session?.state?.value
         else {
-            return Status(message: "StatusWidget.disconnected".localized, color: nil)
+            return statuses.disconnected
         }
         
         if let statusMessage = droneSessionManager.statusMessages?.filter({ $0.level != .info }).sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
@@ -54,14 +56,21 @@ public class StatusWidget: UpdatableWidget {
             return statusMessage.status
         }
         
-        return Status(message: (state.isFlying ? "StatusWidget.manual" : "StatusWidget.ready").localized, color: MDCPalette.green.accent400)
+        return state.isFlying ? statuses.manualFlight : statuses.ready
     }
     
     internal override var updateInterval: TimeInterval { 0.5 }
+    
+    public var statuses = (
+        disconnected: Status(message: "StatusWidget.disconnected".localized, color: MDCPalette.deepPurple.accent400),
+        ready: Status(message: "StatusWidget.ready".localized, color: MDCPalette.green.accent400),
+        manualFlight: Status(message: "StatusWidget.manual".localized, color: MDCPalette.green.accent400)
+    )
 }
 
-public class StatusColorWidget: StatusWidget {
-    private let gradient = CAGradientLayer()
+public class StatusGradientWidget: StatusWidget {
+    public let gradient = CAGradientLayer()
+    public var opacity: CGFloat = 0.5
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,25 +86,29 @@ public class StatusColorWidget: StatusWidget {
     @objc override func update() {
         super.update()
         
-        //FIXME covers the whole screen briefly?
-        gradient.frame = view.bounds
+        gradient.frame = view.frame
         
         guard let color = status.color else {
             gradient.colors = [DronelinkUI.Constants.overlayColor.cgColor]
             return
         }
         
-        gradient.colors = [color.withAlphaComponent(0.5).cgColor, DronelinkUI.Constants.overlayColor.cgColor]
+        gradient.colors = [color.withAlphaComponent(opacity).cgColor, UIColor.clear.cgColor]
     }
 }
 
-public class StatusTextWidget: StatusWidget {
-    public var label: MarqueeLabel?
+public class StatusLabelWidget: StatusWidget {
+    public let label = MarqueeLabel(frame: CGRect.zero, duration: 8.0, fadeLength: 10.0)
+    public var colorEnabled = false
+    public var onTapped: (() -> ())?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        let label = MarqueeLabel(frame: view.frame, duration: 8.0, fadeLength: 10.0)
+        view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
+        
+        label.leadingBuffer = 8
+        label.trailingBuffer = label.leadingBuffer
         label.textColor = UIColor.white
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
@@ -103,11 +116,18 @@ public class StatusTextWidget: StatusWidget {
             make.edges.equalToSuperview()
         }
         
-        self.label = label
+        view.isUserInteractionEnabled = true
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onViewTapped(_:))))
     }
     
     @objc override func update() {
         super.update()
-        label?.text = status.message
+        let status = self.status
+        label.text = status.message
+        view.backgroundColor = colorEnabled ? status.color : UIColor.clear
+    }
+    
+    @objc func onViewTapped(_ sender: UITapGestureRecognizer) {
+        onTapped?()
     }
 }
