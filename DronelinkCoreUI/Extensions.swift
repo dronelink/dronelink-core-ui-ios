@@ -51,6 +51,20 @@ public extension UIView {
     }
 }
 
+extension UIViewController {
+    public func install(inParent: UIViewController, insideSubview: UIView? = nil) {
+        willMove(toParent: inParent)
+        inParent.addChild(self)
+        (insideSubview ?? inParent.view).addSubview(view)
+        didMove(toParent: inParent)
+    }
+    
+    public func uninstallFromParent() {
+        removeFromParent()
+        view.removeFromSuperview()
+    }
+}
+
 extension UIColor {
     convenience init(red: Int, green: Int, blue: Int) {
         assert(red >= 0 && red <= 255, "Invalid red component")

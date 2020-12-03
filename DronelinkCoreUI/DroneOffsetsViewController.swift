@@ -342,7 +342,7 @@ public class DroneOffsetsViewController: UIViewController {
                 
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
                     vector: Kernel.Vector2(
-                        direction: state.kernelOrientation.yaw - (Double.pi / 2),
+                        direction: state.orientation.yaw - (Double.pi / 2),
                         magnitude: 1.0.convertFeetToMeters))
                 break
             }
@@ -372,7 +372,7 @@ public class DroneOffsetsViewController: UIViewController {
                 
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
                     vector: Kernel.Vector2(
-                        direction: state.kernelOrientation.yaw + (Double.pi / 2),
+                        direction: state.orientation.yaw + (Double.pi / 2),
                         magnitude: 1.0.convertFeetToMeters))
                 break
             }
@@ -397,7 +397,7 @@ public class DroneOffsetsViewController: UIViewController {
             
             offsets.droneCoordinate = offsets.droneCoordinate.add(
                 vector: Kernel.Vector2(
-                    direction: state.kernelOrientation.yaw,
+                    direction: state.orientation.yaw,
                     magnitude: 1.0.convertFeetToMeters))
             break
         }
@@ -422,7 +422,7 @@ public class DroneOffsetsViewController: UIViewController {
             
             offsets.droneCoordinate = offsets.droneCoordinate.add(
                 vector: Kernel.Vector2(
-                    direction: state.kernelOrientation.yaw + Double.pi,
+                    direction: state.orientation.yaw + Double.pi,
                     magnitude: 1.0.convertFeetToMeters))
             break
         }
@@ -578,18 +578,18 @@ public class DroneOffsetsViewController: UIViewController {
             let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
             let deadband = 0.15
             
-            let yawPercent = remoteControllerState.kernelLeftStick.x
+            let yawPercent = remoteControllerState.leftStick.x
             if abs(yawPercent) > deadband {
                 offsets.droneYaw += (1.0 * yawPercent).convertDegreesToRadians
             }
 
-            let altitudePercent = remoteControllerState.kernelLeftStick.y
+            let altitudePercent = remoteControllerState.leftStick.y
             if abs(altitudePercent) > deadband {
                 offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
             }
             
             
-            let positionPercent = remoteControllerState.kernelRightStick.y
+            let positionPercent = remoteControllerState.rightStick.y
             if abs(positionPercent) > deadband {
                 guard let state = session?.state?.value else {
                     return
@@ -597,7 +597,7 @@ public class DroneOffsetsViewController: UIViewController {
                 
                 offsets.droneCoordinate = offsets.droneCoordinate.add(
                     vector: Kernel.Vector2(
-                        direction: state.kernelOrientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
+                        direction: state.orientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
                         magnitude: (0.4 * abs(positionPercent)).convertFeetToMeters))
             }
         }

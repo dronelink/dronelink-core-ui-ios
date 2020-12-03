@@ -1,9 +1,9 @@
 //
-//  MapboxMapViewController.swift
+//  MapboxMapWidget.swift
 //  DronelinkCoreUI
 //
-//  Created by Jim McAndrew on 10/28/19.
-//  Copyright © 2019 Dronelink. All rights reserved.
+//  Created by Jim McAndrew on 12/2/20.
+//  Copyright © 2020 Dronelink. All rights reserved.
 //
 import UIKit
 import Foundation
@@ -11,17 +11,9 @@ import Mapbox
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 
-public class MapboxMapViewController: UIViewController {
-    public static func create(droneSessionManager: DroneSessionManager) -> MapboxMapViewController {
-        let mapViewController = MapboxMapViewController()
-        mapViewController.droneSessionManager = droneSessionManager
-        return mapViewController
-    }
+public class MapboxMapWidget: UpdatableWidget {
+    internal override var updateInterval: TimeInterval { 0.1 }
     
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
-    private var missionExecutor: MissionExecutor?
-    private var modeExecutor: ModeExecutor?
     private let mapView = MGLMapView()
     private let droneHomeAnnotation = MGLPointAnnotation()
     private var droneHomeAnnotationView: MGLAnnotationView?
@@ -35,9 +27,6 @@ public class MapboxMapViewController: UIViewController {
     private var missionReengagementEstimateForegroundAnnotation: MGLAnnotation?
     private var modeTargetAnnotation = MGLPointAnnotation()
     private var modeTargetAnnotationView: MGLAnnotationView?
-    private let updateInterval: TimeInterval = 0.1
-    private var updateTimer: Timer?
-    private var lastUpdated = Date()
     private var missionCentered = false
     
     public override func viewDidLoad() {
@@ -45,6 +34,8 @@ public class MapboxMapViewController: UIViewController {
         mapView.addShadow()
         mapView.styleURL = MGLStyle.satelliteStreetsStyleURL
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        mapView.attributionButtonPosition = .topLeft
+        mapView.logoViewPosition = .bottomRight
         mapView.showsUserLocation = true
         mapView.showsScale = false
         mapView.showsHeading = false
@@ -63,23 +54,6 @@ public class MapboxMapViewController: UIViewController {
         update()
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        updateTimer = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
-        droneSessionManager.add(delegate: self)
-        Dronelink.shared.add(delegate: self)
-    }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        updateTimer?.invalidate()
-        updateTimer = nil
-        droneSessionManager.remove(delegate: self)
-        Dronelink.shared.remove(delegate: self)
-        missionExecutor?.remove(delegate: self)
-        modeExecutor?.remove(delegate: self)
-    }
-    
     public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
         let alert = UIAlertController(title: "MicrosoftMapViewController.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
@@ -93,7 +67,9 @@ public class MapboxMapViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    @objc func update() {
+    @objc override func update() {
+        super.update()
+        
         if let state = session?.state?.value, let droneHomeLocation = state.homeLocation {
             droneHomeAnnotation.coordinate = droneHomeLocation.coordinate
             droneHomeAnnotationView?.isHidden = false
@@ -211,18 +187,12 @@ public class MapboxMapViewController: UIViewController {
                 animated: true)
         }
     }
-}
 
-extension MapboxMapViewController: DronelinkDelegate {
-    public func onRegistered(error: String?) {}
-    
-    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
-    
-    public func onMissionLoaded(executor: MissionExecutor) {
+    public override func onMissionLoaded(executor: MissionExecutor) {
+        super.onMissionLoaded(executor: executor)
+        
         DispatchQueue.main.async {
-            self.missionExecutor = executor
             self.missionCentered = false
-            executor.add(delegate: self)
             self.updateMissionRequiredTakeoffArea()
             if executor.estimated {
                 self.updateMissionEstimate()
@@ -230,82 +200,42 @@ extension MapboxMapViewController: DronelinkDelegate {
         }
     }
     
-    public func onMissionUnloaded(executor: MissionExecutor) {
+    public override func onMissionUnloaded(executor: MissionExecutor) {
+        super.onMissionUnloaded(executor: executor)
+        
         DispatchQueue.main.async {
-            self.missionExecutor = nil
             self.missionCentered = false
-            executor.remove(delegate: self)
             self.updateMissionRequiredTakeoffArea()
             self.updateMissionEstimate()
         }
     }
-    
-    public func onFuncLoaded(executor: FuncExecutor) {}
-    
-    public func onFuncUnloaded(executor: FuncExecutor) {}
-    
-    public func onModeLoaded(executor: ModeExecutor) {
-        DispatchQueue.main.async {
-            self.modeExecutor = executor
-            executor.add(delegate: self)
-        }
-    }
-    
-    public func onModeUnloaded(executor: ModeExecutor) {
-        DispatchQueue.main.async {
-            self.modeExecutor = nil
-            executor.remove(delegate: self)
-        }
-    }
-}
 
-extension MapboxMapViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-    }
-    
-    public func onClosed(session: DroneSession) {
-        self.session = nil
-    }
-}
-
-extension MapboxMapViewController: MissionExecutorDelegate {
-    public func onMissionEstimating(executor: MissionExecutor) {}
-    
-    public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+    public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+        super.onMissionEstimated(executor: executor, estimate: estimate)
+        
         DispatchQueue.main.async {
             self.updateMissionEstimate()
         }
     }
-    
-    public func onMissionEngaging(executor: MissionExecutor) {}
-    
-    public func onMissionEngaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {}
-    
-    public func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {}
-    
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {}
-}
 
-extension MapboxMapViewController: ModeExecutorDelegate {
-    public func onModeEngaging(executor: ModeExecutor) {}
-    
-    public func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {}
-    
-    public func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
+    public override func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
+        super.onModeExecuted(executor: executor, engagement: engagement)
+        
         DispatchQueue.main.async {
             self.updateModeElements()
         }
     }
     
-    public func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+    public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
+        
         DispatchQueue.main.async {
             self.updateModeElements()
         }
     }
 }
 
-extension MapboxMapViewController: MGLMapViewDelegate {
+extension MapboxMapWidget: MGLMapViewDelegate {
     public func mapView(_ mapView: MGLMapView, viewFor annotation: MGLAnnotation) -> MGLAnnotationView? {
         if (annotation === droneHomeAnnotation) {
             var droneHome = mapView.dequeueReusableAnnotationView(withIdentifier: "drone-home")
