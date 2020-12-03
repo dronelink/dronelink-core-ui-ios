@@ -14,18 +14,35 @@ import MarqueeLabel
 
 public class CameraCaptureWidget: UpdatableWidget {
     
-    public var captureButton: CaptureButton?
+    public var captureButton: UIButton?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        guard let droneSessionManager = primaryDroneSessionManager else {return}
-        
-        captureButton = CaptureButton.create(droneSessionManager: droneSessionManager)
-        
+        captureButton = UIButton()
+        configCaptureButton()
         view.addSubview(captureButton!)
+        captureButton?.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         captureButton!.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+    }
+    
+    private func configCaptureButton() {
+        captureButton?.setImage(DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        captureButton?.addTarget(self, action: #selector(captureButtonClicked(_:)), for: .touchUpInside)
+    }
+    
+    private func cameraIsCapturing() -> Bool {
+        // Check if the camera is capturing
+        return session?.cameraState(channel: 0)?.value.isCapturing == true
+    }
+    
+    @objc func captureButtonClicked (_ sender:UIButton) {
+        // If camera is capturing then add stop capture command else add start capture command
+        try? self.session?.add(command: cameraIsCapturing() ? Kernel.StopCaptureCameraCommand() : Kernel.StartCaptureCameraCommand())
     }
     
     @objc override func update() {
