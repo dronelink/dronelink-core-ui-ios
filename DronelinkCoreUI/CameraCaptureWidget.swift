@@ -14,8 +14,18 @@ import MarqueeLabel
 
 public class CameraCaptureWidget: UpdatableWidget {
     
+    public var captureButton: CaptureButton?
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
+        guard let droneSessionManager = primaryDroneSessionManager else {return}
+        
+        captureButton = CaptureButton.create(droneSessionManager: droneSessionManager)
+        
+        view.addSubview(captureButton!)
+        captureButton!.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
     }
     
     @objc override func update() {

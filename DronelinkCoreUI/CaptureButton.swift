@@ -14,7 +14,7 @@ public class CaptureButton: UIButton {
     
     private var droneSessionManager: DroneSessionManager!
     
-    public static func create(droneSessionManager: DroneSessionManager) -> CaptureButton {
+    public static func create(droneSessionManager: DroneSessionManager?) -> CaptureButton {
         let captureButton = CaptureButton()
         captureButton.droneSessionManager = droneSessionManager
         return captureButton
