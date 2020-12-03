@@ -23,6 +23,7 @@
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
 		E4F1FB0A2576E17F00778068 /* CaptureButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB092576E17F00778068 /* CaptureButton.swift */; };
 		E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB522579247100778068 /* CameraModeControl.swift */; };
+		E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +48,7 @@
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4F1FB092576E17F00778068 /* CaptureButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureButton.swift; sourceTree = "<group>"; };
 		E4F1FB522579247100778068 /* CameraModeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeControl.swift; sourceTree = "<group>"; };
+		E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitSystemControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 			children = (
 				E4F1FB092576E17F00778068 /* CaptureButton.swift */,
 				E4F1FB522579247100778068 /* CameraModeControl.swift */,
+				E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */,
 				2475371C24252FAA00FFC696 /* CameraOffsetsViewController.swift */,
 				2459750A23679B8C008CAB6B /* DronelinkUI.swift */,
 				2418ACA223ECC18A0099D44C /* DroneOffsetsViewController.swift */,
@@ -235,6 +238,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */,
 				2418ACA323ECC18A0099D44C /* DroneOffsetsViewController.swift in Sources */,
 				2459751823679DCB008CAB6B /* MissionViewController.swift in Sources */,
 				24BEBF8325408343001AE3EF /* ModeViewController.swift in Sources */,
