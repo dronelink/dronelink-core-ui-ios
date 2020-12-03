@@ -240,7 +240,7 @@ public class GenericWidgetFactory: WidgetFactory {
     public func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraGeneralSettingsWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraModeWidget(current: Widget? = nil) -> Widget? { nil }
-    public func createCameraCaptureWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createCameraCaptureWidget(current: Widget? = nil) -> Widget? {  (current as? CameraCaptureWidget) ?? CameraCaptureWidget()  }
     public func createCameraExposureSettingsWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
 }

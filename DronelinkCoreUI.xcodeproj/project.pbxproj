@@ -28,6 +28,7 @@
 		E4F1FB0A2576E17F00778068 /* CaptureButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB092576E17F00778068 /* CaptureButton.swift */; };
 		E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB522579247100778068 /* CameraModeControl.swift */; };
 		E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */; };
+		E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +58,7 @@
 		E4F1FB092576E17F00778068 /* CaptureButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureButton.swift; sourceTree = "<group>"; };
 		E4F1FB522579247100778068 /* CameraModeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeControl.swift; sourceTree = "<group>"; };
 		E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitSystemControl.swift; sourceTree = "<group>"; };
+		E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 				249F37332576EF2900472A7D /* Widget.swift */,
 				2459750323679A9D008CAB6B /* Info.plist */,
 				2446AF95236A0153001A1C4F /* Resources */,
+				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
 			);
 			path = DronelinkCoreUI;
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */,
 				E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */,
 				2418ACA323ECC18A0099D44C /* DroneOffsetsViewController.swift in Sources */,
 				2459751823679DCB008CAB6B /* MissionViewController.swift in Sources */,
