@@ -31,7 +31,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     }
     
     private func configCaptureButton() {
-        captureButton?.setImage(DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysOriginal), for: .normal)
+        captureButton?.setImage(DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysTemplate), for: .normal)
         captureButton?.addTarget(self, action: #selector(captureButtonClicked(_:)), for: .touchUpInside)
     }
     
@@ -47,5 +47,8 @@ public class CameraCaptureWidget: UpdatableWidget {
     
     @objc override func update() {
         super.update()
+        print(session?.cameraState(channel: 0)?.value.mode)
+        
+        captureButton?.tintColor = (session?.cameraState(channel: 0)?.value.mode == .photo) ? .white : .red
     }
 }
