@@ -9,36 +9,21 @@ import UIKit
 import Foundation
 import DronelinkCore
 
-public class Widget: UIViewController {
+open class Widget: UIViewController {
     public var droneSessionManager: DroneSessionManager?
     
-    internal var primaryDroneSessionManager: DroneSessionManager? {
-        if let droneSessionManager = droneSessionManager {
-            return droneSessionManager
-        }
-        
-        for droneSessionManager in Dronelink.shared.droneSessionManagers {
-            if droneSessionManager.session != nil {
-                return droneSessionManager
-            }
-        }
-        
-        return Dronelink.shared.droneSessionManagers.first
+    public var targetDroneSessionManager: DroneSessionManager? {
+        droneSessionManager ?? Dronelink.shared.targetDroneSessionManager
     }
     
-    internal var session: DroneSession? { primaryDroneSessionManager?.session }
-    internal var missionExecutor: MissionExecutor? { Dronelink.shared.missionExecutor }
-    internal var modeExecutor: ModeExecutor? { Dronelink.shared.modeExecutor }
-    internal var funcExecutor: FuncExecutor? { Dronelink.shared.funcExecutor }
-    internal var widgetFactory: WidgetFactory { primaryDroneSessionManager as? WidgetFactory ?? GenericWidgetFactory.shared }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        view.clipsToBounds = true
-    }
+    public var session: DroneSession? { targetDroneSessionManager?.session }
+    public var missionExecutor: MissionExecutor? { Dronelink.shared.missionExecutor }
+    public var modeExecutor: ModeExecutor? { Dronelink.shared.modeExecutor }
+    public var funcExecutor: FuncExecutor? { Dronelink.shared.funcExecutor }
+    public var widgetFactory: WidgetFactory { targetDroneSessionManager as? WidgetFactory ?? GenericWidgetFactory.shared }
 }
 
-public class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegate, DroneSessionDelegate, MissionExecutorDelegate, ModeExecutorDelegate, FuncExecutorDelegate {
+open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegate, DroneSessionDelegate, MissionExecutorDelegate, ModeExecutorDelegate, FuncExecutorDelegate {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Dronelink.shared.add(delegate: self)
@@ -56,79 +41,79 @@ public class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDeleg
         }
     }
 
-    public func onRegistered(error: String?) {}
+    open func onRegistered(error: String?) {}
     
-    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {
+    open func onDroneSessionManagerAdded(manager: DroneSessionManager) {
         manager.add(delegate: self)
     }
     
-    public func onMissionLoaded(executor: MissionExecutor) {
+    open func onMissionLoaded(executor: MissionExecutor) {
         executor.add(delegate: self)
     }
     
-    public func onMissionUnloaded(executor: MissionExecutor) {
+    open func onMissionUnloaded(executor: MissionExecutor) {
         executor.remove(delegate: self)
     }
     
-    public func onFuncLoaded(executor: FuncExecutor) {
+    open func onFuncLoaded(executor: FuncExecutor) {
         executor.add(delegate: self)
     }
     
-    public func onFuncUnloaded(executor: FuncExecutor) {
+    open func onFuncUnloaded(executor: FuncExecutor) {
         executor.remove(delegate: self)
     }
     
-    public func onModeLoaded(executor: ModeExecutor) {
+    open func onModeLoaded(executor: ModeExecutor) {
         executor.add(delegate: self)
     }
     
-    public func onModeUnloaded(executor: ModeExecutor) {
+    open func onModeUnloaded(executor: ModeExecutor) {
         executor.remove(delegate: self)
     }
 
-    public func onOpened(session: DroneSession) {
+    open func onOpened(session: DroneSession) {
         session.add(delegate: self)
     }
     
-    public func onClosed(session: DroneSession) {
+    open func onClosed(session: DroneSession) {
         session.remove(delegate: self)
     }
     
-    public func onInitialized(session: DroneSession) {}
+    open func onInitialized(session: DroneSession) {}
     
-    public func onLocated(session: DroneSession) {}
+    open func onLocated(session: DroneSession) {}
     
-    public func onMotorsChanged(session: DroneSession, value: Bool) {}
+    open func onMotorsChanged(session: DroneSession, value: Bool) {}
     
-    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
+    open func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
     
-    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {}
+    open func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {}
     
-    public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
+    open func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
     
-    public func onMissionEstimating(executor: MissionExecutor) {}
+    open func onMissionEstimating(executor: MissionExecutor) {}
     
-    public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {}
+    open func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {}
     
-    public func onMissionEngaging(executor: MissionExecutor) {}
+    open func onMissionEngaging(executor: MissionExecutor) {}
     
-    public func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {}
+    open func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {}
     
-    public func onMissionExecuted(executor: MissionExecutor, engagement: Executor.Engagement) {}
+    open func onMissionExecuted(executor: MissionExecutor, engagement: Executor.Engagement) {}
     
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {}
+    open func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {}
     
-    public func onModeEngaging(executor: ModeExecutor) {}
+    open func onModeEngaging(executor: ModeExecutor) {}
     
-    public func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {}
+    open func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {}
     
-    public func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {}
+    open func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {}
     
-    public func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {}
+    open func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {}
     
-    public func onFuncInputsChanged(executor: FuncExecutor) {}
+    open func onFuncInputsChanged(executor: FuncExecutor) {}
     
-    public func onFuncExecuted(executor: FuncExecutor) {}
+    open func onFuncExecuted(executor: FuncExecutor) {}
 }
 
 extension UIView {
@@ -142,7 +127,7 @@ extension UIView {
     }
 }
 
-public class WrapperWidget: Widget {
+open class WrapperWidget: Widget {
     private var _viewController: UIViewController?
     
     public var viewController: UIViewController? {
@@ -171,7 +156,7 @@ extension UIViewController {
     }
 }
 
-public class UpdatableWidget: DelegateWidget {
+open class UpdatableWidget: DelegateWidget {
     internal var updateInterval: TimeInterval { 1.0 }
     internal var updateTimer: Timer?
     
@@ -192,7 +177,7 @@ public class UpdatableWidget: DelegateWidget {
         update()
     }
     
-    @objc func update() {}
+    @objc open func update() {}
 }
 
 public protocol WidgetFactory {

@@ -1,8 +1,8 @@
 //
-//  MicrosoftMapViewController.swift
+//  MicrosoftMapWidget.swift
 //  DronelinkCoreUI
 //
-//  Created by Jim McAndrew on 4/21/20.
+//  Created by Jim McAndrew on 12/4/20.
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
 import UIKit
@@ -12,7 +12,7 @@ import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MicrosoftMaps
 
-public class MicrosoftMapViewController: UIViewController {
+public class MicrosoftMapWidget: UpdatableWidget {
     public enum Tracking {
         case none
         case thirdPersonNadir //follow
@@ -24,7 +24,7 @@ public class MicrosoftMapViewController: UIViewController {
         case streets
         case satellite
     }
-    
+
     private struct SceneElements: OptionSet {
         let rawValue: Int
 
@@ -39,20 +39,10 @@ public class MicrosoftMapViewController: UIViewController {
         static let all: SceneElements = [.user, .droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
         static let standard: SceneElements = [.droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
     }
-    
-    public static func create(droneSessionManager: DroneSessionManager, credentialsKey: String) -> MicrosoftMapViewController {
-        let mapViewController = MicrosoftMapViewController()
-        mapViewController.mapView.credentialsKey = credentialsKey
-        mapViewController.droneSessionManager = droneSessionManager
-        return mapViewController
-    }
-    
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
-    private var missionExecutor: MissionExecutor?
-    private var modeExecutor: ModeExecutor?
-    private var funcExecutor: FuncExecutor?
-    private let mapView = MSMapView()
+
+    internal override var updateInterval: TimeInterval { 0.1 }
+
+    public let mapView = MSMapView()
     private let droneLayer = MSMapElementLayer()
     private let droneIcon = MSMapIcon()
     private let droneHomeIcon = MSMapIcon()
@@ -66,14 +56,12 @@ public class MicrosoftMapViewController: UIViewController {
     private let funcInputDroneImage = MSMapImage(uiImage: DronelinkUI.loadImage(named: "func-input-drone", renderingMode: .alwaysOriginal)!)
     private let modeLayer = MSMapElementLayer()
     private let modeTargetIcon = MSMapIcon()
-    private let updateDroneElementsInterval: TimeInterval = 0.1
-    private var updateDroneElementsTimer: Timer?
     private var droneTakeoffAltitude: Double?
     private var droneTakeoffAltitudeReferenceSystem: MSMapAltitudeReferenceSystem { droneTakeoffAltitude == nil ? .surface : .geoid }
     private var style = Style.streets
     private var tracking = Tracking.none
     private var trackingPrevious = Tracking.none
-    
+
     public override func viewDidLoad() {
         mapView.addShadow()
         mapView.clipsToBounds = true
@@ -84,7 +72,7 @@ public class MicrosoftMapViewController: UIViewController {
                     self.tracking = .none
                     self.trackingPrevious = .none
                     break
-                    
+
                 case .none, .thirdPersonOblique, .firstPerson:
                     break
                 }
@@ -105,9 +93,9 @@ public class MicrosoftMapViewController: UIViewController {
         mapView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        
+
         updateScene(elements: .user, animation: .none)
-        
+
         droneLayer.zIndex = 10
         droneHomeIcon.image = MSMapImage(uiImage: DronelinkUI.loadImage(named: "home", renderingMode: .alwaysOriginal)!)
         droneHomeIcon.flat = true
@@ -118,13 +106,13 @@ public class MicrosoftMapViewController: UIViewController {
         droneIcon.desiredCollisionBehavior = .remainVisible
         droneLayer.elements.add(droneIcon)
         mapView.layers.add(droneLayer)
-        
+
         missionLayer.zIndex = 1
         mapView.layers.add(missionLayer)
-        
+
         funcLayer.zIndex = 1
         mapView.layers.add(funcLayer)
-        
+
         modeLayer.zIndex = 1
         modeTargetIcon.image = MSMapImage(uiImage: DronelinkUI.loadImage(named: "drone", renderingMode: .alwaysOriginal)!)
         modeTargetIcon.flat = true
@@ -132,87 +120,26 @@ public class MicrosoftMapViewController: UIViewController {
         modeTargetIcon.desiredCollisionBehavior = .remainVisible
         modeLayer.elements.add(modeTargetIcon)
         mapView.layers.add(modeLayer)
-        
-        updateDroneElements()
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        updateDroneElementsTimer = Timer.scheduledTimer(timeInterval: updateDroneElementsInterval, target: self, selector: #selector(updateDroneElements), userInfo: nil, repeats: true)
-        droneSessionManager.add(delegate: self)
-        Dronelink.shared.add(delegate: self)
-    }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        updateDroneElementsTimer?.invalidate()
-        updateDroneElementsTimer = nil
-        droneSessionManager.remove(delegate: self)
-        Dronelink.shared.remove(delegate: self)
-        session?.remove(delegate: self)
-        missionExecutor?.remove(delegate: self)
-        funcExecutor?.remove(delegate: self)
-        modeExecutor?.remove(delegate: self)
-    }
-    
-    public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
-        let alert = UIAlertController(title: "MicrosoftMapViewController.more".localized, message: nil, preferredStyle: .actionSheet)
-        alert.popoverPresentationController?.sourceView = sender as? UIView
-        
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.reset".localized, style: .default, handler: { _ in
-            self.tracking = .none
-            self.trackingPrevious = .none
-            self.updateScene()
-        }))
-        
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { _ in
-            self.tracking = .thirdPersonNadir
-        }))
-        
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { _ in
-            self.tracking = .thirdPersonOblique
-        }))
-        
-        alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { _ in
-            self.tracking = .firstPerson
-        }))
-        
-//        if tracking == .none {
-//            if style == .streets {
-//                alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.satellite".localized, style: .default, handler: { _ in
-//                    self.update(style: .satellite)
-//                }))
-//            }
-//            else {
-//                alert.addAction(UIAlertAction(title: "MicrosoftMapViewController.streets".localized, style: .default, handler: { _ in
-//                    self.update(style: .streets)
-//                }))
-//            }
-//        }
-        
-        actions?.forEach { alert.addAction($0) }
 
-        alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
-            
-        }))
-
-        present(alert, animated: true)
+        update()
     }
-    
+
     func update(style: Style) {
         self.style = style
         switch (style) {
         case .streets:
             mapView.setStyleSheet(MSMapStyleSheets.roadDark())
             break
-            
+
         case .satellite:
             mapView.setStyleSheet(MSMapStyleSheets.aerialWithOverlay())
             break
         }
     }
-    
-    @objc func updateDroneElements() {
+
+    @objc open override func update() {
+        super.update()
+
         if session?.located ?? false, let state = session?.state?.value, let droneHomeLocation = state.homeLocation {
             var rotation = Int(-mapView.camera.heading) % 360
             if (rotation < 0) {
@@ -221,7 +148,7 @@ public class MicrosoftMapViewController: UIViewController {
             droneHomeIcon.rotation = Float(rotation)
             droneHomeIcon.location = MSGeopoint(latitude: droneHomeLocation.coordinate.latitude, longitude: droneHomeLocation.coordinate.longitude)
         }
-        
+
         let engaged = missionExecutor?.engaged ?? false
         if droneTakeoffAltitude != nil, session?.located ?? false, let state = session?.state?.value, let location = state.location {
             var rotation = Int(-state.orientation.yaw.convertRadiansToDegrees) % 360
@@ -232,7 +159,7 @@ public class MicrosoftMapViewController: UIViewController {
             droneIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             addPositionAboveDroneTakeoffLocation(positions: &droneSessionPositions, coordinate: location.coordinate, altitude: state.altitude)
         }
-        
+
         if engaged || droneSessionPositions.count == 0 {
             if let droneSessionPolyline = droneSessionPolyline {
                 droneLayer.elements.remove(droneSessionPolyline)
@@ -247,12 +174,12 @@ public class MicrosoftMapViewController: UIViewController {
                 droneLayer.elements.add(droneSessionPolyline)
                 self.droneSessionPolyline = droneSessionPolyline
             }
-            
+
             if droneSessionPolyline?.path.size ?? 0 != droneSessionPositions.count {
                 droneSessionPolyline?.path = MSGeopath(positions: droneSessionPositions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             }
         }
-        
+
         if droneMissionExecutedPositions.count == 0 {
             if let droneMissionExecutedPolyline = droneMissionExecutedPolyline {
                 droneLayer.elements.remove(droneMissionExecutedPolyline)
@@ -267,24 +194,24 @@ public class MicrosoftMapViewController: UIViewController {
                 droneLayer.elements.add(droneMissionExecutedPolyline)
                 self.droneMissionExecutedPolyline = droneMissionExecutedPolyline
             }
-            
+
             if droneMissionExecutedPolyline?.path.size ?? 0 != droneMissionExecutedPositions.count {
                 droneMissionExecutedPolyline?.path = MSGeopath(positions: droneMissionExecutedPositions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
             }
         }
-        
+
         if session?.located ?? false, let state = session?.state?.value, let location = state.location {
             var trackingScene: MSMapScene?
             switch (tracking) {
             case .none:
                 break
-                
+
             case .thirdPersonNadir:
                 trackingScene = MSMapScene(
                     location: MSGeopoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude),
                     radius: max(20, state.altitude / 1.5))
                 break
-                
+
             case .thirdPersonOblique:
                 trackingScene = MSMapScene(camera: MSMapCamera(
                     location: MSGeopoint(
@@ -295,7 +222,7 @@ public class MicrosoftMapViewController: UIViewController {
                     heading: state.orientation.yaw.convertRadiansToDegrees,
                     pitch: 45))
                 break
-                
+
             case .firstPerson:
                 trackingScene = MSMapScene(
                     camera: MSMapCamera(
@@ -306,7 +233,7 @@ public class MicrosoftMapViewController: UIViewController {
                         pitch: min((session?.gimbalState(channel: 0)?.value.orientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
                 break
             }
-            
+
             if let trackingScene = trackingScene {
                 //linear causes a memory leak right now:
                 //https://stackoverflow.com/questions/10122570/replace-a-fragment-programmatically
@@ -316,10 +243,10 @@ public class MicrosoftMapViewController: UIViewController {
             }
         }
     }
-    
+
     private func updateMissionElements() {
         missionLayer.elements.clear()
-        
+
         if let requiredTakeoffArea = missionExecutor?.requiredTakeoffArea {
             let polygon = MSMapPolygon()
             polygon.strokeColor = MDCPalette.orange.accent200!.withAlphaComponent(0.5)
@@ -333,7 +260,7 @@ public class MicrosoftMapViewController: UIViewController {
             ]
             missionLayer.elements.add(polygon)
         }
-        
+
         if let restrictionZones = missionExecutor?.restrictionZones {
             restrictionZones.enumerated().forEach {
                 guard let coordinates = missionExecutor?.restrictionZoneBoundaryCoordinates(index: $0.offset) else {
@@ -381,7 +308,7 @@ public class MicrosoftMapViewController: UIViewController {
                 missionLayer.elements.add(polygon)
             }
         }
-        
+
         if let estimateSpatials = missionExecutor?.estimate?.spatials, estimateSpatials.count > 0 {
             var positions: [MSGeoposition] = []
             estimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
@@ -404,7 +331,7 @@ public class MicrosoftMapViewController: UIViewController {
                     reengagementIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: reengagementEstimateSpatial.coordinate.coordinate, altitude: reengagementEstimateSpatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
                     missionLayer.elements.add(reengagementIcon)
                 }
-            
+
                 var positions: [MSGeoposition] = []
                 reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
                 let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
@@ -417,7 +344,7 @@ public class MicrosoftMapViewController: UIViewController {
             }
         }
     }
-    
+
     private func updateFuncElements() {
         var iconIndex = 0
         var inputIndex = 0
@@ -435,7 +362,7 @@ public class MicrosoftMapViewController: UIViewController {
                     else if let spatial = value as? Kernel.GeoSpatial {
                         spatials.append(spatial)
                     }
-                    
+
                     spatials.enumerated().forEach { (variableValueIndex, spatial) in
                         var inputIcon = funcInputDroneIcons[safeIndex: iconIndex]
                         if inputIcon == nil {
@@ -446,7 +373,7 @@ public class MicrosoftMapViewController: UIViewController {
                             inputIcon?.flyout = MSMapFlyout()
                             funcInputDroneIcons.append(inputIcon!)
                         }
-                        
+
                         inputIcon?.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: spatial.coordinate.coordinate, altitude: spatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
                         inputIcon?.flyout?.title = "\(inputIndex + 1). \(input.descriptors.name ?? "")"
                         if let valueFormatted = funcExecutor?.readValue(inputIndex: inputIndex, variableValueIndex: variableValueIndex, formatted: true) as? String {
@@ -461,26 +388,26 @@ public class MicrosoftMapViewController: UIViewController {
             }
             inputIndex += 1
         }
-        
+
         while iconIndex < funcInputDroneIcons.count {
             funcInputDroneIcons.removeLast()
         }
-        
+
         while funcLayer.elements.count > funcInputDroneIcons.count {
             funcLayer.elements.removeMapElement(at: funcLayer.elements.count - 1)
         }
-        
+
         while funcLayer.elements.count < funcInputDroneIcons.count {
             funcLayer.elements.add(funcInputDroneIcons[Int(funcLayer.elements.count)])
         }
     }
-    
+
     private func updateModeElements() {
         guard modeExecutor?.engaged ?? false else {
             modeTargetIcon.visible = false
             return
         }
-        
+
         if let modeTarget = modeExecutor?.target {
             var rotation = Int(-modeTarget.orientation.yaw.convertRadiansToDegrees) % 360
             if (rotation < 0) {
@@ -493,7 +420,7 @@ public class MicrosoftMapViewController: UIViewController {
         else {
             modeTargetIcon.visible = false
         }
-        
+
         if let visibleCoordinates = modeExecutor?.visibleCoordinates, visibleCoordinates.count > 0 {
             tracking = .none
             let boundingBox = MSGeoboundingBox(positions: visibleCoordinates.map { MSGeoposition(coordinates: $0.coordinate) })
@@ -505,7 +432,7 @@ public class MicrosoftMapViewController: UIViewController {
             mapView.setScene(MSMapScene(location: MSGeopoint(latitude: center.latitude, longitude: center.longitude), radius: radius * 2.0, heading: 0, pitch: 0), with: .none)
         }
     }
-    
+
     private func updateDroneTakeoffAltitude() {
         var point: MSGeopoint?
         if let takeoffLocation = session?.state?.value.takeoffLocation {
@@ -514,19 +441,19 @@ public class MicrosoftMapViewController: UIViewController {
         else if let takeoffCoordinate = missionExecutor?.takeoffCoordinate {
             point = MSGeopoint(latitude: takeoffCoordinate.latitude, longitude: takeoffCoordinate.longitude)
         }
-        
+
         guard let pointValid = point else {
             droneTakeoffAltitude = nil
             return
         }
-        
+
         droneTakeoffAltitude = -pointValid.toAltitudeReferenceSystem(.geoid, map: mapView).position.altitude
     }
-    
+
     private func positionAboveDroneTakeoffLocation(coordinate: CLLocationCoordinate2D, altitude: Double) -> MSGeoposition {
         MSGeoposition(latitude: coordinate.latitude, longitude: coordinate.longitude, altitude: (droneTakeoffAltitude ?? 0) + altitude)
     }
-    
+
     @discardableResult
     private func addPositionAboveDroneTakeoffLocation(positions: inout [MSGeoposition], coordinate: CLLocationCoordinate2D, altitude: Double, tolerance: Double = 0.5) -> MSGeoposition {
         var position = positionAboveDroneTakeoffLocation(coordinate: coordinate, altitude: altitude)
@@ -540,58 +467,58 @@ public class MicrosoftMapViewController: UIViewController {
                 position = positionAboveDroneTakeoffLocation(coordinate: coordinate.coordinate(bearing: 0, distance: 0.01), altitude: altitude)
             }
         }
-        
+
         positions.append(position)
         return position
     }
-    
+
     private func updateScene(elements: SceneElements = .standard, animation: MSMapAnimationKind = .linear) {
         if tracking != .none {
             return
         }
-        
+
         var positions: [MSGeoposition] = []
         if elements.contains(.user),
             let location = Dronelink.shared.location?.value {
             positions.append(MSGeoposition(coordinates: location.coordinate))
         }
-        
+
         if elements.contains(.droneCurrent),
             session?.located ?? false,
             let location = session?.state?.value.location {
             positions.append(MSGeoposition(coordinates: location.coordinate))
         }
-        
+
         if elements.contains(.droneHome),
             session?.located ?? false,
             let location = session?.state?.value.homeLocation {
             positions.append(MSGeoposition(coordinates: location.coordinate))
         }
-        
+
         if elements.contains(.droneTakeoff),
             session?.located ?? false,
             let location = session?.state?.value.takeoffLocation {
             positions.append(MSGeoposition(coordinates: location.coordinate))
         }
-        
+
         if elements.contains(.missionTakeoff) {
             if let coordinate = missionExecutor?.takeoffCoordinate {
                 positions.append(MSGeoposition(coordinates: coordinate.coordinate))
             }
         }
-        
+
         if elements.contains(.missionMain) {
             missionExecutor?.estimate?.spatials.forEach {
                 positions.append(MSGeoposition(coordinates: $0.coordinate.coordinate))
             }
         }
-        
+
         if elements.contains(.missionReengagement) {
             missionExecutor?.estimate?.reengagementSpatials?.forEach {
                 positions.append(MSGeoposition(coordinates: $0.coordinate.coordinate))
             }
         }
-        
+
         if positions.count > 0 {
             let boundingBox = MSGeoboundingBox(positions: positions)
             var radius = boundingBox.northWestCorner.coordinate.distance(to: boundingBox.southEastCorner.coordinate) * 0.5
@@ -609,16 +536,9 @@ public class MicrosoftMapViewController: UIViewController {
             //mapView.setScene(MSMapScene(locations: positions.map({ MSGeopoint(position: $0) }), heading: 0, pitch: 45), with: .none)
         }
     }
-}
 
-extension MicrosoftMapViewController: DronelinkDelegate {
-    public func onRegistered(error: String?) {}
-    
-    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
-    
-    public func onMissionLoaded(executor: MissionExecutor) {
-        missionExecutor = executor
-        executor.add(delegate: self)
+    public override func onMissionLoaded(executor: MissionExecutor) {
+        super.onMissionLoaded(executor: executor)
         
         DispatchQueue.main.async {
             self.updateScene()
@@ -628,67 +548,45 @@ extension MicrosoftMapViewController: DronelinkDelegate {
             }
         }
     }
-    
-    public func onMissionUnloaded(executor: MissionExecutor) {
-        droneMissionExecutedPositions.removeAll()
-        missionExecutor = nil
-        executor.remove(delegate: self)
+
+    public override func onMissionUnloaded(executor: MissionExecutor) {
+        super.onMissionUnloaded(executor: executor)
         
+        droneMissionExecutedPositions.removeAll()
         DispatchQueue.main.async {
             self.updateMissionElements()
         }
     }
-    
-    public func onFuncLoaded(executor: FuncExecutor) {
-        funcExecutor = executor
-        executor.add(delegate: self)
-        
-        DispatchQueue.main.async {
-            self.updateFuncElements()
-        }
-    }
-    
-    public func onFuncUnloaded(executor: FuncExecutor) {
-        funcExecutor = nil
-        executor.remove(delegate: self)
-        
-        DispatchQueue.main.async {
-            self.updateFuncElements()
-        }
-    }
-    
-    public func onModeLoaded(executor: ModeExecutor) {
-        modeExecutor = executor
-        executor.add(delegate: self)
-    }
-    
-    public func onModeUnloaded(executor: ModeExecutor) {
-        modeExecutor = nil
-        executor.remove(delegate: self)
-    }
-}
 
-extension MicrosoftMapViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-        session.add(delegate: self)
+    public override func onFuncLoaded(executor: FuncExecutor) {
+        super.onFuncLoaded(executor: executor)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
     }
-    
-    public func onClosed(session: DroneSession) {
+
+    public override func onFuncUnloaded(executor: FuncExecutor) {
+        super.onFuncUnloaded(executor: executor)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
+    }
+
+    public override func onClosed(session: DroneSession) {
+        super.onClosed(session: session)
+        
         droneSessionPositions.removeAll()
-        self.session = nil
-        session.remove(delegate: self)
     }
-}
 
-extension MicrosoftMapViewController: DroneSessionDelegate {
-    public func onInitialized(session: DroneSession) {}
-    
-    public func onLocated(session: DroneSession) {
+    public override func onLocated(session: DroneSession) {
+        super.onLocated(session: session)
+        
         if missionExecutor?.estimating ?? false {
             return
         }
-        
+
         DispatchQueue.main.async {
             self.updateScene()
             //wait 2 seconds to give the map time to load the elevation data
@@ -698,68 +596,59 @@ extension MicrosoftMapViewController: DroneSessionDelegate {
             }
         }
     }
-    
-    public func onMotorsChanged(session: DroneSession, value: Bool) {}
-    
-    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
-    
-    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {}
-    
-    public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
-}
 
-extension MicrosoftMapViewController: MissionExecutorDelegate {
-    public func onMissionEstimating(executor: MissionExecutor) {}
-    
-    public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+
+    public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+        super.onMissionEstimated(executor: executor, estimate: estimate)
+        
         DispatchQueue.main.async {
             self.updateScene()
             self.updateMissionElements()
         }
     }
-    
-    public func onMissionEngaging(executor: MissionExecutor) {}
-    
-    public func onMissionEngaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {}
-    
-    public func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
+
+    public override func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
+        super.onMissionExecuted(executor: executor, engagement: engagement)
+        
         if let state = engagement.droneSession.state?.value, let location = state.location {
             addPositionAboveDroneTakeoffLocation(positions: &droneMissionExecutedPositions, coordinate: location.coordinate, altitude: state.altitude)
         }
     }
-    
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
+
+    public override func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
+        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        
         droneMissionExecutedPositions.removeAll()
         DispatchQueue.main.async {
             self.updateMissionElements()
         }
     }
-}
 
-extension MicrosoftMapViewController: FuncExecutorDelegate {
-    public func onFuncInputsChanged(executor: FuncExecutor) {
+    public override func onFuncInputsChanged(executor: FuncExecutor) {
+        super.onFuncInputsChanged(executor: executor)
+        
         DispatchQueue.main.async {
             self.updateFuncElements()
         }
     }
-    
-    public func onFuncExecuted(executor: FuncExecutor) {}
+
+    public override func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
+        super.onModeExecuted(executor: executor, engagement: engagement)
+        
+        DispatchQueue.main.async {
+            self.updateModeElements()
+        }
+    }
+
+    public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
+        
+        DispatchQueue.main.async {
+            self.updateModeElements()
+        }
+    }
 }
 
-extension MicrosoftMapViewController: ModeExecutorDelegate {
-    public func onModeEngaging(executor: ModeExecutor) {}
-    
-    public func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {}
-    
-    public func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
-        DispatchQueue.main.async {
-            self.updateModeElements()
-        }
-    }
-    
-    public func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
-        DispatchQueue.main.async {
-            self.updateModeElements()
-        }
-    }
+extension MSGeoposition {
+    var coordinate: CLLocationCoordinate2D { CLLocationCoordinate2D(latitude: latitude, longitude: longitude) }
 }

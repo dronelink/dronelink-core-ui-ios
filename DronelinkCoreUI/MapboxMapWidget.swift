@@ -54,20 +54,7 @@ public class MapboxMapWidget: UpdatableWidget {
         update()
     }
     
-    public func onMore(sender: Any, actions: [UIAlertAction]? = nil) {
-        let alert = UIAlertController(title: "MicrosoftMapViewController.more".localized, message: nil, preferredStyle: .actionSheet)
-        alert.popoverPresentationController?.sourceView = sender as? UIView
-        
-        actions?.forEach { alert.addAction($0) }
-
-        alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
-            
-        }))
-
-        present(alert, animated: true)
-    }
-    
-    @objc override func update() {
+    @objc open override func update() {
         super.update()
         
         if let state = session?.state?.value, let droneHomeLocation = state.homeLocation {

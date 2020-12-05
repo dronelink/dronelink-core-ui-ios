@@ -344,6 +344,41 @@ public class DashboardWidget: DelegateWidget {
         updateDynamicViews()
     }
     
+    @objc func onDismiss(sender: Any) {
+        Dronelink.shared.unload()
+        dismiss(animated: true)
+    }
+    
+    public override func onOpened(session: DroneSession) {
+        super.onOpened(session: session)
+        DispatchQueue.main.async { self.updateDynamicViews() }
+    }
+    
+    public override func onClosed(session: DroneSession) {
+        super.onClosed(session: session)
+        DispatchQueue.main.async { self.updateDynamicViews() }
+    }
+    
+    public override func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {
+        super.onMissionEngaged(executor: executor, engagement: engagement)
+        DispatchQueue.main.async { self.updateDismissButton() }
+    }
+    
+    public override func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        DispatchQueue.main.async { self.updateDismissButton() }
+    }
+    
+    public override func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {
+        super.onModeEngaged(executor: executor, engagement: engagement)
+        DispatchQueue.main.async { self.updateDismissButton() }
+    }
+    
+    public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
+        DispatchQueue.main.async { self.updateDismissButton() }
+    }
+    
     private func refreshWidget(current: Widget? = nil, next: Widget? = nil, subview: UIView? = nil) -> Widget? {
         let subview: UIView = subview ?? view
         if current != next {
@@ -374,7 +409,8 @@ public class DashboardWidget: DelegateWidget {
                 break
 
             case .microsoft:
-                mapWidget = refreshWidget(current: mapWidget, next: nil)
+                mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MicrosoftMapWidget) ?? MicrosoftMapWidget(), subview: mapContentView)
+                (mapWidget as? MicrosoftMapWidget)?.mapView.credentialsKey = microsoftMapCredentialsKey ?? ""
                 break
 
             case .none:
@@ -387,21 +423,6 @@ public class DashboardWidget: DelegateWidget {
         mapWidget?.view.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
-
-        statusBackgroundWidget = refreshWidget(current: statusBackgroundWidget, next: widgetFactory.createStatusBackgroundWidget(current: statusBackgroundWidget), subview: topBarView)
-        statusBackgroundWidget?.view.snp.remakeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        statusForegroundWidget = refreshWidget(current: statusForegroundWidget, next: widgetFactory.createStatusForegroundWidget(current: statusForegroundWidget), subview: topBarView)
-        statusForegroundWidget?.view.snp.remakeConstraints { make in
-            let constrainTo: UIView = statusBackgroundWidget?.view ?? view
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-            make.left.equalTo(dismissButton.snp.right).offset(5)
-            make.right.equalToSuperview()
-            make.height.equalTo(statusWidgetHeight)
-        }
-        (statusForegroundWidget as? StatusLabelWidget)?.onTapped = onMainMenu
 
         remainingFlightTimeWidget = refreshWidget(current: remainingFlightTimeWidget, next: widgetFactory.createRemainingFlightTimeWidget(current: remainingFlightTimeWidget))
         remainingFlightTimeWidget?.view.snp.remakeConstraints { make in
@@ -443,6 +464,21 @@ public class DashboardWidget: DelegateWidget {
             primaryIndicatorWidgetPrevious = item.widget
         }
         
+        statusBackgroundWidget = refreshWidget(current: statusBackgroundWidget, next: widgetFactory.createStatusBackgroundWidget(current: statusBackgroundWidget), subview: topBarView)
+        statusBackgroundWidget?.view.snp.remakeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+
+        statusForegroundWidget = refreshWidget(current: statusForegroundWidget, next: widgetFactory.createStatusForegroundWidget(current: statusForegroundWidget), subview: topBarView)
+        statusForegroundWidget?.view.snp.remakeConstraints { make in
+            let constrainTo: UIView = statusBackgroundWidget?.view ?? view
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.left.equalTo(dismissButton.snp.right).offset(5)
+            make.right.equalTo(primaryIndicatorWidgetPrevious?.view.snp.left ?? view.snp.right).offset(-defaultPadding)
+            make.height.equalTo(statusWidgetHeight)
+        }
+        (statusForegroundWidget as? StatusLabelWidget)?.onTapped = onMainMenu
+        
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
             make.top.equalTo(cameraGeneralSettingsButton.snp.bottom).offset(-6)
@@ -459,41 +495,6 @@ public class DashboardWidget: DelegateWidget {
         }
 
         compassWidget = refreshWidget(current: compassWidget, next: widgetFactory.createCompassWidget(current: compassWidget))
-    }
-    
-    @objc func onDismiss(sender: Any) {
-        Dronelink.shared.unload()
-        dismiss(animated: true)
-    }
-    
-    public override func onOpened(session: DroneSession) {
-        super.onOpened(session: session)
-        DispatchQueue.main.async { self.updateDynamicViews() }
-    }
-    
-    public override func onClosed(session: DroneSession) {
-        super.onClosed(session: session)
-        DispatchQueue.main.async { self.updateDynamicViews() }
-    }
-    
-    public override func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {
-        super.onMissionEngaged(executor: executor, engagement: engagement)
-        DispatchQueue.main.async { self.updateDismissButton() }
-    }
-    
-    public override func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
-        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
-        DispatchQueue.main.async { self.updateDismissButton() }
-    }
-    
-    public override func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {
-        super.onModeEngaged(executor: executor, engagement: engagement)
-        DispatchQueue.main.async { self.updateDismissButton() }
-    }
-    
-    public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
-        super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
-        DispatchQueue.main.async { self.updateDismissButton() }
     }
     
     func updateDismissButton() {
