@@ -1,40 +1,32 @@
 //
-//  DroneOffsetsViewController.swift
+//  DroneOffsetsWidget.swift
 //  DronelinkCoreUI
 //
 //  Created by Jim McAndrew on 2/6/20.
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
-
 import Foundation
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 
-public class DroneOffsetsViewController: UIViewController {
+public class DroneOffsetsWidget: UpdatableWidget {
     public enum Style: Int, CaseIterable {
         case altYaw = 0
         case position
         
         var display: String {
             switch self {
-            case .altYaw: return "DroneOffsetsViewController.altitudeYaw".localized
-            case .position: return "DroneOffsetsViewController.position".localized
+            case .altYaw: return "DroneOffsetsWidget.altitudeYaw".localized
+            case .position: return "DroneOffsetsWidget.position".localized
             }
         }
     }
     
-    public static func create(droneSessionManager: DroneSessionManager, styles: [Style] = Style.allCases) -> DroneOffsetsViewController {
-        let droneOffsetsViewController = DroneOffsetsViewController()
-        droneOffsetsViewController.styles = styles
-        droneOffsetsViewController.droneSessionManager = droneSessionManager
-        return droneOffsetsViewController
-    }
+    public override var updateInterval: TimeInterval { 0.25 }
     
-    private var styles: [Style] = Style.allCases
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
+    public var styles: [Style] = Style.allCases
     
     private let debug = false
     private var styleSegmentedControl: UISegmentedControl!
@@ -50,8 +42,6 @@ public class DroneOffsetsViewController: UIViewController {
     private let c2Button = MDCFloatingButton()
     private let cLabel = UILabel()
     
-    private let updateInterval: TimeInterval = 0.25
-    private var updateTimer: Timer?
     private var rcInputsEnabled = false
     private var rollVisible = false
     private var rollValue = 0
@@ -114,19 +104,6 @@ public class DroneOffsetsViewController: UIViewController {
         view.addSubview(cLabel)
         
         update()
-    }
-    
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        droneSessionManager.add(delegate: self)
-        updateTimer = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
-    }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        updateTimer?.invalidate()
-        updateTimer = nil
-        droneSessionManager.remove(delegate: self)
     }
     
     private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector) {
@@ -488,7 +465,9 @@ public class DroneOffsetsViewController: UIViewController {
         update()
     }
     
-    @objc func update() {
+    @objc open override func update() {
+        super.update()
+        
         upButton.isEnabled = session != nil
         downButton.isEnabled = upButton.isEnabled
         leftButton.isEnabled = upButton.isEnabled
@@ -605,15 +584,5 @@ public class DroneOffsetsViewController: UIViewController {
     
     func display(vector: Kernel.Vector2) -> String {
         return "\(Dronelink.shared.format(formatter: "angle", value: vector.direction)) → \(Dronelink.shared.format(formatter: "distance", value: vector.magnitude))"
-    }
-}
-
-extension DroneOffsetsViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-    }
-    
-    public func onClosed(session: DroneSession) {
-        self.session = nil
     }
 }

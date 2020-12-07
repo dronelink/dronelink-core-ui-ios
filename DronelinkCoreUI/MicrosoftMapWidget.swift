@@ -40,7 +40,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
         static let standard: SceneElements = [.droneCurrent, .droneHome, .droneTakeoff, .missionTakeoff, .missionMain, .missionReengagement]
     }
 
-    internal override var updateInterval: TimeInterval { 0.1 }
+    public override var updateInterval: TimeInterval { 0.1 }
 
     public let mapView = MSMapView()
     private let droneLayer = MSMapElementLayer()
@@ -646,6 +646,45 @@ public class MicrosoftMapWidget: UpdatableWidget {
         DispatchQueue.main.async {
             self.updateModeElements()
         }
+    }
+}
+
+extension MicrosoftMapWidget: ConfigurableWidget {
+    public var configurationActions: [UIAlertAction] {
+        var actions: [UIAlertAction] = []
+        
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.reset".localized, style: .default, handler: { _ in
+            self.tracking = .none
+            self.trackingPrevious = .none
+            self.updateScene()
+        }))
+
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { _ in
+            self.tracking = .thirdPersonNadir
+        }))
+
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { _ in
+            self.tracking = .thirdPersonOblique
+        }))
+
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { _ in
+            self.tracking = .firstPerson
+        }))
+
+//        if tracking == .none {
+//            if style == .streets {
+//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { _ in
+//                    self.update(style: .satellite)
+//                }))
+//            }
+//            else {
+//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { _ in
+//                    self.update(style: .streets)
+//                }))
+//            }
+//        }
+        
+        return actions
     }
 }
 

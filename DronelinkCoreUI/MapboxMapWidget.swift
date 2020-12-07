@@ -2,8 +2,8 @@
 //  MapboxMapWidget.swift
 //  DronelinkCoreUI
 //
-//  Created by Jim McAndrew on 12/2/20.
-//  Copyright © 2020 Dronelink. All rights reserved.
+//  Created by Jim McAndrew on 10/28/19.
+//  Copyright © 2019 Dronelink. All rights reserved.
 //
 import UIKit
 import Foundation
@@ -12,7 +12,7 @@ import DronelinkCore
 import MaterialComponents.MaterialPalettes
 
 public class MapboxMapWidget: UpdatableWidget {
-    internal override var updateInterval: TimeInterval { 0.1 }
+    public override var updateInterval: TimeInterval { 0.1 }
     
     private let mapView = MGLMapView()
     private let droneHomeAnnotation = MGLPointAnnotation()
@@ -34,7 +34,7 @@ public class MapboxMapWidget: UpdatableWidget {
         mapView.addShadow()
         mapView.styleURL = MGLStyle.satelliteStreetsStyleURL
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        mapView.attributionButtonPosition = .topLeft
+        mapView.attributionButtonPosition = .bottomRight
         mapView.logoViewPosition = .bottomRight
         mapView.showsUserLocation = true
         mapView.showsScale = false

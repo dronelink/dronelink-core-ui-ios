@@ -21,6 +21,9 @@ open class Widget: UIViewController {
     public var modeExecutor: ModeExecutor? { Dronelink.shared.modeExecutor }
     public var funcExecutor: FuncExecutor? { Dronelink.shared.funcExecutor }
     public var widgetFactory: WidgetFactory { targetDroneSessionManager as? WidgetFactory ?? GenericWidgetFactory.shared }
+    public var portrait: Bool { return UIScreen.main.bounds.width < UIScreen.main.bounds.height }
+    public var tablet: Bool { return UIDevice.current.userInterfaceIdiom == .pad }
+    public let defaultPadding: CGFloat = 10
 }
 
 open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegate, DroneSessionDelegate, MissionExecutorDelegate, ModeExecutorDelegate, FuncExecutorDelegate {
@@ -157,8 +160,8 @@ extension UIViewController {
 }
 
 open class UpdatableWidget: DelegateWidget {
-    internal var updateInterval: TimeInterval { 1.0 }
-    internal var updateTimer: Timer?
+    public var updateInterval: TimeInterval { 1.0 }
+    public var updateTimer: Timer?
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -180,7 +183,23 @@ open class UpdatableWidget: DelegateWidget {
     @objc open func update() {}
 }
 
+public enum ExecutorWidgetLayout: String {
+    case small = "small",
+         medium = "medium",
+         large = "large"
+}
+
+public protocol ExecutorWidget: Widget {
+    var layout: ExecutorWidgetLayout { get }
+    var preferredSize: CGSize { get }
+}
+
+public protocol ConfigurableWidget {
+    var configurationActions: [UIAlertAction] { get }
+}
+
 public protocol WidgetFactory {
+    func createExecutorWidget(current: ExecutorWidget?) -> ExecutorWidget?
     func createMainMenuWidget(current: Widget?) -> Widget?
     func createCameraFeedWidget(current: Widget?, primary: Bool) -> Widget?
     func createStatusBackgroundWidget(current: Widget?) -> Widget?
@@ -198,15 +217,38 @@ public protocol WidgetFactory {
     func createHorizontalSpeedWidget(current: Widget?) -> Widget?
     func createVerticalSpeedWidget(current: Widget?) -> Widget?
     func createCameraGeneralSettingsWidget(current: Widget?) -> Widget?
+    func createCameraExposureWidget(current: Widget?) -> Widget?
+    func createCameraStorageWidget(current: Widget?) -> Widget?
+    func createCameraAutoExposureWidget(current: Widget?) -> Widget?
+    func createCameraExposureFocusWidget(current: Widget?) -> Widget?
+    func createCameraFocusModeWidget(current: Widget?) -> Widget?
     func createCameraModeWidget(current: Widget?) -> Widget?
     func createCameraCaptureWidget(current: Widget?) -> Widget?
     func createCameraExposureSettingsWidget(current: Widget?) -> Widget?
     func createCompassWidget(current: Widget?) -> Widget?
+    func createTelemetryWidget(current: Widget?) -> Widget?
+    func createRTKStatusWidget(current: Widget?) -> Widget?
+    func createRTKSettingsWidget(current: Widget?) -> Widget?
 }
 
 public class GenericWidgetFactory: WidgetFactory {
     public static let shared = GenericWidgetFactory()
     
+    public func createExecutorWidget(current: ExecutorWidget? = nil) -> ExecutorWidget? {
+        if Dronelink.shared.executor is MissionExecutor {
+            return (current as? MissionExecutorWidget) ?? MissionExecutorWidget()
+        }
+        
+        if Dronelink.shared.executor is ModeExecutor {
+            return (current as? ModeExecutorWidget) ?? ModeExecutorWidget()
+        }
+
+        if Dronelink.shared.executor is FuncExecutor {
+            return (current as? FuncExecutorWidget) ?? FuncExecutorWidget()
+        }
+        
+        return nil
+    }
     public func createMainMenuWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraFeedWidget(current: Widget? = nil, primary: Bool = true) -> Widget? { nil }
     public func createStatusBackgroundWidget(current: Widget? = nil) -> Widget? { (current as? StatusGradientWidget) ?? StatusGradientWidget() }
@@ -224,8 +266,16 @@ public class GenericWidgetFactory: WidgetFactory {
     public func createHorizontalSpeedWidget(current: Widget? = nil) -> Widget? { nil }
     public func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraGeneralSettingsWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createCameraExposureWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createCameraExposureFocusWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createCameraFocusModeWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraModeWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraCaptureWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCameraExposureSettingsWidget(current: Widget? = nil) -> Widget? { nil }
     public func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
+    public func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
+    public func createRTKSettingsWidget(current: Widget? = nil) -> Widget? { nil }
 }

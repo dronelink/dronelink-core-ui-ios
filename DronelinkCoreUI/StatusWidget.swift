@@ -58,7 +58,7 @@ public class StatusWidget: UpdatableWidget {
         return state.isFlying ? statuses.manualFlight : statuses.ready
     }
     
-    internal override var updateInterval: TimeInterval { 0.5 }
+    public override var updateInterval: TimeInterval { 0.5 }
     
     public var statuses = (
         disconnected: Status(message: "StatusWidget.disconnected".localized, color: MDCPalette.deepPurple.accent400),
