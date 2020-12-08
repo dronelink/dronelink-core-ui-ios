@@ -86,6 +86,9 @@ public class CameraCaptureWidget: UpdatableWidget {
             imageName = "hyperMode"
         case .interval:
             imageName = "timerMode"
+            if let interval = session?.cameraState(channel: 0)?.value.photoInterval {
+                count =  String(interval)
+            }
         case .panorama:
             imageName = "panoMode"
         default:
