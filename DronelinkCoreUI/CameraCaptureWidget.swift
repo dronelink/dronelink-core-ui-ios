@@ -15,6 +15,9 @@ import MarqueeLabel
 public class CameraCaptureWidget: UpdatableWidget {
     
     public var captureButton: UIButton?
+    public var captureModeImageView: UIImageView?
+    public var countIndicatorLabel: UILabel?
+    
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +28,24 @@ public class CameraCaptureWidget: UpdatableWidget {
             make.edges.equalToSuperview()
         }
         
-        captureButton!.snp.makeConstraints { make in
+        
+        captureModeImageView = UIImageView()
+        captureModeImageView?.tintColor = .black
+        captureModeImageView?.contentMode = .scaleAspectFit
+        captureModeImageView?.isUserInteractionEnabled = false
+        view.addSubview(captureModeImageView!)
+        captureModeImageView?.snp.makeConstraints { make in
+            make.center.equalTo(captureButton!.snp.center)
+            make.height.equalTo(20)
+            make.width.equalTo(20)
+        }
+        
+        countIndicatorLabel = UILabel()
+        countIndicatorLabel?.textColor = .black
+        countIndicatorLabel?.isUserInteractionEnabled = false
+        view.addSubview(countIndicatorLabel!)
+        countIndicatorLabel?.textAlignment = .right
+        countIndicatorLabel?.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
@@ -45,10 +65,52 @@ public class CameraCaptureWidget: UpdatableWidget {
         try? self.session?.add(command: cameraIsCapturing() ? Kernel.StopCaptureCameraCommand() : Kernel.StartCaptureCameraCommand())
     }
     
+    private func configCaptureModeImage(mode: DronelinkCore.Kernel.CameraPhotoMode?) {
+        var imageName = ""
+        var count = ""
+        
+        switch mode {
+        case .aeb:
+            imageName = "aebMode"
+            if let aeb = session?.cameraState(channel: 0)?.value.aebCount {
+                count =  aeb.rawValue
+            }
+        case .burst:
+            imageName = "burstMode"
+            if let burst = session?.cameraState(channel: 0)?.value.burstCount {
+                count =  burst.rawValue
+            }
+        case .ehdr:
+            imageName = "hdrMode"
+        case .hyperLight:
+            imageName = "hyperMode"
+        case .interval:
+            imageName = "timerMode"
+        case .panorama:
+            imageName = "panoMode"
+        default:
+            imageName = ""
+        }
+        
+        if imageName != "" {
+            captureModeImageView?.isHidden = false
+            captureModeImageView?.image = DronelinkUI.loadImage(named: imageName)?.withRenderingMode(.alwaysTemplate)
+        } else {
+            captureModeImageView?.isHidden = true
+        }
+        
+        if count != "" {
+            countIndicatorLabel?.isHidden = false
+            countIndicatorLabel?.text = count
+        } else {
+            countIndicatorLabel?.isHidden = true
+        }
+    }
+    
     @objc override func update() {
         super.update()
-        print(session?.cameraState(channel: 0)?.value.mode)
-        
         captureButton?.tintColor = (session?.cameraState(channel: 0)?.value.mode == .photo) ? .white : .red
+        guard let photoMode = (session?.cameraState(channel: 0)?.value.photoMode) else {return}
+        configCaptureModeImage(mode: photoMode)
     }
 }
