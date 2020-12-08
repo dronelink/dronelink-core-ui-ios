@@ -248,7 +248,7 @@ open class WidgetFactory {
     open func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureFocusWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraFocusModeWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraModeWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createCameraModeWidget(current: Widget? = nil) -> Widget? { (current as? CameraModeWidget) ?? CameraModeWidget() }
     open func createCameraCaptureWidget(current: Widget? = nil) -> Widget?  { (current as? CameraCaptureWidget) ?? CameraCaptureWidget() }
     open func createCameraExposureSettingsWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCompassWidget(current: Widget? = nil) -> Widget? { nil }

@@ -28,7 +28,6 @@ public class CameraCaptureWidget: UpdatableWidget {
             make.edges.equalToSuperview()
         }
         
-        
         captureModeImageView = UIImageView()
         captureModeImageView?.tintColor = .black
         captureModeImageView?.contentMode = .scaleAspectFit
@@ -66,46 +65,52 @@ public class CameraCaptureWidget: UpdatableWidget {
     }
     
     private func configCaptureModeImage(mode: DronelinkCore.Kernel.CameraPhotoMode?) {
-        var imageName = ""
-        var count = ""
         
-        switch mode {
-        case .aeb:
-            imageName = "aebMode"
-            if let aeb = session?.cameraState(channel: 0)?.value.aebCount {
-                count =  aeb.rawValue
+        if session?.cameraState(channel: 0)?.value.mode == .photo {
+            var imageName = ""
+            var count = ""
+            
+            switch mode {
+            case .aeb:
+                imageName = "aebMode"
+                if let aeb = session?.cameraState(channel: 0)?.value.aebCount {
+                    count =  aeb.rawValue
+                }
+            case .burst:
+                imageName = "burstMode"
+                if let burst = session?.cameraState(channel: 0)?.value.burstCount {
+                    count =  burst.rawValue
+                }
+            case .ehdr:
+                imageName = "hdrMode"
+            case .hyperLight:
+                imageName = "hyperMode"
+            case .interval:
+                imageName = "timerMode"
+                if let interval = session?.cameraState(channel: 0)?.value.photoInterval {
+                    count =  String(interval)
+                }
+            case .panorama:
+                imageName = "panoMode"
+            default:
+                imageName = ""
             }
-        case .burst:
-            imageName = "burstMode"
-            if let burst = session?.cameraState(channel: 0)?.value.burstCount {
-                count =  burst.rawValue
+            
+            if imageName != "" {
+                captureModeImageView?.isHidden = false
+                captureModeImageView?.image = DronelinkUI.loadImage(named: imageName)?.withRenderingMode(.alwaysTemplate)
+            } else {
+                captureModeImageView?.isHidden = true
             }
-        case .ehdr:
-            imageName = "hdrMode"
-        case .hyperLight:
-            imageName = "hyperMode"
-        case .interval:
-            imageName = "timerMode"
-            if let interval = session?.cameraState(channel: 0)?.value.photoInterval {
-                count =  String(interval)
+            
+            if count != "" {
+                countIndicatorLabel?.isHidden = false
+                countIndicatorLabel?.text = count
+            } else {
+                countIndicatorLabel?.isHidden = true
             }
-        case .panorama:
-            imageName = "panoMode"
-        default:
-            imageName = ""
-        }
-        
-        if imageName != "" {
-            captureModeImageView?.isHidden = false
-            captureModeImageView?.image = DronelinkUI.loadImage(named: imageName)?.withRenderingMode(.alwaysTemplate)
         } else {
             captureModeImageView?.isHidden = true
-        }
-        
-        if count != "" {
-            countIndicatorLabel?.isHidden = false
-            countIndicatorLabel?.text = count
-        } else {
             countIndicatorLabel?.isHidden = true
         }
     }

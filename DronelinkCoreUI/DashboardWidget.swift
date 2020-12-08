@@ -699,8 +699,9 @@ public class DashboardWidget: DelegateWidget {
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
             make.top.equalTo(cameraGeneralSettingsButton.snp.bottom).offset(-6)
-            make.left.equalToSuperview().offset(2)
-            make.right.equalToSuperview().offset(-2)
+            make.left.equalToSuperview().offset(10)
+            make.height.equalTo(cameraModeWidget!.view.snp.width)
+            make.right.equalToSuperview().offset(-10)
         }
 
         cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
