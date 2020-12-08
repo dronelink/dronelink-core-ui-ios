@@ -1,10 +1,12 @@
 //
-//  MissionViewController.swift
+//  MissionExecutorWidget.swift
 //  DronelinkCoreUI
 //
-//  Created by Jim McAndrew on 4/18/19.
-//  Copyright © 2019 Dronelink. All rights reserved.
+//  Created by Jim McAndrew on 12/7/20.
+//  Copyright © 2020 Dronelink. All rights reserved.
 //
+
+import Foundation
 import DronelinkCore
 import Foundation
 import CoreLocation
@@ -16,26 +18,26 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 import MaterialComponents.MDCActivityIndicator
 
-public protocol MissionViewControllerDelegate: class {
-    func onMissionExpandToggle()
-}
-
-public class MissionViewController: UIViewController {
-    public static func create(droneSessionManager: DroneSessionManager, delegate: MissionViewControllerDelegate? = nil) -> MissionViewController {
-        let missionViewController = MissionViewController()
-        missionViewController.droneSessionManager = droneSessionManager
-        missionViewController.delegate = delegate
-        return missionViewController
-    }
+public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
+    public override var updateInterval: TimeInterval { 0.5 }
     
-    private weak var delegate: MissionViewControllerDelegate?
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
-    private var missionExecutor: MissionExecutor?
+    public var layout: ExecutorWidgetLayout = .small
+    
+    public var preferredSize: CGSize {
+        if (portrait && tablet) {
+            return CGSize(width: 0, height: layout == .small ? 0 : 80)
+        }
+        
+        if (portrait) {
+            return CGSize(width: 0, height: layout == .small ? 100 : 80)
+        }
+        
+        return CGSize(width: tablet ? 350 : 0, height: layout == .small ? 80 : (tablet ? 180 : 0))
+    }
     
     private let activityIndicator = MDCActivityIndicator()
     private let primaryButton = MDCFloatingButton()
-    private let expandToggleButton = UIButton()
+    private let layoutToggleButton = UIButton()
     private let countdownProgressView = MDCProgressView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
@@ -58,10 +60,6 @@ public class MissionViewController: UIViewController {
     private var countdownTimer: Timer?
     private var countdownRemaining = 0
     private var countdownMax = 60
-    private let updateInterval: TimeInterval = 0.5
-    private var lastUpdated = Date()
-    private var _expanded = false
-    public var expanded: Bool { _expanded }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -119,8 +117,8 @@ public class MissionViewController: UIViewController {
         messagesTextView.isEditable = false
         view.addSubview(messagesTextView)
         
-        expandToggleButton.addTarget(self, action: #selector(onExpandToggle), for: .touchUpInside)
-        view.addSubview(expandToggleButton)
+        layoutToggleButton.addTarget(self, action: #selector(onLayoutToggle), for: .touchUpInside)
+        view.addSubview(layoutToggleButton)
         
         dismissButton.tintColor = UIColor.white
         dismissButton.setImage(DronelinkUI.loadImage(named: "baseline_close_white_36pt"), for: .normal)
@@ -128,24 +126,9 @@ public class MissionViewController: UIViewController {
         view.addSubview(dismissButton)
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        droneSessionManager.add(delegate: self)
-        Dronelink.shared.add(delegate: self)
-        update()
-    }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        droneSessionManager.remove(delegate: self)
-        Dronelink.shared.remove(delegate: self)
-        missionExecutor?.remove(delegate: self)
-    }
-    
     public override func updateViewConstraints() {
         super.updateViewConstraints()
         
-        let defaultPadding = 10
         let labelHeight = 30
         
         primaryButton.snp.remakeConstraints { make in
@@ -166,7 +149,7 @@ public class MissionViewController: UIViewController {
             make.centerY.equalTo(progressView.snp.centerY)
         }
         
-        expandToggleButton.snp.remakeConstraints { make in
+        layoutToggleButton.snp.remakeConstraints { make in
             make.top.equalToSuperview()
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
@@ -221,11 +204,6 @@ public class MissionViewController: UIViewController {
             make.top.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
         }
-    }
-    
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        view.setNeedsUpdateConstraints()
     }
     
     @objc func onPrimary(sender: Any) {
@@ -305,10 +283,10 @@ public class MissionViewController: UIViewController {
             let distance = Dronelink.shared.format(formatter: "distance", value: actualTakeoffLocation.distance(from: suggestedTakeoffLocation))
             let altitude = missionExecutor.droneTakeoffAltitudeAlternate == nil ? nil : Dronelink.shared.format(formatter: "altitude", value: missionExecutor.droneTakeoffAltitudeAlternate!)
             DronelinkUI.shared.showDialog(
-                title: "MissionViewController.start.takeoffLocationWarning.title".localized,
+                title: "MissionExecutorWidget.start.takeoffLocationWarning.title".localized,
                 details: altitude != nil && missionExecutor.elevationsRequired
-                    ? String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.available".localized, distance, altitude!)
-                    : String(format: "MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable".localized, distance),
+                    ? String(format: "MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available".localized, distance, altitude!)
+                    : String(format: "MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable".localized, distance),
                 actions: [
                     MDCAlertAction(title: "continue".localized, emphasis: .high, handler: { action in
                         self.startCountdown()
@@ -357,7 +335,7 @@ public class MissionViewController: UIViewController {
         countdownTimer = nil
         update()
         if (aborted) {
-            Dronelink.shared.announce(message: "ExecutableViewController.start.cancelled".localized)
+            Dronelink.shared.announce(message: "ExecutableWidget.start.cancelled".localized)
         }
     }
     
@@ -380,7 +358,7 @@ public class MissionViewController: UIViewController {
                 }
             }
             catch DronelinkError.droneSerialNumberUnavailable {
-                DronelinkUI.shared.showDialog(title: "ExecutableViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableViewController.start.engage.droneSerialNumberUnavailable.message".localized)
+                DronelinkUI.shared.showDialog(title: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.message".localized)
                 self.update()
             }
             catch {
@@ -389,20 +367,18 @@ public class MissionViewController: UIViewController {
         }
     }
     
-    @objc func onExpandToggle() {
-        toggle(expanded: !expanded)
-    }
-    
-    public func toggle(expanded: Bool) {
-        _expanded = expanded
-        delegate?.onMissionExpandToggle()
+    @objc func onLayoutToggle() {
+        layout = layout == .small ? .medium : .small
+        view.superview?.setNeedsUpdateConstraints()
     }
     
     @objc func onDismiss() {
         Dronelink.shared.unloadMission()
     }
     
-    func update() {
+    @objc open override func update() {
+        super.update()
+        
         guard let missionExecutor = missionExecutor else {
             return
         }
@@ -421,7 +397,7 @@ public class MissionViewController: UIViewController {
             messagesTextView.isHidden = true
 
             activityIndicator.startAnimating()
-            subtitleLabel.text = "MissionViewController.estimating".localized
+            subtitleLabel.text = "MissionExecutorWidget.estimating".localized
             return
         }
 
@@ -441,7 +417,7 @@ public class MissionViewController: UIViewController {
             primaryButton.isEnabled = true
             primaryButton.setBackgroundColor(primaryDisengagedColor.interpolate(primaryEngagedColor, percent: CGFloat(progress)))
             primaryButton.setImage(cancelImage, for: .normal)
-            titleLabel.text = String(format: "ExecutableViewController.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
+            titleLabel.text = String(format: "ExecutableWidget.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
             countdownProgressView.setProgress(progress, animated: true)
             countdownProgressView.progressTintColor = progressDisengagedColor?.interpolate(progressEngagedColor, percent: CGFloat(progress))
             return
@@ -459,7 +435,7 @@ public class MissionViewController: UIViewController {
             dismissButton.isHidden = true
             messagesTextView.isHidden = true
 
-            subtitleLabel.text = "ExecutableViewController.start.engaging".localized
+            subtitleLabel.text = "ExecutableWidget.start.engaging".localized
             return
         }
 
@@ -482,13 +458,13 @@ public class MissionViewController: UIViewController {
             executionDuration = missionExecutor.executionDuration
         }
         let timeRemaining = max(estimateTime - executionDuration, 0)
-        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableViewController.executionDuration.empty".localized)
-        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "ExecutableViewController.executionDuration.empty".localized)
+        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
+        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
         progressView.setProgress(Float(min(estimateTime == 0 ? 0 : executionDuration / estimateTime, 1)), animated: true)
 
         if missionExecutor.engaged {
             progressView.progressTintColor = progressEngagedColor
-            messagesTextView.text = expanded ? missionExecutor.executingMessageGroups.map({ $0.display }).joined(separator: "\n\n") : nil
+            messagesTextView.text = layout == .small ? nil : missionExecutor.executingMessageGroups.map({ $0.display }).joined(separator: "\n\n")
             primaryButton.setBackgroundColor(primaryEngagedColor)
             primaryButton.setImage(disengageImage, for: .normal)
         }
@@ -517,125 +493,48 @@ public class MissionViewController: UIViewController {
         missionExecutor.estimate(droneSession: self.session, altitudeRequired: true, timeRequired: true)
         return true
     }
-}
 
-extension MissionViewController: DronelinkDelegate {
-    public func onRegistered(error: String?) {}
-    
-    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
-    
-    public func onMissionLoaded(executor: MissionExecutor) {
-        missionExecutor = executor
-        previousEstimateContext = nil
-        executor.add(delegate: self)
-        estimateMission()
+    open override func onMissionLoaded(executor: MissionExecutor) {
+        super.onMissionLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-            
-            if let missionDetailsExpanded = executor.userInterfaceSettings?.missionDetailsExpanded {
-                self.toggle(expanded: missionDetailsExpanded)
-            }
+        if let expanded = executor.userInterfaceSettings?.missionDetailsExpanded {
+            layout = expanded ? .medium : .small
         }
-    }
-    
-    public func onMissionUnloaded(executor: MissionExecutor) {
-        missionExecutor = nil
         previousEstimateContext = nil
-        executor.remove(delegate: self)
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
-    }
-    
-    public func onFuncLoaded(executor: FuncExecutor) {}
-    
-    public func onFuncUnloaded(executor: FuncExecutor) {}
-    
-    public func onModeLoaded(executor: ModeExecutor) {}
-    
-    public func onModeUnloaded(executor: ModeExecutor) {}
-}
-
-extension MissionViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-        session.add(delegate: self)
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
-    }
-    
-    public func onClosed(session: DroneSession) {
-        self.session = nil
-        session.remove(delegate: self)
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
-    }
-}
-
-extension MissionViewController: DroneSessionDelegate {
-    public func onInitialized(session: DroneSession) {}
-    
-    public func onLocated(session: DroneSession) {
         estimateMission()
     }
     
-    public func onMotorsChanged(session: DroneSession, value: Bool) {}
-    
-    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
-    
-    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {}
-    
-    public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
-}
-
-extension MissionViewController: MissionExecutorDelegate {
-    public func onMissionEstimating(executor: MissionExecutor) {
-        DispatchQueue.main.async {
-            self.update()
-        }
+    open override func onMissionUnloaded(executor: MissionExecutor) {
+        super.onMissionUnloaded(executor: executor)
+        previousEstimateContext = nil
     }
     
-    public func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+    open override func onLocated(session: DroneSession) {
+        super.onLocated(session: session)
+        estimateMission()
+    }
+    
+    open override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+        super.onMissionEstimated(executor: executor, estimate: estimate)
+        
         if self.engageOnMissionEstimated {
             self.engage()
             return
         }
-
-        DispatchQueue.main.async {
-            self.update()
-        }
     }
     
-    public func onMissionEngaging(executor: MissionExecutor) {
-        Dronelink.shared.announce(message: "MissionViewController.engaging".localized)
-        DispatchQueue.main.async {
-            self.update()
-        }
+    open override func onMissionEngaging(executor: MissionExecutor) {
+        super.onMissionEngaging(executor: executor)
+        Dronelink.shared.announce(message: "MissionExecutorWidget.engaging".localized)
     }
     
-    public func onMissionEngaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
-        DispatchQueue.main.async {
-            self.update()
-        }
+    open override func onMissionEngaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
+        super.onMissionEngaged(executor: executor, engagement: engagement)
     }
     
-    public func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
-        if (-lastUpdated.timeIntervalSinceNow >= updateInterval) {
-            lastUpdated = Date()
-            DispatchQueue.main.async {
-                self.update()
-            }
-        }
-    }
-    
-    public func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
+    open override func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
+        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        
         if (reason.title != "MissionDisengageReason.user.disengaged".localized) {
             DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
         }
@@ -646,9 +545,6 @@ extension MissionViewController: MissionExecutorDelegate {
             return
         }
 
-        Dronelink.shared.announce(message: "MissionViewController.disengaged".localized)
-        DispatchQueue.main.async {
-            self.update()
-        }
+        Dronelink.shared.announce(message: "MissionExecutorWidget.disengaged".localized)
     }
 }

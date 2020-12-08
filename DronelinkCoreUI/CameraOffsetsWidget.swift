@@ -1,38 +1,28 @@
 //
-//  CameraOffsetsViewController.swift
+//  CameraOffsetsWidget.swift
 //  DronelinkCoreUI
 //
 //  Created by Jim McAndrew on 3/20/20.
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
-
 import Foundation
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 
-public class CameraOffsetsViewController: UIViewController {
-    
-    public static func create(droneSessionManager: DroneSessionManager) -> CameraOffsetsViewController {
-        let cameraOffsetsViewController = CameraOffsetsViewController()
-        cameraOffsetsViewController.droneSessionManager = droneSessionManager
-        return cameraOffsetsViewController
-    }
+public class CameraOffsetsWidget: UpdatableWidget {
+    public override var updateInterval: TimeInterval { 0.25 }
     
     private let c1Image = DronelinkUI.loadImage(named: "baseline_remove_white_24pt")
     private let c2Image = DronelinkUI.loadImage(named: "baseline_add_white_24pt")
     
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
     private var exposureCommand: Kernel.ExposureCompensationStepCameraCommand?
     
     private let c1Button = MDCFloatingButton()
     private let c2Button = MDCFloatingButton()
     private let cLabel = UILabel()
     
-    private let updateInterval: TimeInterval = 0.25
-    private var updateTimer: Timer?
     private let listenRCButtonsInterval: TimeInterval = 0.1
     private var listenRCButtonsTimer: Timer?
     private var c1PressedPrevious = false
@@ -71,18 +61,13 @@ public class CameraOffsetsViewController: UIViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        droneSessionManager.add(delegate: self)
-        updateTimer = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
         listenRCButtonsTimer = Timer.scheduledTimer(timeInterval: listenRCButtonsInterval, target: self, selector: #selector(listenRCButtons), userInfo: nil, repeats: true)
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        updateTimer?.invalidate()
-        updateTimer = nil
         listenRCButtonsTimer?.invalidate()
         listenRCButtonsTimer = nil
-        droneSessionManager.remove(delegate: self)
     }
     
     private func configureButton(button: MDCFloatingButton, color: UIColor? = nil, action: Selector) {
@@ -171,7 +156,9 @@ public class CameraOffsetsViewController: UIViewController {
         }
     }
     
-    @objc func update() {
+    @objc open override func update() {
+        super.update()
+        
         let exposureCompensation = session?.cameraState(channel: 0)?.value.exposureCompensation
         c1Button.tintColor = exposureCommand == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
         c1Button.isEnabled = exposureCompensation != nil
@@ -221,30 +208,10 @@ public class CameraOffsetsViewController: UIViewController {
         c1PressedPrevious = remoteControllerState?.c1Button.pressed ?? false
         c2PressedPrevious = remoteControllerState?.c2Button.pressed ?? false
     }
-}
 
-extension CameraOffsetsViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-        session.add(delegate: self)
-    }
-    
-    public func onClosed(session: DroneSession) {
-        self.session = nil
-        session.remove(delegate: self)
-    }
-}
-
-extension CameraOffsetsViewController: DroneSessionDelegate {
-    public func onInitialized(session: DroneSession) {}
-    
-    public func onLocated(session: DroneSession) {}
-    
-    public func onMotorsChanged(session: DroneSession, value: Bool) {}
-    
-    public func onCommandExecuted(session: DroneSession, command: KernelCommand) {}
-    
-    public func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {
+    open override func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {
+        super.onCommandFinished(session: session, command: command, error: error)
+        
         guard let exposureCommand = self.exposureCommand else {
             return
         }
@@ -256,6 +223,4 @@ extension CameraOffsetsViewController: DroneSessionDelegate {
             }
         }
     }
-    
-    public func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
 }

@@ -42,13 +42,12 @@ public class StatusWidget: UpdatableWidget {
         }
         
         guard
-            let droneSessionManager = primaryDroneSessionManager,
-            let state = droneSessionManager.session?.state?.value
+            let state = session?.state?.value
         else {
             return statuses.disconnected
         }
         
-        if let statusMessage = droneSessionManager.statusMessages?.filter({ $0.level != .info }).sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
+        if let statusMessage = targetDroneSessionManager?.statusMessages?.filter({ $0.level != .info }).sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
             return statusMessage.status
         }
         
@@ -59,7 +58,7 @@ public class StatusWidget: UpdatableWidget {
         return state.isFlying ? statuses.manualFlight : statuses.ready
     }
     
-    internal override var updateInterval: TimeInterval { 0.5 }
+    public override var updateInterval: TimeInterval { 0.5 }
     
     public var statuses = (
         disconnected: Status(message: "StatusWidget.disconnected".localized, color: MDCPalette.deepPurple.accent400),
@@ -75,6 +74,7 @@ public class StatusGradientWidget: StatusWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.clipsToBounds = true
         view.backgroundColor = DronelinkUI.Constants.overlayColor
         
         gradient.colors = [DronelinkUI.Constants.overlayColor.cgColor]
@@ -83,7 +83,7 @@ public class StatusGradientWidget: StatusWidget {
         view.layer.insertSublayer(gradient, at: 0)
     }
     
-    @objc override func update() {
+    @objc open override func update() {
         super.update()
         
         gradient.frame = view.frame
@@ -106,6 +106,7 @@ public class StatusLabelWidget: StatusWidget {
         super.viewDidLoad()
         
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
+        view.backgroundColor = UIColor.clear
         
         label.leadingBuffer = 8
         label.trailingBuffer = label.leadingBuffer
@@ -120,11 +121,13 @@ public class StatusLabelWidget: StatusWidget {
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onViewTapped(_:))))
     }
     
-    @objc override func update() {
+    @objc open override func update() {
         super.update()
         let status = self.status
         label.text = status.message
-        view.backgroundColor = colorEnabled ? status.color : UIColor.clear
+        if colorEnabled {
+            view.backgroundColor = status.color
+        }
     }
     
     @objc func onViewTapped(_ sender: UITapGestureRecognizer) {

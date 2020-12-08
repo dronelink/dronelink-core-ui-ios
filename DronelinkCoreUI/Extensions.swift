@@ -10,6 +10,8 @@ import JavaScriptCore
 import CoreLocation
 import UIKit
 import os
+import MaterialComponents
+import Kingfisher
 
 extension String {
     internal static let LocalizationMissing = "MISSING STRING LOCALIZATION"
@@ -129,4 +131,7 @@ extension UIColor {
             blue: rgb & 0xFF
         )
     }
+}
+
+extension MDCActivityIndicator: Placeholder {
 }

@@ -107,7 +107,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         }
     }
     
-    @objc override func update() {
+    @objc public override func update() {
         super.update()
         captureButton?.tintColor = (session?.cameraState(channel: 0)?.value.mode == .photo) ? .white : .red
         guard let photoMode = (session?.cameraState(channel: 0)?.value.photoMode) else {return}

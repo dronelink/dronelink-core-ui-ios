@@ -1,8 +1,8 @@
 //
-//  ModeViewController.swift
+//  ModeExecutorWidget.swift
 //  DronelinkCoreUI
 //
-//  Created by Jim McAndrew on 10/21/10.
+//  Created by Jim McAndrew on 12/7/20.
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
 import DronelinkCore
@@ -16,26 +16,26 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 import MaterialComponents.MDCActivityIndicator
 
-public protocol ModeViewControllerDelegate: class {
-    func onModeExpandToggle()
-}
-
-public class ModeViewController: UIViewController {
-    public static func create(droneSessionManager: DroneSessionManager, delegate: ModeViewControllerDelegate? = nil) -> ModeViewController {
-        let modeViewController = ModeViewController()
-        modeViewController.droneSessionManager = droneSessionManager
-        modeViewController.delegate = delegate
-        return modeViewController
-    }
+public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
+    public override var updateInterval: TimeInterval { 0.5 }
     
-    private weak var delegate: ModeViewControllerDelegate?
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
-    private var modeExecutor: ModeExecutor?
+    public var layout: ExecutorWidgetLayout = .small
+    
+    public var preferredSize: CGSize {
+        if (portrait && tablet) {
+            return CGSize(width: 0, height: layout == .small ? 0 : 80)
+        }
+        
+        if (portrait) {
+            return CGSize(width: 0, height: layout == .small ? 100 : 80)
+        }
+        
+        return CGSize(width: tablet ? 350 : 0, height: layout == .small ? 80 : (tablet ? 180 : 0))
+    }
     
     private let activityIndicator = MDCActivityIndicator()
     private let primaryButton = MDCFloatingButton()
-    private let expandToggleButton = UIButton()
+    private let layoutToggleButton = UIButton()
     private let countdownProgressView = MDCProgressView()
     private let titleLabel = UILabel()
     private let subtitleLabel = UILabel()
@@ -54,10 +54,6 @@ public class ModeViewController: UIViewController {
     private var countdownTimer: Timer?
     private var countdownRemaining = 0
     private var countdownMax = 60
-    private let updateInterval: TimeInterval = 0.5
-    private var lastUpdated = Date()
-    private var _expanded = false
-    public var expanded: Bool { _expanded }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -104,8 +100,8 @@ public class ModeViewController: UIViewController {
         messagesTextView.isEditable = false
         view.addSubview(messagesTextView)
         
-        expandToggleButton.addTarget(self, action: #selector(onExpandToggle), for: .touchUpInside)
-        view.addSubview(expandToggleButton)
+        layoutToggleButton.addTarget(self, action: #selector(onLayoutToggle), for: .touchUpInside)
+        view.addSubview(layoutToggleButton)
         
         dismissButton.tintColor = UIColor.white
         dismissButton.setImage(DronelinkUI.loadImage(named: "baseline_close_white_36pt"), for: .normal)
@@ -113,24 +109,9 @@ public class ModeViewController: UIViewController {
         view.addSubview(dismissButton)
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        droneSessionManager.add(delegate: self)
-        Dronelink.shared.add(delegate: self)
-        update()
-    }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        droneSessionManager.remove(delegate: self)
-        Dronelink.shared.remove(delegate: self)
-        modeExecutor?.remove(delegate: self)
-    }
-    
     public override func updateViewConstraints() {
         super.updateViewConstraints()
         
-        let defaultPadding = 10
         let labelHeight = 30
         
         primaryButton.snp.remakeConstraints { make in
@@ -144,7 +125,7 @@ public class ModeViewController: UIViewController {
             make.edges.equalTo(primaryButton)
         }
         
-        expandToggleButton.snp.remakeConstraints { make in
+        layoutToggleButton.snp.remakeConstraints { make in
             make.top.equalToSuperview()
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
@@ -192,11 +173,6 @@ public class ModeViewController: UIViewController {
             make.top.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
         }
-    }
-    
-    override public func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        view.setNeedsUpdateConstraints()
     }
     
     @objc func onPrimary(sender: Any) {
@@ -247,7 +223,7 @@ public class ModeViewController: UIViewController {
         countdownTimer = nil
         update()
         if (aborted) {
-            Dronelink.shared.announce(message: "ExecutableViewController.start.cancelled".localized)
+            Dronelink.shared.announce(message: "ExecutableWidget.start.cancelled".localized)
         }
     }
     
@@ -269,7 +245,7 @@ public class ModeViewController: UIViewController {
                 }
             }
             catch DronelinkError.droneSerialNumberUnavailable {
-                DronelinkUI.shared.showDialog(title: "ExecutableViewController.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableViewController.start.engage.droneSerialNumberUnavailable.message".localized)
+                DronelinkUI.shared.showDialog(title: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.message".localized)
                 self.update()
             }
             catch {
@@ -278,20 +254,18 @@ public class ModeViewController: UIViewController {
         }
     }
     
-    @objc func onExpandToggle() {
-        toggle(expanded: !expanded)
-    }
-    
-    public func toggle(expanded: Bool) {
-        _expanded = expanded
-        delegate?.onModeExpandToggle()
+    @objc func onLayoutToggle() {
+        layout = layout == .small ? .medium : .small
+        view.superview?.setNeedsUpdateConstraints()
     }
     
     @objc func onDismiss() {
         Dronelink.shared.unloadMode()
     }
     
-    func update() {
+    @objc open override func update() {
+        super.update()
+        
         guard let modeExecutor = modeExecutor else {
             return
         }
@@ -312,7 +286,7 @@ public class ModeViewController: UIViewController {
             primaryButton.isEnabled = true
             primaryButton.setBackgroundColor(primaryDisengagedColor.interpolate(primaryEngagedColor, percent: CGFloat(progress)))
             primaryButton.setImage(cancelImage, for: .normal)
-            titleLabel.text = String(format: "ExecutableViewController.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
+            titleLabel.text = String(format: "ExecutableWidget.start.countdown".localized, Int(ceil(Double(countdownRemaining) / 20)))
             countdownProgressView.setProgress(progress, animated: true)
             countdownProgressView.progressTintColor = progressDisengagedColor?.interpolate(progressEngagedColor, percent: CGFloat(progress))
             return
@@ -328,7 +302,7 @@ public class ModeViewController: UIViewController {
             dismissButton.isHidden = true
             messagesTextView.isHidden = true
 
-            subtitleLabel.text = "ExecutableViewController.start.engaging".localized
+            subtitleLabel.text = "ExecutableWidget.start.engaging".localized
             return
         }
 
@@ -343,105 +317,33 @@ public class ModeViewController: UIViewController {
         activityIndicator.stopAnimating()
         primaryButton.isEnabled = session != nil
         let executionDuration = modeExecutor.executionDuration
-        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableViewController.executionDuration.empty".localized)
+        executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
 
         if modeExecutor.engaged {
             subtitleLabel.text = modeExecutor.summaryMessage?.display ?? ""
-            messagesTextView.text = expanded ? modeExecutor.executingMessageGroups.map({ $0.display }).joined(separator: "") : nil
+            messagesTextView.text = layout == .small ? nil : modeExecutor.executingMessageGroups.map({ $0.display }).joined(separator: "")
             primaryButton.setBackgroundColor(primaryEngagedColor)
             primaryButton.setImage(disengageImage, for: .normal)
         }
         else {
-            subtitleLabel.text = session == nil ? "ModeViewController.disconnected".localized : "ModeViewController.ready".localized
+            subtitleLabel.text = session == nil ? "ModeExecutorWidget.disconnected".localized : "ModeExecutorWidget.ready".localized
             messagesTextView.text = nil
             primaryButton.setBackgroundColor(primaryDisengagedColor)
             primaryButton.setImage(engageImage, for: .normal)
         }
     }
-}
 
-extension ModeViewController: DronelinkDelegate {
-    public func onRegistered(error: String?) {}
-    
-    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
-    
-    public func onMissionLoaded(executor: MissionExecutor) {}
-    
-    public func onMissionUnloaded(executor: MissionExecutor) {}
-    
-    public func onFuncLoaded(executor: FuncExecutor) {}
-    
-    public func onFuncUnloaded(executor: FuncExecutor) {}
-    
-    public func onModeLoaded(executor: ModeExecutor) {
-        modeExecutor = executor
-        executor.add(delegate: self)
-        
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
+    open override func onModeEngaging(executor: ModeExecutor) {
+        super.onModeEngaging(executor: executor)
+        Dronelink.shared.announce(message: "ModeExecutorWidget.engaging".localized)
     }
     
-    public func onModeUnloaded(executor: ModeExecutor) {
-        modeExecutor = nil
-        executor.remove(delegate: self)
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
-    }
-}
-
-extension ModeViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
-    }
-    
-    public func onClosed(session: DroneSession) {
-        self.session = nil
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-            self.update()
-        }
-    }
-}
-
-extension ModeViewController: ModeExecutorDelegate {
-    public func onModeEngaging(executor: ModeExecutor) {
-        Dronelink.shared.announce(message: "ModeViewController.engaging".localized)
-        DispatchQueue.main.async {
-            self.update()
-        }
-    }
-    
-    public func onModeEngaged(executor: ModeExecutor, engagement: ModeExecutor.Engagement) {
-        DispatchQueue.main.async {
-            self.update()
-        }
-    }
-    
-    public func onModeExecuted(executor: ModeExecutor, engagement: ModeExecutor.Engagement) {
-        if (-lastUpdated.timeIntervalSinceNow >= updateInterval) {
-            lastUpdated = Date()
-            DispatchQueue.main.async {
-                self.update()
-            }
-        }
-    }
-    
-    public func onModeDisengaged(executor: ModeExecutor, engagement: ModeExecutor.Engagement, reason: Kernel.Message) {
+    open override func onModeDisengaged(executor: ModeExecutor, engagement: ModeExecutor.Engagement, reason: Kernel.Message) {
+        super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
         if (reason.title != "ModeDisengageReason.user.disengaged".localized) {
             DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
         }
         
-        Dronelink.shared.announce(message: "ModeViewController.disengaged".localized)
-        DispatchQueue.main.async {
-            self.update()
-        }
+        Dronelink.shared.announce(message: "ModeExecutorWidget.disengaged".localized)
     }
 }

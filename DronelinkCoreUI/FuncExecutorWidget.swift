@@ -1,8 +1,8 @@
 //
-//  FuncViewController.swift
+//  FuncExecutorWidget.swift
 //  DronelinkCoreUI
 //
-//  Created by Jim McAndrew on 1/30/20.
+//  Created by Jim McAndrew on 12/7/20.
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
 import DronelinkCore
@@ -15,24 +15,19 @@ import Kingfisher
 import Agrume
 import IQKeyboardManager
 
-public protocol FuncViewControllerDelegate: class {
-    func onFuncExpanded(value: Bool)
-}
-
-public class FuncViewController: UIViewController {
+public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     private static var mostRecentExecuted: FuncExecutor?
     
-    public static func create(droneSessionManager: DroneSessionManager, delegate: FuncViewControllerDelegate? = nil) -> FuncViewController {
-        let funcViewController = FuncViewController()
-        funcViewController.droneSessionManager = droneSessionManager
-        funcViewController.delegate = delegate
-        return funcViewController
+    public var layout: ExecutorWidgetLayout = .small
+    
+    public var preferredSize: CGSize {
+        if (portrait && tablet) {
+            return CGSize(width: layout == .large ? 350 : 310, height: layout == .large ? 0 : 185)
+        }
+        
+        return CGSize(width: portrait ? 0 : (layout == .large ? 350 : 310), height: layout == .large ? 0 : 185)
     }
     
-    private weak var delegate: FuncViewControllerDelegate?
-    private var droneSessionManager: DroneSessionManager!
-    private var session: DroneSession?
-    private var funcExecutor: FuncExecutor?
     private let imagePlaceholder = MDCActivityIndicator()
     private let headerBackgroundView = UIView()
     private let footerBackgroundView = UIView()
@@ -57,7 +52,6 @@ public class FuncViewController: UIViewController {
     private let cancelImage = DronelinkUI.loadImage(named: "baseline_close_white_36pt")
     private let droneImage = DronelinkUI.loadImage(named: "baseline_navigation_white_36pt")
     
-    private var tablet: Bool { return UIDevice.current.userInterfaceIdiom == .pad }
     private let segmentedMaxOptions = 2
     private var intro = true
     private var inputIndex = 0
@@ -155,7 +149,7 @@ public class FuncViewController: UIViewController {
         variableDroneMarkButton.imageView?.contentMode = .scaleAspectFit
         variableDroneMarkButton.setImageTintColor(.white, for: .normal)
         variableDroneMarkButton.setTitleColor(.white, for: .normal)
-        variableDroneMarkButton.setTitle("FuncViewController.input.drone".localized, for: .normal)
+        variableDroneMarkButton.setTitle("FuncExecutorWidget.input.drone".localized, for: .normal)
         variableDroneMarkButton.addTarget(self, action: #selector(onDroneMark(sender:)), for: .touchUpInside)
         view.addSubview(variableDroneMarkButton)
         
@@ -205,17 +199,11 @@ public class FuncViewController: UIViewController {
         
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Dronelink.shared.add(delegate: self)
-        droneSessionManager.add(delegate: self)
         listenRCButtonsTimer = Timer.scheduledTimer(timeInterval: listenRCButtonsInterval, target: self, selector: #selector(listenRCButtons), userInfo: nil, repeats: true)
-        update()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        Dronelink.shared.remove(delegate: self)
-        droneSessionManager.remove(delegate: self)
-        funcExecutor?.remove(delegate: self)
         listenRCButtonsTimer?.invalidate()
         listenRCButtonsTimer = nil
     }
@@ -434,16 +422,16 @@ public class FuncViewController: UIViewController {
                 self.view.setNeedsUpdateConstraints()
             }
             
-            if let mostRecentExecuted = FuncViewController.mostRecentExecuted,
+            if let mostRecentExecuted = FuncExecutorWidget.mostRecentExecuted,
                 mostRecentExecuted.id == funcExecutor.id {
                 DronelinkUI.shared.showDialog(
-                    title: "FuncViewController.cachedInputs.title".localized,
-                    details: "FuncViewController.cachedInputs.message".localized,
+                    title: "FuncExecutorWidget.cachedInputs.title".localized,
+                    details: "FuncExecutorWidget.cachedInputs.message".localized,
                     actions: [
-                        MDCAlertAction(title: "FuncViewController.cachedInputs.action.new".localized, emphasis: .high, handler: { action in
+                        MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.new".localized, emphasis: .high, handler: { action in
                             finish()
                         }),
-                        MDCAlertAction(title: "FuncViewController.cachedInputs.action.previous".localized, handler: { action in
+                        MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.previous".localized, handler: { action in
                             funcExecutor.addCachedInputs(funcExecutor: mostRecentExecuted)
                             finish()
                         })
@@ -515,12 +503,12 @@ public class FuncViewController: UIViewController {
     
     @objc func onDroneMark(sender: Any) {
         guard let session = self.session else {
-            DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.drone.unavailable".localized)
+            DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.drone.unavailable".localized)
             return
         }
         
         if session.state?.value.location == nil {
-            DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.location.unavailable".localized)
+            DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.location.unavailable".localized)
             return
         }
         
@@ -600,7 +588,7 @@ public class FuncViewController: UIViewController {
             case .drone:
                 if next {
                     if funcExecutor?.readValue(inputIndex: inputIndex) == nil && !input.optional {
-                        DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.required".localized)
+                        DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.required".localized)
                         return false
                     }
                     return true
@@ -611,7 +599,7 @@ public class FuncViewController: UIViewController {
         }
         
         if !input.optional && value == nil && input.variable.valueType != .null {
-            DronelinkUI.shared.showSnackbar(text: "FuncViewController.input.required".localized)
+            DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.required".localized)
             return false
         }
         
@@ -676,7 +664,7 @@ public class FuncViewController: UIViewController {
         }
     }
     
-    func update() {
+    private func update() {
         guard let funcExecutor = funcExecutor else {
             return
         }
@@ -704,7 +692,7 @@ public class FuncViewController: UIViewController {
             primaryButton.isHidden = false
 
             titleLabel.text = funcExecutor.descriptors.name
-            primaryButton.setTitle((executing ? "FuncViewController.primary.executing" : hasInputs ? "FuncViewController.primary.intro" : "FuncViewController.primary.execute").localized, for: .normal)
+            primaryButton.setTitle((executing ? "FuncExecutorWidget.primary.executing" : hasInputs ? "FuncExecutorWidget.primary.intro" : "FuncExecutorWidget.primary.execute").localized, for: .normal)
             variableDescriptionTextView.text = funcExecutor.descriptors.description
             return
         }
@@ -713,7 +701,7 @@ public class FuncViewController: UIViewController {
         backButton.isHidden = false
         backButton.isEnabled = inputIndex > 0
         nextButton.isHidden = false
-        nextButton.setTitle((last ? "FuncViewController.primary.execute" : "next").localized, for: .normal)
+        nextButton.setTitle((last ? "FuncExecutorWidget.primary.execute" : "next").localized, for: .normal)
         progressLabel.isHidden = last
         progressLabel.text = inputIndex + 1 == funcExecutor.inputCount ? "\(inputIndex + 1)" : "\(inputIndex + 1) / \(funcExecutor.inputCount)"
         
@@ -769,25 +757,40 @@ public class FuncViewController: UIViewController {
                 break
             }
 
-            delegate?.onFuncExpanded(value: !(input.imageUrl?.isEmpty ?? true))
+            layout = (input.imageUrl?.isEmpty ?? true) ? .small : .large
+            view.superview?.setNeedsUpdateConstraints()
             return
         }
         
         if last {
             variableNameLabel.isHidden = false
-            variableNameLabel.text = "FuncViewController.input.summary".localized
+            variableNameLabel.text = "FuncExecutorWidget.input.summary".localized
             variableSummaryViewController.view.isHidden = false
             variableSummaryViewController.refresh()
-            delegate?.onFuncExpanded(value: funcExecutor.inputCount > 3)
+            layout = funcExecutor.inputCount > 3 ? .large : .small
+            view.superview?.setNeedsUpdateConstraints()
             return
         }
     }
+    
+    open override func onFuncLoaded(executor: FuncExecutor) {
+        super.onFuncLoaded(executor: executor)
+        
+        self.inputIndex = 0
+        self.intro = true
+        if let urls = executor.urls {
+            DronelinkUI.shared.cacheImages(urls: urls)
+        }
+    }
+    
+    open override func onFuncExecuted(executor: FuncExecutor) {
+        super.onFuncExecuted(executor: executor)
+        
+        FuncExecutorWidget.mostRecentExecuted = executor
+    }
 }
 
-extension MDCActivityIndicator: Placeholder {
-}
-
-extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+extension FuncExecutorWidget: UIPickerViewDataSource, UIPickerViewDelegate {
     public func numberOfComponents(in pickerView: UIPickerView) -> Int {
         guard let input = input, input.enumValues != nil else {
             return 0
@@ -808,73 +811,13 @@ extension FuncViewController: UIPickerViewDataSource, UIPickerViewDelegate {
         }
         
         if row == 0 {
-            return "FuncViewController.input.choose".localized
+            return "FuncExecutorWidget.input.choose".localized
         }
         return input.enumValues?[safeIndex: row - 1] ?? ""
     }
 }
 
-extension FuncViewController: DronelinkDelegate {
-    public func onRegistered(error: String?) {}
-    
-    public func onDroneSessionManagerAdded(manager: DroneSessionManager) {}
-    
-    public func onMissionLoaded(executor: MissionExecutor) {}
-    
-    public func onMissionUnloaded(executor: MissionExecutor) {}
-    
-    public func onFuncLoaded(executor: FuncExecutor) {
-        funcExecutor = executor
-        executor.add(delegate: self)
-        DispatchQueue.main.async {
-            self.inputIndex = 0
-            self.intro = true
-            self.view.setNeedsUpdateConstraints()
-            
-            if let urls = executor.urls {
-                DronelinkUI.shared.cacheImages(urls: urls)
-            }
-        }
-    }
-    
-    public func onFuncUnloaded(executor: FuncExecutor) {
-        funcExecutor = nil
-        executor.remove(delegate: self)
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-        }
-    }
-    
-    public func onModeLoaded(executor: ModeExecutor) {}
-    
-    public func onModeUnloaded(executor: ModeExecutor) {}
-}
-
-extension FuncViewController: DroneSessionManagerDelegate {
-    public func onOpened(session: DroneSession) {
-        self.session = session
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-        }
-    }
-    
-    public func onClosed(session: DroneSession) {
-        self.session = nil
-        DispatchQueue.main.async {
-            self.view.setNeedsUpdateConstraints()
-        }
-    }
-}
-
-extension FuncViewController: FuncExecutorDelegate {
-    public func onFuncInputsChanged(executor: FuncExecutor) {}
-    
-    public func onFuncExecuted(executor: FuncExecutor) {
-        FuncViewController.mostRecentExecuted = executor
-    }
-}
-
-extension FuncViewController: UITextFieldDelegate {
+extension FuncExecutorWidget: UITextFieldDelegate {
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
@@ -1007,7 +950,7 @@ class FuncSummaryTableViewController: UIViewController, UITableViewDelegate, UIT
             if let valueNumberMeasurementTypeDisplay = funcExecutor.readValueNumberMeasurementTypeDisplay(index: indexPath.row) {
                 name = "\(name) (\(valueNumberMeasurementTypeDisplay))"
             }
-            var details = "FuncViewController.input.none".localized
+            var details = "FuncExecutorWidget.input.none".localized
             if let value = funcExecutor.readValue(inputIndex: indexPath.row, formatted: true) as? String {
                 details = value
             }

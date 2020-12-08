@@ -8,7 +8,7 @@ PODS:
   - Kingfisher/Core (5.15.8)
   - Mapbox-iOS-SDK (6.3.0):
     - MapboxMobileEvents (~> 0.10.4)
-  - MapboxMobileEvents (0.10.6)
+  - MapboxMobileEvents (0.10.7)
   - MarqueeLabel (4.0.5)
   - MaterialComponents/ActivityIndicator (119.0.0):
     - MaterialComponents/Palettes
@@ -209,7 +209,7 @@ SPEC CHECKSUMS:
   IQKeyboardManager: 2a6e97afdafc7becf0cb17a9a8d795e3a980717f
   Kingfisher: a3c03d702433fa6cfedabb2bddbe076fb8f2e902
   Mapbox-iOS-SDK: 6a67397df2bcafe5d2851604192aa8de6f8d6c89
-  MapboxMobileEvents: 5ef561e6b6f9cbff2900d62a52322e75d1a7dfdf
+  MapboxMobileEvents: d0a581dedd8f47411cc65ea520b965e83914316e
   MarqueeLabel: 00cc0bcd087111dca575878b3531af980559707d
   MaterialComponents: 69a725e28406a97816441dea4ec6ec38265a08bb
   MDFInternationalization: 010097556d6b09d2c4ea38e0820ea6d37be6a314
