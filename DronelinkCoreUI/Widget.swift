@@ -231,7 +231,7 @@ open class WidgetFactory {
     open func createStatusBackgroundWidget(current: Widget? = nil) -> Widget? { (current as? StatusGradientWidget) ?? StatusGradientWidget() }
     open func createStatusForegroundWidget(current: Widget? = nil) -> Widget?  { (current as? StatusLabelWidget) ?? StatusLabelWidget() }
     open func createRemainingFlightTimeWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createFlightModeWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createFlightModeWidget(current: Widget? = nil) -> Widget? { (current as? FlightModeWidget) ?? FlightModeWidget() }
     open func createGPSWidget(current: Widget? = nil) -> Widget? { nil }
     open func createVisionWidget(current: Widget? = nil) -> Widget? { nil }
     open func createUplinkWidget(current: Widget? = nil) -> Widget? { nil }

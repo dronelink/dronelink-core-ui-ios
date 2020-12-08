@@ -27,6 +27,7 @@
 		24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
 		E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */; };
+		E4AD4F6725800F9700404783 /* FlightModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F6625800F9700404783 /* FlightModeWidget.swift */; };
 		E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB522579247100778068 /* CameraModeControl.swift */; };
 		E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */; };
 		E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */; };
@@ -58,6 +59,7 @@
 		63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.debug.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.debug.xcconfig"; sourceTree = "<group>"; };
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeWidget.swift; sourceTree = "<group>"; };
+		E4AD4F6625800F9700404783 /* FlightModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightModeWidget.swift; sourceTree = "<group>"; };
 		E4F1FB522579247100778068 /* CameraModeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeControl.swift; sourceTree = "<group>"; };
 		E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitSystemControl.swift; sourceTree = "<group>"; };
 		E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureWidget.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				2446AF95236A0153001A1C4F /* Resources */,
 				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
 				E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */,
+				E4AD4F6625800F9700404783 /* FlightModeWidget.swift */,
 			);
 			path = DronelinkCoreUI;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */,
+				E4AD4F6725800F9700404783 /* FlightModeWidget.swift in Sources */,
 				E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */,
 				2418ACA323ECC18A0099D44C /* DroneOffsetsWidget.swift in Sources */,
 				2459751823679DCB008CAB6B /* MissionExecutorWidget.swift in Sources */,
