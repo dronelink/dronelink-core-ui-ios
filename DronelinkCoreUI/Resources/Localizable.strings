@@ -55,16 +55,12 @@
 
 "InstrumentsViewController.empty" = "--";
 
-"TelemetryWidget.distance.prefix" = "D";
-"TelemetryWidget.altitude.prefix" = "A";
-"TelemetryWidget.horizontalSpeed.prefix" = "H/S";
-"TelemetryWidget.verticalSpeed.prefix" = "V/S";
-"TelemetryWidget.unit.distance.metric" = "m";
-"TelemetryWidget.unit.distance.imperial" = "ft";
-"TelemetryWidget.unit.horizontalSpeed.metric" = "km/h";
-"TelemetryWidget.unit.horizontalSpeed.imperial" = "mph";
-"TelemetryWidget.unit.verticalSpeed.metric" = "m/s";
-"TelemetryWidget.unit.verticalSpeed.imperial" = "fps";
+"NumericInstrumentWidget.empty" = "--";
+
+"DistanceWidget.prefix" = "D";
+"AltitudeWidget.prefix" = "A";
+"HorizontalSpeedWidget.prefix" = "H/S";
+"VerticalSpeedWidget.prefix" = "V/S";
 
 "StatusWidget.disconnected" = "Disconnected";
 "StatusWidget.ready" = "All Systems Go";

@@ -237,11 +237,13 @@ open class WidgetFactory {
     open func createUplinkWidget(current: Widget? = nil) -> Widget? { nil }
     open func createDownlinkWidget(current: Widget? = nil) -> Widget? { nil }
     open func createBatteryWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createDistanceUserWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createDistanceHomeWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createAltitudeWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createHorizontalSpeedWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createDistanceWidget(current: Widget? = nil) -> Widget? { (current as? DistanceWidget) ?? DistanceWidget()  }
+    open func createDistanceHomeWidget(current: Widget? = nil) -> Widget? { (current as? DistanceHomeWidget) ?? DistanceHomeWidget() }
+    open func createDistanceUserWidget(current: Widget? = nil) -> Widget? { (current as? DistanceUserWidget) ?? DistanceUserWidget() }
+    open func createAltitudeWidget(current: Widget? = nil) -> Widget? { (current as? AltitudeWidget) ?? AltitudeWidget() }
+    open func createHorizontalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? HorizontalSpeedWidget) ?? HorizontalSpeedWidget() }
+    open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? VerticalSpeedWidget) ?? VerticalSpeedWidget() }
+    open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open func createCameraGeneralSettingsWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
@@ -252,7 +254,6 @@ open class WidgetFactory {
     open func createCameraCaptureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureSettingsWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKSettingsWidget(current: Widget? = nil) -> Widget? { nil }
 }
