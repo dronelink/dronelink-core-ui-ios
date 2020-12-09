@@ -42,10 +42,11 @@ public class CameraCaptureWidget: UpdatableWidget {
         countIndicatorLabel = UILabel()
         countIndicatorLabel?.textColor = .black
         countIndicatorLabel?.isUserInteractionEnabled = false
+        countIndicatorLabel?.font = UIFont.systemFont(ofSize: 10)
         view.addSubview(countIndicatorLabel!)
         countIndicatorLabel?.textAlignment = .right
         countIndicatorLabel?.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.edges.equalToSuperview().offset(-5)
         }
     }
     
