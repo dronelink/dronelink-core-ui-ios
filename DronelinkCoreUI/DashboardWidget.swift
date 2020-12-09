@@ -123,10 +123,10 @@ public class DashboardWidget: DelegateWidget {
     private var primaryIndicatorWidgets: [(widget: Widget, widthRatio: CGFloat)] {
         var widgets: [(widget: Widget, widthRatio: CGFloat)] = []
         if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 4.5)) }
-        if let widget = gpsWidget { widgets.append((widget: widget, widthRatio: 1.75)) }
+        if let widget = gpsWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = visionWidget { widgets.append((widget: widget, widthRatio: 1.35)) }
         if let widget = uplinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
-        if let widget = downlinkWidget { widgets.append((widget: widget, widthRatio: 2.75)) }
+        if let widget = downlinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = batteryWidget { widgets.append((widget: widget, widthRatio: 2.75)) }
         return widgets
     }

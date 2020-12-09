@@ -232,10 +232,10 @@ open class WidgetFactory {
     open func createStatusForegroundWidget(current: Widget? = nil) -> Widget?  { (current as? StatusLabelWidget) ?? StatusLabelWidget() }
     open func createRemainingFlightTimeWidget(current: Widget? = nil) -> Widget? { nil }
     open func createFlightModeWidget(current: Widget? = nil) -> Widget? { (current as? FlightModeWidget) ?? FlightModeWidget() }
-    open func createGPSWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createGPSWidget(current: Widget? = nil) -> Widget? { (current as? GPSWidget) ?? GPSWidget() }
     open func createVisionWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createUplinkWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createDownlinkWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createUplinkWidget(current: Widget? = nil) -> Widget? { (current as? UplinkWidget) ?? UplinkWidget() }
+    open func createDownlinkWidget(current: Widget? = nil) -> Widget? { (current as? DownlinkWidget) ?? DownlinkWidget() }
     open func createBatteryWidget(current: Widget? = nil) -> Widget? { nil }
     open func createDistanceUserWidget(current: Widget? = nil) -> Widget? { nil }
     open func createDistanceHomeWidget(current: Widget? = nil) -> Widget? { nil }

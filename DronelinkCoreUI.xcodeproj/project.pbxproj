@@ -28,6 +28,9 @@
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
 		E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */; };
 		E4AD4F6725800F9700404783 /* FlightModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F6625800F9700404783 /* FlightModeWidget.swift */; };
+		E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F81258105A600404783 /* GPSWidget.swift */; };
+		E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F9C258115D400404783 /* UplinkWidget.swift */; };
+		E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F9F258115E000404783 /* DownlinkWidget.swift */; };
 		E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB522579247100778068 /* CameraModeControl.swift */; };
 		E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */; };
 		E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */; };
@@ -60,6 +63,9 @@
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeWidget.swift; sourceTree = "<group>"; };
 		E4AD4F6625800F9700404783 /* FlightModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightModeWidget.swift; sourceTree = "<group>"; };
+		E4AD4F81258105A600404783 /* GPSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSWidget.swift; sourceTree = "<group>"; };
+		E4AD4F9C258115D400404783 /* UplinkWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UplinkWidget.swift; sourceTree = "<group>"; };
+		E4AD4F9F258115E000404783 /* DownlinkWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownlinkWidget.swift; sourceTree = "<group>"; };
 		E4F1FB522579247100778068 /* CameraModeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeControl.swift; sourceTree = "<group>"; };
 		E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitSystemControl.swift; sourceTree = "<group>"; };
 		E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureWidget.swift; sourceTree = "<group>"; };
@@ -130,6 +136,9 @@
 				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
 				E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */,
 				E4AD4F6625800F9700404783 /* FlightModeWidget.swift */,
+				E4AD4F81258105A600404783 /* GPSWidget.swift */,
+				E4AD4F9C258115D400404783 /* UplinkWidget.swift */,
+				E4AD4F9F258115E000404783 /* DownlinkWidget.swift */,
 			);
 			path = DronelinkCoreUI;
 			sourceTree = "<group>";
@@ -268,6 +277,7 @@
 				2490A791257EDBB500253F11 /* RTKSettingsWidget.swift in Sources */,
 				2475371D24252FAA00FFC696 /* CameraOffsetsWidget.swift in Sources */,
 				247E09EA244F407500D002A2 /* MicrosoftMapWidget.swift in Sources */,
+				E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */,
 				249F37182576ECF500472A7D /* StatusWidget.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapboxMapWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
@@ -275,10 +285,12 @@
 				E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */,
 				2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */,
 				242AC08623870D4C00438D26 /* TelemetryWidget.swift in Sources */,
+				E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */,
 				24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */,
 				2459751623679D1F008CAB6B /* Extensions.swift in Sources */,
 				24A53CC7248ED29000A0014F /* InstrumentsViewController.swift in Sources */,
 				249F37802577D01800472A7D /* DashboardWidget.swift in Sources */,
+				E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */,
 				249F37342576EF2900472A7D /* Widget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
