@@ -55,16 +55,12 @@
 
 "InstrumentsViewController.empty" = "--";
 
-"TelemetryWidget.distance.prefix" = "D";
-"TelemetryWidget.altitude.prefix" = "A";
-"TelemetryWidget.horizontalSpeed.prefix" = "H/S";
-"TelemetryWidget.verticalSpeed.prefix" = "V/S";
-"TelemetryWidget.unit.distance.metric" = "m";
-"TelemetryWidget.unit.distance.imperial" = "ft";
-"TelemetryWidget.unit.horizontalSpeed.metric" = "km/h";
-"TelemetryWidget.unit.horizontalSpeed.imperial" = "mph";
-"TelemetryWidget.unit.verticalSpeed.metric" = "m/s";
-"TelemetryWidget.unit.verticalSpeed.imperial" = "fps";
+"NumericInstrumentWidget.empty" = "--";
+
+"DistanceWidget.prefix" = "D";
+"AltitudeWidget.prefix" = "A";
+"HorizontalSpeedWidget.prefix" = "H/S";
+"VerticalSpeedWidget.prefix" = "V/S";
 
 "StatusWidget.disconnected" = "Disconnected";
 "StatusWidget.ready" = "All Systems Go";
@@ -76,7 +72,7 @@
 "DashboardWidget.device.legacy.confirm.dismiss" = "Don't Warn Again";
 "DashboardWidget.camera.noSDCard.title" = "SD Card Missing";
 "DashboardWidget.camera.noSDCard.details" = "Please make sure to insert an SD card before running a mission with data capture.";
-"DashboardWidget.cameraGeneralSettings" = "MENU";
+"DashboardWidget.cameraMenu" = "MENU";
 "DashboardWidget.contentSettings" = "Map Options";
 "DashboardWidget.map.mapbox" = "2D (Satellite)";
 "DashboardWidget.map.microsoft" = "3D (Beta)";

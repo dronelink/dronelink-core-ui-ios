@@ -19,10 +19,10 @@
 		247E09EA244F407500D002A2 /* MicrosoftMapWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247E09E9244F407500D002A2 /* MicrosoftMapWidget.swift */; };
 		2490A791257EDBB500253F11 /* RTKSettingsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490A78F257EDBB500253F11 /* RTKSettingsWidget.swift */; };
 		2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490A790257EDBB500253F11 /* RTKStatusWidget.swift */; };
+		2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2492514D257FCACE005F5AC9 /* NumericInstrumentWidget.swift */; };
 		249F37182576ECF500472A7D /* StatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F37172576ECF500472A7D /* StatusWidget.swift */; };
 		249F37342576EF2900472A7D /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F37332576EF2900472A7D /* Widget.swift */; };
 		249F37802577D01800472A7D /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F377F2577D01800472A7D /* DashboardWidget.swift */; };
-		24A53CC7248ED29000A0014F /* InstrumentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A53CC6248ED29000A0014F /* InstrumentsViewController.swift */; };
 		24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */; };
 		24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
@@ -52,10 +52,10 @@
 		247E09E9244F407500D002A2 /* MicrosoftMapWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrosoftMapWidget.swift; sourceTree = "<group>"; };
 		2490A78F257EDBB500253F11 /* RTKSettingsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RTKSettingsWidget.swift; sourceTree = "<group>"; };
 		2490A790257EDBB500253F11 /* RTKStatusWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RTKStatusWidget.swift; sourceTree = "<group>"; };
+		2492514D257FCACE005F5AC9 /* NumericInstrumentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumericInstrumentWidget.swift; sourceTree = "<group>"; };
 		249F37172576ECF500472A7D /* StatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusWidget.swift; sourceTree = "<group>"; };
 		249F37332576EF2900472A7D /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		249F377F2577D01800472A7D /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
-		24A53CC6248ED29000A0014F /* InstrumentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstrumentsViewController.swift; sourceTree = "<group>"; };
 		24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuncExecutorWidget.swift; sourceTree = "<group>"; };
 		24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModeExecutorWidget.swift; sourceTree = "<group>"; };
 		24C355C2F269DEDDB27438E6 /* Pods-DronelinkCoreUI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.release.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.release.xcconfig"; sourceTree = "<group>"; };
@@ -121,11 +121,11 @@
 				2418ACA223ECC18A0099D44C /* DroneOffsetsWidget.swift */,
 				2459751523679D1F008CAB6B /* Extensions.swift */,
 				24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */,
-				24A53CC6248ED29000A0014F /* InstrumentsViewController.swift */,
 				2459752E2367A22D008CAB6B /* MapboxMapWidget.swift */,
 				247E09E9244F407500D002A2 /* MicrosoftMapWidget.swift */,
 				2459751723679DCB008CAB6B /* MissionExecutorWidget.swift */,
 				24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */,
+				2492514D257FCACE005F5AC9 /* NumericInstrumentWidget.swift */,
 				2490A78F257EDBB500253F11 /* RTKSettingsWidget.swift */,
 				2490A790257EDBB500253F11 /* RTKStatusWidget.swift */,
 				249F37172576ECF500472A7D /* StatusWidget.swift */,
@@ -280,6 +280,7 @@
 				E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */,
 				249F37182576ECF500472A7D /* StatusWidget.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapboxMapWidget.swift in Sources */,
+				2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
 				E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */,
 				E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */,
@@ -288,7 +289,6 @@
 				E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */,
 				24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */,
 				2459751623679D1F008CAB6B /* Extensions.swift in Sources */,
-				24A53CC7248ED29000A0014F /* InstrumentsViewController.swift in Sources */,
 				249F37802577D01800472A7D /* DashboardWidget.swift in Sources */,
 				E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */,
 				249F37342576EF2900472A7D /* Widget.swift in Sources */,
