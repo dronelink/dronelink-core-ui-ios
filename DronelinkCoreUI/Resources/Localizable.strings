@@ -72,7 +72,7 @@
 "DashboardWidget.device.legacy.confirm.dismiss" = "Don't Warn Again";
 "DashboardWidget.camera.noSDCard.title" = "SD Card Missing";
 "DashboardWidget.camera.noSDCard.details" = "Please make sure to insert an SD card before running a mission with data capture.";
-"DashboardWidget.cameraGeneralSettings" = "MENU";
+"DashboardWidget.cameraMenu" = "MENU";
 "DashboardWidget.contentSettings" = "Map Options";
 "DashboardWidget.map.mapbox" = "2D (Satellite)";
 "DashboardWidget.map.microsoft" = "3D (Beta)";

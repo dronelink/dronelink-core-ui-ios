@@ -94,8 +94,8 @@ public class DashboardWidget: DelegateWidget {
     private let reticalImageView = UIImageView()
     private let secondaryContentView = UIView()
     private let cameraControlsView = UIView()
-    private let cameraGeneralSettingsButton = UIButton(type: .custom)
-    private let cameraExposureSettingsButton = UIButton(type: .custom)
+    private let cameraMenuButton = UIButton(type: .custom)
+    private let cameraExposureMenuButton = UIButton(type: .custom)
     private let offsetsButton = UIButton(type: .custom)
     private var offsetsButtonEnabled = false
     private var overlayViewController: UIViewController?
@@ -233,22 +233,22 @@ public class DashboardWidget: DelegateWidget {
         cameraControlsView.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.addSubview(cameraControlsView)
         
-        cameraGeneralSettingsButton.setTitle("DashboardWidget.cameraGeneralSettings".localized, for: .normal)
-        cameraGeneralSettingsButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
-        cameraGeneralSettingsButton.addTarget(self, action: #selector(onCameraGeneralSettings(sender:)), for: .touchUpInside)
-        cameraControlsView.addSubview(cameraGeneralSettingsButton)
-        cameraGeneralSettingsButton.snp.makeConstraints { make in
+        cameraMenuButton.setTitle("DashboardWidget.cameraMenu".localized, for: .normal)
+        cameraMenuButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
+        cameraMenuButton.addTarget(self, action: #selector(onCameraMenu(sender:)), for: .touchUpInside)
+        cameraControlsView.addSubview(cameraMenuButton)
+        cameraMenuButton.snp.makeConstraints { make in
             make.top.equalTo(0)
             make.centerX.equalToSuperview()
             make.height.equalTo(48)
             make.width.equalTo(48)
         }
         
-        cameraExposureSettingsButton.tintColor = UIColor.white
-        cameraExposureSettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_tune_white_36pt"), for: .normal)
-        cameraExposureSettingsButton.addTarget(self, action: #selector(onCameraExposureSettings(sender:)), for: .touchUpInside)
-        cameraControlsView.addSubview(cameraExposureSettingsButton)
-        cameraExposureSettingsButton.snp.makeConstraints { make in
+        cameraExposureMenuButton.tintColor = UIColor.white
+        cameraExposureMenuButton.setImage(DronelinkUI.loadImage(named: "baseline_tune_white_36pt"), for: .normal)
+        cameraExposureMenuButton.addTarget(self, action: #selector(onCameraExposureMenu(sender:)), for: .touchUpInside)
+        cameraControlsView.addSubview(cameraExposureMenuButton)
+        cameraExposureMenuButton.snp.makeConstraints { make in
             make.bottom.equalToSuperview().offset(-12)
             make.centerX.equalToSuperview()
             make.height.equalTo(28)
@@ -328,21 +328,15 @@ public class DashboardWidget: DelegateWidget {
         }
     }
     
-    @objc func onCameraGeneralSettings(sender: Any) {
-        if let widget = widgetFactory.createCameraGeneralSettingsWidget(current: nil) {
+    @objc func onCameraMenu(sender: Any) {
+        if let widget = widgetFactory.createCameraMenuWidget(current: nil) {
             showOverlay(viewController: widget)
-        }
-        else {
-            //FIXME show message that it isn't implemented yet
         }
     }
     
-    @objc func onCameraExposureSettings(sender: Any) {
-        if let widget = widgetFactory.createCameraExposureSettingsWidget(current: nil) {
+    @objc func onCameraExposureMenu(sender: Any) {
+        if let widget = widgetFactory.createCameraExposureMenuWidget(current: nil) {
             showOverlay(viewController: widget)
-        }
-        else {
-            //FIXME show message that it isn't implemented yet
         }
     }
     
@@ -698,7 +692,7 @@ public class DashboardWidget: DelegateWidget {
         
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
-            make.top.equalTo(cameraGeneralSettingsButton.snp.bottom).offset(-6)
+            make.top.equalTo(cameraMenuButton.snp.bottom).offset(-6)
             make.left.equalToSuperview().offset(2)
             make.right.equalToSuperview().offset(-2)
         }
@@ -708,7 +702,7 @@ public class DashboardWidget: DelegateWidget {
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(cameraCaptureWidget!.view.snp.width)
-            make.bottom.equalTo(cameraExposureSettingsButton.snp.top).offset(-12)
+            make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-12)
         }
 
         compassWidget = refreshWidget(current: compassWidget, next: widgetFactory.createCompassWidget(current: compassWidget))
@@ -790,6 +784,9 @@ public class DashboardWidget: DelegateWidget {
                 }
             }
         }
+        
+        cameraMenuButton.isEnabled = widgetFactory.cameraMenuWidgetEnabled
+        cameraExposureMenuButton.isEnabled = widgetFactory.cameraExposureMenuWidgetEnabled
 
         cameraControlsView.snp.remakeConstraints { make in
             make.centerY.equalTo(primaryContentView.snp.centerY)

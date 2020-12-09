@@ -47,7 +47,7 @@ public class RTKStatusWidget: Widget {
             return
         }
         
-        if let widget = widgetFactory.createRTKSettingsWidget(current: nil) as? RTKSettingsWidget {
+        if let widget = widgetFactory.createRTKMenuWidget(current: nil) as? RTKSettingsWidget {
             widget.set(manager: manager)
             present(widget, animated: true, completion: nil)
         }

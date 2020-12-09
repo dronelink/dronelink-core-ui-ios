@@ -244,7 +244,8 @@ open class WidgetFactory {
     open func createHorizontalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? HorizontalSpeedWidget) ?? HorizontalSpeedWidget() }
     open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? VerticalSpeedWidget) ?? VerticalSpeedWidget() }
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
-    open func createCameraGeneralSettingsWidget(current: Widget? = nil) -> Widget? { nil }
+    open var cameraMenuWidgetEnabled: Bool { false }
+    open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
@@ -252,8 +253,9 @@ open class WidgetFactory {
     open func createCameraFocusModeWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraModeWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraCaptureWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraExposureSettingsWidget(current: Widget? = nil) -> Widget? { nil }
+    open var cameraExposureMenuWidgetEnabled: Bool { false }
+    open func createCameraExposureMenuWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createRTKSettingsWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createRTKMenuWidget(current: Widget? = nil) -> Widget? { nil }
 }
