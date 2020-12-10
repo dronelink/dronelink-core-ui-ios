@@ -6,10 +6,12 @@
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
 import UIKit
+import AVFoundation
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
+import MaterialComponents.MaterialActivityIndicator
 import MarqueeLabel
 
 public class CameraCaptureWidget: UpdatableWidget {
@@ -19,6 +21,8 @@ public class CameraCaptureWidget: UpdatableWidget {
     public var countIndicatorLabel: UILabel?
     private var stopCameraCaptureCommand: Kernel.StopCaptureCameraCommand?
     private var startCameraCaptureCommand: Kernel.StartCaptureCameraCommand?
+    
+    public var activityIndicator: MDCActivityIndicator?
     
     private var captureIcon = DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysTemplate)
     private var stopIcon = DronelinkUI.loadImage(named: "stopIcon")?.withRenderingMode(.alwaysOriginal)
@@ -31,7 +35,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     private var panoModeImage = DronelinkUI.loadImage(named: "panoMode")?.withRenderingMode(.alwaysTemplate)
     
     private var originalDate: Date?
-    private var timer : Timer?
+    private var videoTimer : Timer?
     
     public var videoTimeLabel: UILabel?
     
@@ -42,6 +46,18 @@ public class CameraCaptureWidget: UpdatableWidget {
         configCaptureButton()
         view.addSubview(captureButton!)
         captureButton?.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(5)
+            make.left.equalToSuperview()
+            make.right.equalToSuperview()
+            make.bottom.equalToSuperview().offset(-15)
+        }
+        
+        activityIndicator = MDCActivityIndicator()
+        activityIndicator?.cycleColors = [.darkGray]
+        activityIndicator?.indicatorMode = .indeterminate
+        activityIndicator?.isUserInteractionEnabled = false
+        view.addSubview(activityIndicator!)
+        activityIndicator?.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
@@ -74,7 +90,6 @@ public class CameraCaptureWidget: UpdatableWidget {
         videoTimeLabel?.textAlignment = .center
         videoTimeLabel?.isUserInteractionEnabled = false
         videoTimeLabel?.font = UIFont.systemFont(ofSize: 12)
-        videoTimeLabel?.text = "00.00"
         videoTimeLabel?.isHidden = true
         view.addSubview(videoTimeLabel!)
         videoTimeLabel?.snp.makeConstraints { make in
@@ -85,10 +100,10 @@ public class CameraCaptureWidget: UpdatableWidget {
         }
     }
     
-    private func initializeTimer() {
+    private func initializeVideoTimer() {
         originalDate = Date()
         videoTimeLabel?.text = "00.00"
-        self.timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector:#selector(self.getCurrentTime) , userInfo: nil, repeats: true)
+        self.videoTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector:#selector(self.getCurrentTime) , userInfo: nil, repeats: true)
     }
     
     @objc private func getCurrentTime() {
@@ -121,6 +136,10 @@ public class CameraCaptureWidget: UpdatableWidget {
         } else {
             cmd = Kernel.StartCaptureCameraCommand()
             self.startCameraCaptureCommand = cmd as! Kernel.StartCaptureCameraCommand
+            
+            if session?.cameraState(channel: 0)?.value.mode == .photo {
+                activityIndicator?.startAnimating()
+            }
         }
         try? self.session?.add(command: cmd)
     }
@@ -191,12 +210,19 @@ public class CameraCaptureWidget: UpdatableWidget {
             self.startCameraCaptureCommand = nil
             DispatchQueue.main.async {
                 self.captureButton?.isEnabled = (command.id == startCameraCommand.id)
+                
                 guard let mode = (session.cameraState(channel: 0)?.value.mode) else {return}
                 
                 if mode == .video && error == nil {
-                    self.initializeTimer()
+                    
+                    self.initializeVideoTimer()
                     self.videoTimeLabel?.isHidden = false
                     self.captureButton?.setImage(self.stopIcon, for: .normal)
+                    
+                } else if mode == .photo {
+                    
+                    self.activityIndicator?.stopAnimating()
+                    AudioServicesPlaySystemSound(1108)
                 }
                 
             }
@@ -208,8 +234,8 @@ public class CameraCaptureWidget: UpdatableWidget {
                 guard let mode = (session.cameraState(channel: 0)?.value.mode) else {return}
                 
                 if mode == .video && error == nil {
-                    self.timer?.invalidate()
-                    self.timer = nil
+                    self.videoTimer?.invalidate()
+                    self.videoTimer = nil
                     self.videoTimeLabel?.isHidden = true
                     self.captureButton?.setImage(self.captureIcon, for: .normal)
                 }
