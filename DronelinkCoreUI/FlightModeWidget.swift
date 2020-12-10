@@ -34,10 +34,10 @@ public class FlightModeWidget: UpdatableWidget {
         flightModeLabel = UILabel()
         flightModeLabel?.textColor = .white
         flightModeLabel?.textAlignment = .left
-        flightModeLabel?.font = UIFont.systemFont(ofSize: 10)
+        flightModeLabel?.font = UIFont.systemFont(ofSize: 14)
         view.addSubview(flightModeLabel!)
         flightModeLabel?.snp.makeConstraints { make in
-            make.left.equalTo(flightModeImageView?.bounds.size.width ?? 0)
+            make.left.equalTo(flightModeImageView!.snp.right).offset(5)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()

@@ -236,7 +236,7 @@ open class WidgetFactory {
     open func createVisionWidget(current: Widget? = nil) -> Widget? { nil }
     open func createUplinkWidget(current: Widget? = nil) -> Widget? { (current as? UplinkWidget) ?? UplinkWidget() }
     open func createDownlinkWidget(current: Widget? = nil) -> Widget? { (current as? DownlinkWidget) ?? DownlinkWidget() }
-    open func createBatteryWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createBatteryWidget(current: Widget? = nil) -> Widget? { (current as? BatteryWidget) ?? BatteryWidget() }
     open func createDistanceWidget(current: Widget? = nil) -> Widget? { (current as? DistanceWidget) ?? DistanceWidget()  }
     open func createDistanceHomeWidget(current: Widget? = nil) -> Widget? { (current as? DistanceHomeWidget) ?? DistanceHomeWidget() }
     open func createDistanceUserWidget(current: Widget? = nil) -> Widget? { (current as? DistanceUserWidget) ?? DistanceUserWidget() }

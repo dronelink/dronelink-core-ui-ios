@@ -31,7 +31,8 @@
 		E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F81258105A600404783 /* GPSWidget.swift */; };
 		E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F9C258115D400404783 /* UplinkWidget.swift */; };
 		E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F9F258115E000404783 /* DownlinkWidget.swift */; };
-		E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB522579247100778068 /* CameraModeControl.swift */; };
+		E4AD50042581547200404783 /* BatteryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD50032581547100404783 /* BatteryWidget.swift */; };
+		E4AD501F258167F600404783 /* GenericSignalWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD501E258167F600404783 /* GenericSignalWidget.swift */; };
 		E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */; };
 		E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */; };
 /* End PBXBuildFile section */
@@ -66,7 +67,8 @@
 		E4AD4F81258105A600404783 /* GPSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSWidget.swift; sourceTree = "<group>"; };
 		E4AD4F9C258115D400404783 /* UplinkWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UplinkWidget.swift; sourceTree = "<group>"; };
 		E4AD4F9F258115E000404783 /* DownlinkWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownlinkWidget.swift; sourceTree = "<group>"; };
-		E4F1FB522579247100778068 /* CameraModeControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeControl.swift; sourceTree = "<group>"; };
+		E4AD50032581547100404783 /* BatteryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatteryWidget.swift; sourceTree = "<group>"; };
+		E4AD501E258167F600404783 /* GenericSignalWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericSignalWidget.swift; sourceTree = "<group>"; };
 		E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitSystemControl.swift; sourceTree = "<group>"; };
 		E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -113,7 +115,6 @@
 		2459750123679A9D008CAB6B /* DronelinkCoreUI */ = {
 			isa = PBXGroup;
 			children = (
-				E4F1FB522579247100778068 /* CameraModeControl.swift */,
 				E4F1FB6C25793F6000778068 /* UnitSystemControl.swift */,
 				2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */,
 				249F377F2577D01800472A7D /* DashboardWidget.swift */,
@@ -139,6 +140,8 @@
 				E4AD4F81258105A600404783 /* GPSWidget.swift */,
 				E4AD4F9C258115D400404783 /* UplinkWidget.swift */,
 				E4AD4F9F258115E000404783 /* DownlinkWidget.swift */,
+				E4AD50032581547100404783 /* BatteryWidget.swift */,
+				E4AD501E258167F600404783 /* GenericSignalWidget.swift */,
 			);
 			path = DronelinkCoreUI;
 			sourceTree = "<group>";
@@ -269,11 +272,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */,
+				E4AD50042581547200404783 /* BatteryWidget.swift in Sources */,
 				E4AD4F6725800F9700404783 /* FlightModeWidget.swift in Sources */,
 				E4F1FB6D25793F6000778068 /* UnitSystemControl.swift in Sources */,
 				2418ACA323ECC18A0099D44C /* DroneOffsetsWidget.swift in Sources */,
 				2459751823679DCB008CAB6B /* MissionExecutorWidget.swift in Sources */,
 				24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */,
+				E4AD501F258167F600404783 /* GenericSignalWidget.swift in Sources */,
 				2490A791257EDBB500253F11 /* RTKSettingsWidget.swift in Sources */,
 				2475371D24252FAA00FFC696 /* CameraOffsetsWidget.swift in Sources */,
 				247E09EA244F407500D002A2 /* MicrosoftMapWidget.swift in Sources */,
@@ -283,7 +288,6 @@
 				2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
 				E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */,
-				E4F1FB532579247100778068 /* CameraModeControl.swift in Sources */,
 				2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */,
 				242AC08623870D4C00438D26 /* TelemetryWidget.swift in Sources */,
 				E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */,

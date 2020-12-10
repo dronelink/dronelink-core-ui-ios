@@ -122,7 +122,7 @@ public class DashboardWidget: DelegateWidget {
     private var batteryWidget: Widget?
     private var primaryIndicatorWidgets: [(widget: Widget, widthRatio: CGFloat)] {
         var widgets: [(widget: Widget, widthRatio: CGFloat)] = []
-        if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 4.5)) }
+        if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 5.5)) }
         if let widget = gpsWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = visionWidget { widgets.append((widget: widget, widthRatio: 1.35)) }
         if let widget = uplinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
@@ -702,7 +702,7 @@ public class DashboardWidget: DelegateWidget {
         cameraCaptureWidget?.view.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.height.equalTo(cameraCaptureWidget!.view.snp.width)
+            make.height.equalTo(cameraCaptureWidget!.view.snp.width).offset(20)
             make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-12)
         }
 
