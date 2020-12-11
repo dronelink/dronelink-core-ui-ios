@@ -183,15 +183,18 @@ public class CameraCaptureWidget: UpdatableWidget {
         guard let photoMode = (session?.cameraState(channel: 0)?.value.photoMode) else {return}
         configCaptureModeImage(mode: photoMode)
         
-        let videoTimeInSeconds = session?.cameraState(channel: 0)?.value.currentVideoTimeInSeconds ?? 0
+        let videoTimeInSeconds = session?.cameraState(channel: 0)?.value.currentVideoTime ?? 0
         
-        videoTimeLabel.text = String(format:"%02d:%02d", (videoTimeInSeconds / 60), (videoTimeInSeconds % 60))
+        videoTimeLabel.text = String(format:"%02d:%02d", (Int(videoTimeInSeconds) / 60), (Int(videoTimeInSeconds) % 60))
     }
     
     public override func onClosed(session: DroneSession) {
         super.onClosed(session: session)
         DispatchQueue.main.async {
             self.captureButton.isEnabled = false
+            self.captureButton.setImage(self.captureIcon, for: .normal)
+            self.captureButton.tintColor = .white
+            self.videoTimeLabel.isHidden = true
         }
     }
     

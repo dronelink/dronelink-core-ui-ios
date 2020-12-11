@@ -28,6 +28,7 @@ public class CameraModeWidget: UpdatableWidget {
         
         configCameraModeButton()
         view.addSubview(cameraModeButton)
+        cameraModeButton.isEnabled = false
         cameraModeButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview().offset(5)
@@ -37,7 +38,7 @@ public class CameraModeWidget: UpdatableWidget {
     }
     
     private func configCameraModeButton() {
-        cameraModeButton.setImage( (session?.cameraState(channel: 0)?.value.mode == .photo) ? cameraPhotoImage : cameraVideoImage, for: .normal)
+        cameraModeButton.setImage( (session?.cameraState(channel: 0)?.value.mode == .video) ? cameraVideoImage : cameraPhotoImage, for: .normal)
         cameraModeButton.tintColor = .white
         cameraModeButton.addTarget(self, action: #selector(cameraModeButtonClicked(_:)), for: .touchUpInside)
     }
@@ -65,11 +66,14 @@ public class CameraModeWidget: UpdatableWidget {
         guard let cameraMode = (session?.cameraState(channel: 0)?.value.mode) else {return}
         
         cameraModeButton.setImage( ( cameraMode == .video) ? cameraVideoImage : cameraPhotoImage, for: .normal)
+        
+        cameraModeButton.isEnabled = !(session?.cameraState(channel: 0)?.value.isCapturing ?? false)
     }
     
     public override func onClosed(session: DroneSession) {
         super.onClosed(session: session)
         DispatchQueue.main.async {
+            self.cameraModeButton.setImage(self.cameraPhotoImage, for: .normal)
             self.cameraModeButton.isEnabled = false
         }
     }
