@@ -16,84 +16,81 @@ import MarqueeLabel
 
 public class CameraCaptureWidget: UpdatableWidget {
     
-    public var captureButton: UIButton?
-    public var captureModeImageView: UIImageView?
-    public var countIndicatorLabel: UILabel?
+    public let captureButton = UIButton()
+    public let captureModeImageView = UIImageView()
+    public let countIndicatorLabel = UILabel()
     private var stopCameraCaptureCommand: Kernel.StopCaptureCameraCommand?
     private var startCameraCaptureCommand: Kernel.StartCaptureCameraCommand?
     
-    public var activityIndicator: MDCActivityIndicator?
+    public let activityIndicator = MDCActivityIndicator()
     
-    private var captureIcon = DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysTemplate)
-    private var stopIcon = DronelinkUI.loadImage(named: "stopIcon")?.withRenderingMode(.alwaysOriginal)
+    public let captureIcon = DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysTemplate)
+    public let stopIcon = DronelinkUI.loadImage(named: "stopIcon")?.withRenderingMode(.alwaysOriginal)
     
-    private var aebModeImage = DronelinkUI.loadImage(named: "aebMode")?.withRenderingMode(.alwaysTemplate)
-    private var burstModeImage = DronelinkUI.loadImage(named: "burstMode")?.withRenderingMode(.alwaysTemplate)
-    private var hdrModeImage = DronelinkUI.loadImage(named: "hdrMode")?.withRenderingMode(.alwaysTemplate)
-    private var hyperModeImage = DronelinkUI.loadImage(named: "hyperMode")?.withRenderingMode(.alwaysTemplate)
-    private var timerModeImage = DronelinkUI.loadImage(named: "timerMode")?.withRenderingMode(.alwaysTemplate)
-    private var panoModeImage = DronelinkUI.loadImage(named: "panoMode")?.withRenderingMode(.alwaysTemplate)
+    public let aebModeImage = DronelinkUI.loadImage(named: "aebMode")?.withRenderingMode(.alwaysTemplate)
+    public let burstModeImage = DronelinkUI.loadImage(named: "burstMode")?.withRenderingMode(.alwaysTemplate)
+    public let hdrModeImage = DronelinkUI.loadImage(named: "hdrMode")?.withRenderingMode(.alwaysTemplate)
+    public let hyperModeImage = DronelinkUI.loadImage(named: "hyperMode")?.withRenderingMode(.alwaysTemplate)
+    public let timerModeImage = DronelinkUI.loadImage(named: "timerMode")?.withRenderingMode(.alwaysTemplate)
+    public let panoModeImage = DronelinkUI.loadImage(named: "panoMode")?.withRenderingMode(.alwaysTemplate)
     
-    private var originalDate: Date?
-    private var videoTimer : Timer?
+    public let videoTimeLabel = UILabel()
     
-    public var videoTimeLabel: UILabel?
+    private var cameraIsCapturing: Bool {
+        session?.cameraState(channel: 0)?.value.isCapturing ?? false
+    }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        captureButton = UIButton()
         configCaptureButton()
-        view.addSubview(captureButton!)
-        captureButton?.snp.makeConstraints { make in
+        captureButton.isEnabled = false
+        view.addSubview(captureButton)
+        captureButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview().offset(-15)
         }
         
-        activityIndicator = MDCActivityIndicator()
-        activityIndicator?.cycleColors = [.darkGray]
-        activityIndicator?.indicatorMode = .indeterminate
-        activityIndicator?.isUserInteractionEnabled = false
-        view.addSubview(activityIndicator!)
-        activityIndicator?.snp.makeConstraints { make in
+        activityIndicator.cycleColors = [.darkGray]
+        activityIndicator.indicatorMode = .indeterminate
+        activityIndicator.isUserInteractionEnabled = false
+        view.addSubview(activityIndicator)
+        activityIndicator.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview().offset(-15)
         }
         
-        captureModeImageView = UIImageView()
-        captureModeImageView?.tintColor = .black
-        captureModeImageView?.contentMode = .scaleAspectFit
-        captureModeImageView?.isUserInteractionEnabled = false
-        view.addSubview(captureModeImageView!)
-        captureModeImageView?.snp.makeConstraints { make in
-            make.center.equalTo(captureButton!.snp.center)
+        captureModeImageView.tintColor = .black
+        captureModeImageView.contentMode = .scaleAspectFit
+        captureModeImageView.isUserInteractionEnabled = false
+        view.addSubview(captureModeImageView)
+        captureModeImageView.snp.makeConstraints { make in
+            make.center.equalTo(captureButton.snp.center)
             make.height.equalTo(20)
             make.width.equalTo(20)
         }
         
-        countIndicatorLabel = UILabel()
-        countIndicatorLabel?.textColor = .black
-        countIndicatorLabel?.isUserInteractionEnabled = false
-        countIndicatorLabel?.font = UIFont.systemFont(ofSize: 10)
-        view.addSubview(countIndicatorLabel!)
-        countIndicatorLabel?.textAlignment = .right
-        countIndicatorLabel?.snp.makeConstraints { make in
+        countIndicatorLabel.textColor = .black
+        countIndicatorLabel.isUserInteractionEnabled = false
+        countIndicatorLabel.font = UIFont.systemFont(ofSize: 10)
+        view.addSubview(countIndicatorLabel)
+        countIndicatorLabel.textAlignment = .right
+        countIndicatorLabel.snp.makeConstraints { make in
             make.edges.equalToSuperview().offset(-5)
         }
         
-        videoTimeLabel = UILabel()
-        videoTimeLabel?.textColor = .white
-        videoTimeLabel?.textAlignment = .center
-        videoTimeLabel?.isUserInteractionEnabled = false
-        videoTimeLabel?.font = UIFont.systemFont(ofSize: 12)
-        videoTimeLabel?.isHidden = true
-        view.addSubview(videoTimeLabel!)
-        videoTimeLabel?.snp.makeConstraints { make in
-            make.top.equalTo(captureButton!.snp.bottom).offset(5)
+        videoTimeLabel.textColor = .white
+        videoTimeLabel.textAlignment = .center
+        videoTimeLabel.isUserInteractionEnabled = false
+        videoTimeLabel.font = UIFont.systemFont(ofSize: 12)
+        videoTimeLabel.isHidden = true
+        view.addSubview(videoTimeLabel)
+        videoTimeLabel.snp.makeConstraints { make in
+            make.top.equalTo(captureButton.snp.bottom).offset(5)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -101,36 +98,21 @@ public class CameraCaptureWidget: UpdatableWidget {
     }
     
     private func initializeVideoTimer() {
-        originalDate = Date()
-        videoTimeLabel?.text = "00.00"
-        self.videoTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector:#selector(self.getCurrentTime) , userInfo: nil, repeats: true)
-    }
-    
-    @objc private func getCurrentTime() {
-        guard let original = originalDate else {return}
-        let now = Date()
-        let minutes = Calendar.current.dateComponents([.minute], from: original, to: now).minute
-        let seconds = Calendar.current.dateComponents([.second], from: original, to: now).second
-        videoTimeLabel?.text = String(format:"%02d:%02d", (minutes ?? 0), (seconds ?? 0))
+        videoTimeLabel.text = "00.00".localized
     }
     
     private func configCaptureButton() {
-        captureButton?.setImage(captureIcon, for: .normal)
-        captureButton?.addTarget(self, action: #selector(captureButtonClicked(_:)), for: .touchUpInside)
-    }
-    
-    private func cameraIsCapturing() -> Bool {
-        // Check if the camera is capturing
-        return session?.cameraState(channel: 0)?.value.isCapturing == true
+        captureButton.setImage(captureIcon, for: .normal)
+        captureButton.addTarget(self, action: #selector(captureButtonClicked(_:)), for: .touchUpInside)
     }
     
     @objc func captureButtonClicked (_ sender:UIButton) {
         // If camera is capturing then add stop capture command else add start capture command
-        captureButton?.isEnabled = false
+        captureButton.isEnabled = false
         
         var cmd: KernelCommand
         
-        if cameraIsCapturing() {
+        if cameraIsCapturing {
             cmd = Kernel.StopCaptureCameraCommand()
             self.stopCameraCaptureCommand = cmd as! Kernel.StopCaptureCameraCommand
         } else {
@@ -138,7 +120,7 @@ public class CameraCaptureWidget: UpdatableWidget {
             self.startCameraCaptureCommand = cmd as! Kernel.StartCaptureCameraCommand
             
             if session?.cameraState(channel: 0)?.value.mode == .photo {
-                activityIndicator?.startAnimating()
+                activityIndicator.startAnimating()
             }
         }
         try? self.session?.add(command: cmd)
@@ -177,69 +159,91 @@ public class CameraCaptureWidget: UpdatableWidget {
             }
             
             if let modeImage = image {
-                captureModeImageView?.isHidden = false
-                captureModeImageView?.image = modeImage
+                captureModeImageView.isHidden = false
+                captureModeImageView.image = modeImage
             } else {
-                captureModeImageView?.isHidden = true
+                captureModeImageView.isHidden = true
             }
             
             if count != "" {
-                countIndicatorLabel?.isHidden = false
-                countIndicatorLabel?.text = count
+                countIndicatorLabel.isHidden = false
+                countIndicatorLabel.text = count
             } else {
-                countIndicatorLabel?.isHidden = true
+                countIndicatorLabel.isHidden = true
             }
         } else {
-            captureModeImageView?.isHidden = true
-            countIndicatorLabel?.isHidden = true
+            captureModeImageView.isHidden = true
+            countIndicatorLabel.isHidden = true
         }
     }
     
     @objc public override func update() {
         super.update()
-        captureButton?.tintColor = (session?.cameraState(channel: 0)?.value.mode == .photo) ? .white : .red
+        captureButton.tintColor = (session?.cameraState(channel: 0)?.value.mode == .video) ? .red : .white
         guard let photoMode = (session?.cameraState(channel: 0)?.value.photoMode) else {return}
         configCaptureModeImage(mode: photoMode)
+        
+        let videoTimeInSeconds = session?.cameraState(channel: 0)?.value.currentVideoTimeInSeconds ?? 0
+        
+        videoTimeLabel.text = String(format:"%02d:%02d", (videoTimeInSeconds / 60), (videoTimeInSeconds % 60))
+    }
+    
+    public override func onClosed(session: DroneSession) {
+        super.onClosed(session: session)
+        DispatchQueue.main.async {
+            self.captureButton.isEnabled = false
+        }
+    }
+    
+    public override func onOpened(session: DroneSession) {
+        super.onOpened(session: session)
+        DispatchQueue.main.async {
+            self.captureButton.isEnabled = true
+        }
     }
     
     public override func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {
         
         super.onCommandFinished(session: session, command: command, error: error)
         
-        if let startCameraCommand = self.startCameraCaptureCommand {
-            self.startCameraCaptureCommand = nil
-            DispatchQueue.main.async {
-                self.captureButton?.isEnabled = (command.id == startCameraCommand.id)
-                
-                guard let mode = (session.cameraState(channel: 0)?.value.mode) else {return}
-                
-                if mode == .video && error == nil {
+        if error != nil {
+            DronelinkUI.shared.showSnackbar(text: error?.localizedDescription ?? "Unknown Error".localized)
+        } else {
+            if let startCameraCommand = self.startCameraCaptureCommand {
+                self.startCameraCaptureCommand = nil
+                DispatchQueue.main.async {
+                    self.captureButton.isEnabled = (command.id == startCameraCommand.id)
                     
-                    self.initializeVideoTimer()
-                    self.videoTimeLabel?.isHidden = false
-                    self.captureButton?.setImage(self.stopIcon, for: .normal)
+                    guard let mode = (session.cameraState(channel: 0)?.value.mode) else {return}
                     
-                } else if mode == .photo {
+                    if mode == .video {
+                        
+                        self.initializeVideoTimer()
+                        self.videoTimeLabel.isHidden = false
+                        self.captureButton.setImage(self.stopIcon, for: .normal)
+                        
+                    } else if mode == .photo {
+                        
+                        self.activityIndicator.stopAnimating()
+                        AudioServicesPlaySystemSound(1108)
+                    }
                     
-                    self.activityIndicator?.stopAnimating()
-                    AudioServicesPlaySystemSound(1108)
                 }
-                
-            }
-        } else if let stopCameraCommand = self.stopCameraCaptureCommand {
-            self.stopCameraCaptureCommand = nil
-            DispatchQueue.main.async {
-                self.captureButton?.isEnabled = (command.id == stopCameraCommand.id)
-                
-                guard let mode = (session.cameraState(channel: 0)?.value.mode) else {return}
-                
-                if mode == .video && error == nil {
-                    self.videoTimer?.invalidate()
-                    self.videoTimer = nil
-                    self.videoTimeLabel?.isHidden = true
-                    self.captureButton?.setImage(self.captureIcon, for: .normal)
+            } else if let stopCameraCommand = self.stopCameraCaptureCommand {
+                self.stopCameraCaptureCommand = nil
+                DispatchQueue.main.async {
+                    self.captureButton.isEnabled = (command.id == stopCameraCommand.id)
+                    
+                    guard let mode = (session.cameraState(channel: 0)?.value.mode) else {return}
+                    
+                    if mode == .video && error == nil {
+                        self.videoTimeLabel.isHidden = true
+                        self.captureButton.setImage(self.captureIcon, for: .normal)
+                    }
                 }
             }
         }
+        
+        
       }
 }

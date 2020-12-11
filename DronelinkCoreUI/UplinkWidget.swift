@@ -19,7 +19,7 @@ public class UplinkWidget: GenericSignalWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        iconImageView?.image = DronelinkUI.loadImage(named: "upLinkIcon")?.withRenderingMode(.alwaysOriginal)
+        iconImageView.image = DronelinkUI.loadImage(named: "upLinkIcon")?.withRenderingMode(.alwaysOriginal)
     }
     
     @objc public override func update() {

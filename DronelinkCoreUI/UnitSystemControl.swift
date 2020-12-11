@@ -40,8 +40,12 @@ public class UnitSystemControl: UISegmentedControl {
     }
     
     @objc func segmentedControlValueChanged(segment: UISegmentedControl) {
-        var command = Kernel.UnitSystemCommand()
-        command.unit = segment.selectedSegmentIndex == 0 ? .metric : .imperial
-        try? self.droneSessionManager.session?.add(command: command)
+        
+        Dronelink.shared.unitSystem = segment.selectedSegmentIndex == 0 ? .metric : .imperial
+        
+        // TODO: We need to implement some changes in the Kernel in order to change the Unit System
+//        var command = Kernel.UnitSystemCommand()
+//        command.unit = segment.selectedSegmentIndex == 0 ? .metric : .imperial
+//        try? self.droneSessionManager.session?.add(command: command)
     }
 }

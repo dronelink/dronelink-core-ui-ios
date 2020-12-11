@@ -16,19 +16,19 @@ import MarqueeLabel
 
 public class CameraModeWidget: UpdatableWidget {
     
-    public var cameraModeButton: UIButton?
+    public let cameraModeButton = UIButton()
     
-    private let cameraPhotoImage = DronelinkUI.loadImage(named: "cameraPhotoMode")?.withRenderingMode(.alwaysTemplate)
-    private let cameraVideoImage = DronelinkUI.loadImage(named: "cameraVideoMode")?.withRenderingMode(.alwaysTemplate)
+    public let cameraPhotoImage = DronelinkUI.loadImage(named: "cameraPhotoMode")?.withRenderingMode(.alwaysTemplate)
+    public let cameraVideoImage = DronelinkUI.loadImage(named: "cameraVideoMode")?.withRenderingMode(.alwaysTemplate)
     
     private var modeCameraCommand: Kernel.ModeCameraCommand?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        cameraModeButton = UIButton()
+        
         configCameraModeButton()
-        view.addSubview(cameraModeButton!)
-        cameraModeButton?.snp.makeConstraints { make in
+        view.addSubview(cameraModeButton)
+        cameraModeButton.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview().offset(5)
             make.right.equalToSuperview().offset(-5)
@@ -37,9 +37,9 @@ public class CameraModeWidget: UpdatableWidget {
     }
     
     private func configCameraModeButton() {
-        cameraModeButton?.setImage( (session?.cameraState(channel: 0)?.value.mode == .photo) ? cameraPhotoImage : cameraVideoImage, for: .normal)
-        cameraModeButton?.tintColor = .white
-        cameraModeButton?.addTarget(self, action: #selector(cameraModeButtonClicked(_:)), for: .touchUpInside)
+        cameraModeButton.setImage( (session?.cameraState(channel: 0)?.value.mode == .photo) ? cameraPhotoImage : cameraVideoImage, for: .normal)
+        cameraModeButton.tintColor = .white
+        cameraModeButton.addTarget(self, action: #selector(cameraModeButtonClicked(_:)), for: .touchUpInside)
     }
     
     private func cameraIsInPhotoMode() -> Bool {
@@ -48,7 +48,7 @@ public class CameraModeWidget: UpdatableWidget {
     
     @objc func cameraModeButtonClicked (_ sender:UIButton) {
         
-        cameraModeButton?.isEnabled = false
+        cameraModeButton.isEnabled = false
         
         var cmd = Kernel.ModeCameraCommand()
         
@@ -64,7 +64,21 @@ public class CameraModeWidget: UpdatableWidget {
         
         guard let cameraMode = (session?.cameraState(channel: 0)?.value.mode) else {return}
         
-        cameraModeButton?.setImage( ( cameraMode == .photo) ? cameraPhotoImage : cameraVideoImage, for: .normal)
+        cameraModeButton.setImage( ( cameraMode == .video) ? cameraVideoImage : cameraPhotoImage, for: .normal)
+    }
+    
+    public override func onClosed(session: DroneSession) {
+        super.onClosed(session: session)
+        DispatchQueue.main.async {
+            self.cameraModeButton.isEnabled = false
+        }
+    }
+    
+    public override func onOpened(session: DroneSession) {
+        super.onOpened(session: session)
+        DispatchQueue.main.async {
+            self.cameraModeButton.isEnabled = true
+        }
     }
     
     public override func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {
@@ -78,7 +92,7 @@ public class CameraModeWidget: UpdatableWidget {
         self.modeCameraCommand = nil
         
         DispatchQueue.main.async {
-            self.cameraModeButton?.isEnabled = (command.id == cameraModeCommand.id)
+            self.cameraModeButton.isEnabled = (command.id == cameraModeCommand.id)
         }
       }
 }

@@ -19,8 +19,8 @@ public class DownlinkWidget: GenericSignalWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        iconImageView?.image = DronelinkUI.loadImage(named: "downLinkIcon")?.withRenderingMode(.alwaysTemplate)
-        iconImageView?.tintColor = .white
+        iconImageView.image = DronelinkUI.loadImage(named: "downLinkIcon")?.withRenderingMode(.alwaysTemplate)
+        iconImageView.tintColor = .white
     }
     
     @objc public override func update() {
