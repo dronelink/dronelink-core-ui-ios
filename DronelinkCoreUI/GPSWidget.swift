@@ -60,6 +60,7 @@ public class GPSWidget: UpdatableWidget {
     private func updateGpsSignal(signalValue: Kernel.GPSSignalLevel) {
         
         gpsSignalLevelLabel.text = signalValue.rawValue
+        gpsSignalLevelLabel.isHidden = signalValue == .none
         
         switch signalValue {
         case ._0:
