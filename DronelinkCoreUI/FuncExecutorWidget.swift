@@ -287,22 +287,31 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             make.top.equalToSuperview().offset(45)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            switch input?.variable.valueType ?? .null {
-            case .null:
-                make.bottom.equalToSuperview().offset(tablet ? -120 : -115)
-                break
-            case .boolean, .number, .string:
-                make.bottom.equalToSuperview().offset(tablet ? -155 : -125)
-                break
-            case .drone:
-                make.bottom.equalToSuperview().offset(tablet ? -205 : -160)
-                break
+            if intro, !(funcExecutor?.introImageUrl?.isEmpty ?? true) {
+                make.bottom.equalToSuperview().offset(tablet ? -50 : -45)
+            }
+            else {
+                switch input?.variable.valueType ?? .null {
+                case .null:
+                    make.bottom.equalToSuperview().offset(tablet ? -120 : -115)
+                    break
+                case .boolean, .number, .string:
+                    make.bottom.equalToSuperview().offset(tablet ? -155 : -125)
+                    break
+                case .drone:
+                    make.bottom.equalToSuperview().offset(tablet ? -205 : -160)
+                    break
+                }
             }
         }
         
         var expanded = false
         var variableTopControl: UIView = variableNameLabel
         if !intro, let imageUrl = input?.imageUrl, !imageUrl.isEmpty {
+            expanded = true
+            variableTopControl = variableImageView
+        }
+        else if intro, !(funcExecutor?.introImageUrl?.isEmpty ?? true) {
             expanded = true
             variableTopControl = variableImageView
         }
@@ -685,15 +694,24 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         if intro {
             titleImageView.isHidden = false
             titleLabel.isHidden = false
-            variableDescriptionTextView.isHidden = false
             backButton.isHidden = true
             nextButton.isHidden = true
             progressLabel.isHidden = true
             primaryButton.isHidden = false
 
             titleLabel.text = funcExecutor.descriptors.name
-            primaryButton.setTitle((executing ? "FuncExecutorWidget.primary.executing" : hasInputs ? "FuncExecutorWidget.primary.intro" : "FuncExecutorWidget.primary.execute").localized, for: .normal)
-            variableDescriptionTextView.text = funcExecutor.descriptors.description
+            primaryButton.setTitle((executing ? "FuncViewController.primary.executing" : hasInputs ? "FuncViewController.primary.intro" : "FuncViewController.primary.execute").localized, for: .normal)
+            
+            if let introImageUrl = funcExecutor.introImageUrl, !introImageUrl.isEmpty {
+                variableImageView.isHidden = false
+                variableImageView.image = nil
+                variableImageView.kf.setImage(with: URL(string: introImageUrl), placeholder: imagePlaceholder)
+            }
+            else {
+                variableDescriptionTextView.isHidden = false
+                variableDescriptionTextView.text = funcExecutor.descriptors.description
+            }
+            
             return
         }
 
