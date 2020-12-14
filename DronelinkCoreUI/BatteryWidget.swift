@@ -16,7 +16,6 @@ import MarqueeLabel
 import SnapKit
 
 public class BatteryWidget: UpdatableWidget {
-    
     public let iconImageView = UIImageView(image: DronelinkUI.loadImage(named: "batteryIcon")?.withRenderingMode(.alwaysTemplate))
     public let batteryLevelLabel = UILabel()
     
@@ -28,13 +27,13 @@ public class BatteryWidget: UpdatableWidget {
         iconImageView.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
-            make.width.equalTo(self.view.snp.height)
+            make.width.equalTo(view.snp.height)
             make.bottom.equalToSuperview()
         }
         
         batteryLevelLabel.textColor = .green
         batteryLevelLabel.textAlignment = .left
-        batteryLevelLabel.font = UIFont.systemFont(ofSize: 14)
+        batteryLevelLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(batteryLevelLabel)
         batteryLevelLabel.snp.makeConstraints { make in
             make.left.equalTo(iconImageView.snp.right)
@@ -44,20 +43,16 @@ public class BatteryWidget: UpdatableWidget {
         }
     }
     
-    private func updateBatteryLevel(batteryPercent: Double?) {
-        guard let batteryValue = batteryPercent else {
-            batteryLevelLabel.text = "N/A".localized
-            batteryLevelLabel.textColor = .red
+    @objc public override func update() {
+        super.update()
+        
+        guard let batteryPercent = session?.state?.value.batteryPercent else {
+            batteryLevelLabel.text = "na".localized
+            batteryLevelLabel.textColor = .white
             return
         }
         
-        batteryLevelLabel.text = String(format: "%.0f", batteryValue * 100) + "%"
-        
-        batteryLevelLabel.textColor = (session?.isLowerThanBatteryWarningThreshold ?? false) ? .red : .green
-    }
-    
-    @objc public override func update() {
-        super.update()
-        updateBatteryLevel(batteryPercent: session?.state?.value.batteryPercent)
+        batteryLevelLabel.text = Dronelink.shared.format(formatter: "percent", value: batteryPercent)
+        batteryLevelLabel.textColor = batteryPercent < (session?.state?.value.lowBatteryThreshold ?? 0) ? MDCPalette.red.accent400 : MDCPalette.green.accent400
     }
 }

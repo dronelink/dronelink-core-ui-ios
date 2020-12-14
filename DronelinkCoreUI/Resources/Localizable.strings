@@ -14,6 +14,7 @@
 "next" = "Next";
 "resume" = "Resume";
 "learnMore" = "Learn More";
+"na" = "N/A";
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
 
@@ -113,7 +114,3 @@
 "RTKSettingsWidget.popover.configuration.mountpoint" = "Mount point";
 
 "RTKStatusWidget.status.label" = "Network RTK";
-
-"00.00" = "00.00";
-"Unknown Error" = "Unknown Error";
-"N/A" = "N/A";

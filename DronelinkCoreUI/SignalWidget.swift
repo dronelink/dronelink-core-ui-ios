@@ -1,5 +1,5 @@
 //
-//  GenericSignalWidget.swift
+//  SignalWidget.swift
 //  DronelinkCoreUI
 //
 //  Created by Nicolas Torres on 9/12/20.
@@ -14,7 +14,7 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
-public class GenericSignalWidget: UpdatableWidget {
+public class SignalWidget: UpdatableWidget {
     
     public let signal_0_Image = DronelinkUI.loadImage(named: "signal0")?.withRenderingMode(.alwaysOriginal)
     public let signal_1_Image = DronelinkUI.loadImage(named: "signal1")?.withRenderingMode(.alwaysOriginal)
@@ -60,9 +60,5 @@ public class GenericSignalWidget: UpdatableWidget {
         } else {
             signalLevelImageView.image = signal_5_Image
         }
-    }
-    
-    @objc public override func update() {
-        super.update()
     }
 }

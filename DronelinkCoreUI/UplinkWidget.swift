@@ -14,12 +14,11 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
-public class UplinkWidget: GenericSignalWidget {
-    
+public class UplinkWidget: SignalWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
         iconImageView.image = DronelinkUI.loadImage(named: "upLinkIcon")?.withRenderingMode(.alwaysOriginal)
+        iconImageView.tintColor = .white
     }
     
     @objc public override func update() {

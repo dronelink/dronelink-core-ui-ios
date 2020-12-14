@@ -14,11 +14,9 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
-public class DownlinkWidget: GenericSignalWidget {
-    
+public class DownlinkWidget: SignalWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
         iconImageView.image = DronelinkUI.loadImage(named: "downLinkIcon")?.withRenderingMode(.alwaysTemplate)
         iconImageView.tintColor = .white
     }

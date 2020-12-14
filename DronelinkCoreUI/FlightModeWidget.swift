@@ -15,7 +15,6 @@ import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
 public class FlightModeWidget: UpdatableWidget {
-    
     public var flightModeImageView: UIImageView?
     public var flightModeLabel: UILabel?
     
@@ -34,10 +33,10 @@ public class FlightModeWidget: UpdatableWidget {
         flightModeLabel = UILabel()
         flightModeLabel?.textColor = .white
         flightModeLabel?.textAlignment = .left
-        flightModeLabel?.font = UIFont.systemFont(ofSize: 14)
+        flightModeLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(flightModeLabel!)
         flightModeLabel?.snp.makeConstraints { make in
-            make.left.equalTo(flightModeImageView!.snp.right).offset(5)
+            make.left.equalTo(flightModeImageView!.snp.right).offset(defaultPadding)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -46,6 +45,6 @@ public class FlightModeWidget: UpdatableWidget {
     
     @objc public override func update() {
         super.update()
-        flightModeLabel?.text = String(session?.state?.value.mode ?? "")
+        flightModeLabel?.text = String(session?.state?.value.mode ?? "na".localized)
     }
 }
