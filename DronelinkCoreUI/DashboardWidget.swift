@@ -122,11 +122,11 @@ public class DashboardWidget: DelegateWidget {
     private var batteryWidget: Widget?
     private var primaryIndicatorWidgets: [(widget: Widget, widthRatio: CGFloat)] {
         var widgets: [(widget: Widget, widthRatio: CGFloat)] = []
-        if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 4.5)) }
-        if let widget = gpsWidget { widgets.append((widget: widget, widthRatio: 1.75)) }
+        if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 5.5)) }
+        if let widget = gpsWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = visionWidget { widgets.append((widget: widget, widthRatio: 1.35)) }
         if let widget = uplinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
-        if let widget = downlinkWidget { widgets.append((widget: widget, widthRatio: 2.75)) }
+        if let widget = downlinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = batteryWidget { widgets.append((widget: widget, widthRatio: 2.75)) }
         return widgets
     }
@@ -693,15 +693,16 @@ public class DashboardWidget: DelegateWidget {
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
             make.top.equalTo(cameraMenuButton.snp.bottom).offset(-6)
-            make.left.equalToSuperview().offset(2)
-            make.right.equalToSuperview().offset(-2)
+            make.left.equalToSuperview().offset(10)
+            make.height.equalTo(cameraModeWidget!.view.snp.width)
+            make.right.equalToSuperview().offset(-10)
         }
 
         cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
         cameraCaptureWidget?.view.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
-            make.height.equalTo(cameraCaptureWidget!.view.snp.width)
+            make.height.equalTo(cameraCaptureWidget!.view.snp.width).offset(20)
             make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-12)
         }
 
