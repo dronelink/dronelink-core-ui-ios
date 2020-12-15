@@ -15,6 +15,8 @@ import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
 public class FlightModeWidget: UpdatableWidget {
+    public override var updateInterval: TimeInterval { 0.5 }
+    
     public var flightModeImageView: UIImageView?
     public var flightModeLabel: UILabel?
     

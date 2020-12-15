@@ -15,6 +15,8 @@ import MaterialComponents.MaterialActivityIndicator
 import MarqueeLabel
 
 public class CameraCaptureWidget: UpdatableWidget {
+    public override var updateInterval: TimeInterval { 0.5 }
+    
     public var channel: UInt = 0
     private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
     
@@ -50,13 +52,11 @@ public class CameraCaptureWidget: UpdatableWidget {
         
         activityIndicator.cycleColors = [.darkGray]
         activityIndicator.indicatorMode = .indeterminate
+        activityIndicator.radius = 26
         activityIndicator.isUserInteractionEnabled = false
         view.addSubview(activityIndicator)
         activityIndicator.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(5)
-            make.left.equalToSuperview()
-            make.right.equalToSuperview()
-            make.bottom.equalToSuperview().offset(-15)
+            make.edges.equalTo(captureButton)
         }
         
         capturePhotoModeImageView.tintColor = .black
@@ -75,7 +75,10 @@ public class CameraCaptureWidget: UpdatableWidget {
         view.addSubview(countIndicatorLabel)
         countIndicatorLabel.textAlignment = .right
         countIndicatorLabel.snp.makeConstraints { make in
-            make.edges.equalToSuperview().offset(-5)
+            make.top.equalTo(capturePhotoModeImageView.snp.bottom).offset(-11)
+            make.left.equalTo(capturePhotoModeImageView.snp.right).offset(-7)
+            make.height.equalTo(15)
+            make.width.equalTo(15)
         }
         
         videoTimeLabel.textColor = .white
@@ -110,17 +113,18 @@ public class CameraCaptureWidget: UpdatableWidget {
         var photoModeImage: UIImage?
         var count = ""
         
+        //FIXME there seems to be a bug with DJI reporting interval photo on startup
         switch cameraState?.photoMode ?? .unknown {
         case .aeb:
             photoModeImage = aebModeImage
-            if let aeb = cameraState?.aebCount {
+            if let aeb = cameraState?.aebCount?.rawValue {
                 count = "\(aeb)"
             }
             break
             
         case .burst:
             photoModeImage = burstModeImage
-            if let burst = cameraState?.burstCount {
+            if let burst = cameraState?.burstCount?.rawValue {
                 count = "\(burst)"
             }
             break
@@ -148,10 +152,21 @@ public class CameraCaptureWidget: UpdatableWidget {
             break
         }
         
+        if cameraState?.isCapturing ?? false {
+            if cameraState?.mode == .photo, !activityIndicator.isAnimating {
+                activityIndicator.startAnimating()
+            }
+        }
+        else {
+            if activityIndicator.isAnimating {
+                activityIndicator.stopAnimating()
+            }
+        }
+        
         capturePhotoModeImageView.image = photoModeImage
         capturePhotoModeImageView.isHidden = cameraState?.mode != .photo
         
-        if count.isEmpty {
+        if !count.isEmpty {
             countIndicatorLabel.isHidden = false
             countIndicatorLabel.text = count
         } else {

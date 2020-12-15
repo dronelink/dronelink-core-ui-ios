@@ -15,6 +15,8 @@ import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
 public class CameraModeWidget: UpdatableWidget {
+    public override var updateInterval: TimeInterval { 0.5 }
+    
     public var channel: UInt = 0
     private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
     
