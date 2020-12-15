@@ -127,7 +127,7 @@ public class DashboardWidget: DelegateWidget {
         if let widget = visionWidget { widgets.append((widget: widget, widthRatio: 1.35)) }
         if let widget = uplinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = downlinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
-        if let widget = batteryWidget { widgets.append((widget: widget, widthRatio: 2.75)) }
+        if let widget = batteryWidget { widgets.append((widget: widget, widthRatio: 3.4)) }
         return widgets
     }
     private var cameraAutoExposureWidget: Widget?
@@ -693,9 +693,9 @@ public class DashboardWidget: DelegateWidget {
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
             make.top.equalTo(cameraMenuButton.snp.bottom).offset(-6)
-            make.left.equalToSuperview().offset(10)
+            make.left.equalToSuperview().offset(3)
             make.height.equalTo(cameraModeWidget!.view.snp.width)
-            make.right.equalToSuperview().offset(-10)
+            make.right.equalToSuperview().offset(-3)
         }
 
         cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
@@ -703,7 +703,7 @@ public class DashboardWidget: DelegateWidget {
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(cameraCaptureWidget!.view.snp.width).offset(20)
-            make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-12)
+            make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-2)
         }
 
         compassWidget = refreshWidget(current: compassWidget, next: widgetFactory.createCompassWidget(current: compassWidget))
