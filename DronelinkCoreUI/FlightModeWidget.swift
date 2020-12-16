@@ -34,7 +34,6 @@ public class FlightModeWidget: UpdatableWidget {
         }
         
         label.addShadow()
-        label = UILabel()
         label.numberOfLines = 1
         label.minimumScaleFactor = 0.5
         label.adjustsFontSizeToFitWidth = true

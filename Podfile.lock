@@ -1,5 +1,5 @@
 PODS:
-  - Agrume (5.6.11):
+  - Agrume (5.6.12):
     - SwiftyGif
   - DronelinkCore (2.0.0)
   - IQKeyboardManager (6.5.6)
@@ -204,11 +204,11 @@ EXTERNAL SOURCES:
     :path: "../../private/dronelink-core-ios"
 
 SPEC CHECKSUMS:
-  Agrume: 085e64c6884fae11d3f3650fad3ebcb2c3df7597
+  Agrume: d60f7ead4aad9720564148f7e9cbe0b225b1d814
   DronelinkCore: 8dfac69d2405686dd13cfc518e60214069ba7632
   IQKeyboardManager: 2a6e97afdafc7becf0cb17a9a8d795e3a980717f
   Kingfisher: a3c03d702433fa6cfedabb2bddbe076fb8f2e902
-  Mapbox-iOS-SDK: 6a67397df2bcafe5d2851604192aa8de6f8d6c89
+  Mapbox-iOS-SDK: 2563ed87ead6ec08f1c2090873977b8a7be335a8
   MapboxMobileEvents: d0a581dedd8f47411cc65ea520b965e83914316e
   MarqueeLabel: 00cc0bcd087111dca575878b3531af980559707d
   MaterialComponents: 69a725e28406a97816441dea4ec6ec38265a08bb

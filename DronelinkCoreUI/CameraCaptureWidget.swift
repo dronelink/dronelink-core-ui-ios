@@ -23,7 +23,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     public let button = UIButton()
     public let activityBackgroundImageView = UIImageView()
     public let activityIndicator = MDCActivityIndicator()
-    public let modeImageView = UIImageView()
+    public let extraImageView = UIImageView()
     public let extraLabel = UILabel()
     public let timeLabel = UILabel()
     
@@ -36,6 +36,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     public var activityImage = DronelinkUI.loadImage(named: "activityIcon")?.withRenderingMode(.alwaysTemplate)
     public var startImage = DronelinkUI.loadImage(named: "captureIcon")?.withRenderingMode(.alwaysTemplate)
     public var stopImage = DronelinkUI.loadImage(named: "stopIcon")?.withRenderingMode(.alwaysOriginal)
+    public var sdCardMissing = DronelinkUI.loadImage(named: "sdCardMissing")?.withRenderingMode(.alwaysOriginal)
     public var aebModeImage = DronelinkUI.loadImage(named: "aebMode")?.withRenderingMode(.alwaysTemplate)
     public var burstModeImage = DronelinkUI.loadImage(named: "burstMode")?.withRenderingMode(.alwaysTemplate)
     public var hdrModeImage = DronelinkUI.loadImage(named: "hdrMode")?.withRenderingMode(.alwaysTemplate)
@@ -44,6 +45,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     public var panoModeImage = DronelinkUI.loadImage(named: "panoMode")?.withRenderingMode(.alwaysTemplate)
     
     private var pendingCommand: KernelCommand?
+    private var previousCapturing = false
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,11 +81,11 @@ public class CameraCaptureWidget: UpdatableWidget {
             make.edges.equalTo(button)
         }
         
-        modeImageView.tintColor = .black
-        modeImageView.contentMode = .scaleAspectFit
-        modeImageView.isUserInteractionEnabled = false
-        view.addSubview(modeImageView)
-        modeImageView.snp.makeConstraints { make in
+        extraImageView.tintColor = .black
+        extraImageView.contentMode = .scaleAspectFit
+        extraImageView.isUserInteractionEnabled = false
+        view.addSubview(extraImageView)
+        extraImageView.snp.makeConstraints { make in
             make.center.equalTo(button.snp.center)
             make.height.equalTo(22)
             make.width.equalTo(22)
@@ -101,8 +103,8 @@ public class CameraCaptureWidget: UpdatableWidget {
         extraLabel.layer.masksToBounds = true
         view.addSubview(extraLabel)
         extraLabel.snp.makeConstraints { make in
-            make.top.equalTo(modeImageView.snp.bottom).offset(-11)
-            make.left.equalTo(modeImageView.snp.left).offset(-3)
+            make.top.equalTo(extraImageView.snp.bottom).offset(-11)
+            make.left.equalTo(extraImageView.snp.left).offset(-3)
             make.height.equalTo(12)
             make.width.equalTo(12)
         }
@@ -134,8 +136,42 @@ public class CameraCaptureWidget: UpdatableWidget {
     @objc public override func update() {
         super.update()
         
+        var sound: UInt32?
+        
+        if !(cameraState?.isCapturingPhotoInterval ?? false) {
+            if cameraState?.isCapturing ?? false {
+                if !previousCapturing {
+                    switch cameraState?.mode ?? .unknown {
+                    case .photo:
+                        sound = photoSystemSound
+                        break
+                        
+                    case .video:
+                        sound = videoStartSystemSound
+                        break
+                        
+                    default:
+                        break
+                    }
+                }
+            }
+            else {
+                if previousCapturing {
+                    if cameraState?.mode == .video {
+                        sound = videoStopSystemSound
+                    }
+                }
+            }
+        }
+        
+        if let sound = sound {
+            AudioServicesPlaySystemSound(sound)
+        }
+        
+        previousCapturing = cameraState?.isCapturing ?? false
+        
         button.tintColor = cameraState?.mode == .video ? videoColor : photoColor
-        button.isEnabled = session != nil && pendingCommand == nil && !(cameraState?.isBusy ?? false)
+        button.isEnabled = session != nil && pendingCommand == nil && (!(cameraState?.isCapturing ?? false) || cameraState?.isCapturingContinuous ?? false)
         button.setImage(cameraState?.isCapturingContinuous ?? false ? stopImage : startImage, for: .normal)
         
         activityBackgroundImageView.alpha = button.isEnabled ? 1.0 : 0.5
@@ -150,40 +186,44 @@ public class CameraCaptureWidget: UpdatableWidget {
             }
         }
         
-        var modeImage: UIImage?
-        var extra: String?
+        var extraImage: UIImage?
+        var extraText: String?
         
-        if cameraState?.mode == .photo {
+        if cameraState?.storageLocation == .sdCard, !(cameraState?.isSDCardInserted ?? true) {
+            extraImage = sdCardMissing
+        }
+        
+        if extraImage == nil, cameraState?.mode == .photo {
             switch cameraState?.photoMode ?? .unknown {
             case .aeb:
-                modeImage = aebModeImage
-                extra = cameraState?.aebCount?.rawValue
+                extraImage = aebModeImage
+                extraText = cameraState?.aebCount?.rawValue
                 break
                 
             case .burst:
-                modeImage = burstModeImage
-                extra = cameraState?.burstCount?.rawValue
+                extraImage = burstModeImage
+                extraText = cameraState?.burstCount?.rawValue
                 break
                 
             case .ehdr:
-                modeImage = hdrModeImage
+                extraImage = hdrModeImage
                 break
                 
             case .hyperLight:
-                modeImage = hyperModeImage
+                extraImage = hyperModeImage
                 break
                 
             case .interval:
                 if !(cameraState?.isCapturingPhotoInterval ?? false) {
-                    modeImage = timerModeImage
+                    extraImage = timerModeImage
                     if let interval = cameraState?.photoInterval {
-                        extra = String(interval)
+                        extraText = String(interval)
                     }
                 }
                 break
                 
             case .panorama:
-                modeImage = panoModeImage
+                extraImage = panoModeImage
                 break
                 
             default:
@@ -191,14 +231,14 @@ public class CameraCaptureWidget: UpdatableWidget {
             }
         }
         
-        modeImageView.image = modeImage
-        modeImageView.isHidden = cameraState?.mode != .photo
+        extraImageView.image = extraImage
+        extraImageView.isHidden = extraImage == nil
         
-        if extra?.isEmpty ?? true {
+        if extraText?.isEmpty ?? true {
             extraLabel.isHidden = true
         } else {
             extraLabel.isHidden = false
-            extraLabel.text = extra
+            extraLabel.text = extraText
         }
         
         if let currentVideoTime = cameraState?.currentVideoTime {
@@ -225,16 +265,6 @@ public class CameraCaptureWidget: UpdatableWidget {
             }
             
             DispatchQueue.main.async {
-                if self.cameraState?.mode == .video {
-                    if command is Kernel.StartCaptureCameraCommand, let videoStartSystemSound = self.videoStartSystemSound {
-                        AudioServicesPlaySystemSound(videoStartSystemSound)
-                    }
-                    
-                    if command is Kernel.StopCaptureCameraCommand, let videoStopSystemSound = self.videoStopSystemSound {
-                        AudioServicesPlaySystemSound(videoStopSystemSound)
-                        
-                    }
-                }
                 self.update()
             }
         }
@@ -242,7 +272,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     
     public override func onCameraFileGenerated(session: DroneSession, file: CameraFile) {
         super.onCameraFileGenerated(session: session, file: file)
-        if let photoSystemSound = photoSystemSound, cameraState?.mode == .photo {
+        if let photoSystemSound = photoSystemSound, cameraState?.mode == .photo, cameraState?.photoMode == .interval {
             DispatchQueue.main.async {
                 AudioServicesPlaySystemSound(photoSystemSound)
             }
