@@ -69,13 +69,12 @@ public class StatusWidget: UpdatableWidget {
 
 public class StatusGradientWidget: StatusWidget {
     public let gradient = CAGradientLayer()
-    public var opacity: CGFloat = 0.5
+    public var opacity: CGFloat = 0.73
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
         view.clipsToBounds = true
-        view.backgroundColor = DronelinkUI.Constants.overlayColor
         
         gradient.colors = [DronelinkUI.Constants.overlayColor.cgColor]
         gradient.startPoint = CGPoint(x: 0, y: 0)
@@ -105,11 +104,15 @@ public class StatusLabelWidget: StatusWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.clipsToBounds = true
+        
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.backgroundColor = UIColor.clear
         
+        label.addShadow()
         label.leadingBuffer = 8
         label.trailingBuffer = label.leadingBuffer
+        label.speed = MarqueeLabel.SpeedLimit.rate(60)
         label.textColor = UIColor.white
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)

@@ -17,6 +17,7 @@ import MarqueeLabel
 public class UplinkWidget: SignalWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
         iconImageView.image = DronelinkUI.loadImage(named: "upLinkIcon")?.withRenderingMode(.alwaysOriginal)
         iconImageView.tintColor = .white
     }

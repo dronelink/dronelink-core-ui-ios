@@ -17,28 +17,33 @@ import MarqueeLabel
 public class FlightModeWidget: UpdatableWidget {
     public override var updateInterval: TimeInterval { 0.5 }
     
-    public var flightModeImageView: UIImageView?
-    public var flightModeLabel: UILabel?
+    public var imgageView = UIImageView()
+    public var label = UILabel()
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        flightModeImageView = UIImageView(image: DronelinkUI.loadImage(named: "flightModeIcon")?.withRenderingMode(.alwaysOriginal))
-        view.addSubview(flightModeImageView!)
-        flightModeImageView?.snp.makeConstraints { make in
+        imgageView.addShadow()
+        imgageView.image = DronelinkUI.loadImage(named: "flightModeIcon")?.withRenderingMode(.alwaysOriginal)
+        view.addSubview(imgageView)
+        imgageView.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
             make.width.equalTo(self.view.snp.height)
             make.bottom.equalToSuperview()
         }
         
-        flightModeLabel = UILabel()
-        flightModeLabel?.textColor = .white
-        flightModeLabel?.textAlignment = .left
-        flightModeLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
-        view.addSubview(flightModeLabel!)
-        flightModeLabel?.snp.makeConstraints { make in
-            make.left.equalTo(flightModeImageView!.snp.right).offset(defaultPadding)
+        label.addShadow()
+        label = UILabel()
+        label.numberOfLines = 1
+        label.minimumScaleFactor = 0.5
+        label.adjustsFontSizeToFitWidth = true
+        label.textColor = .white
+        label.textAlignment = .left
+        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        view.addSubview(label)
+        label.snp.makeConstraints { make in
+            make.left.equalTo(imgageView.snp.right).offset(defaultPadding)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -47,6 +52,6 @@ public class FlightModeWidget: UpdatableWidget {
     
     @objc public override func update() {
         super.update()
-        flightModeLabel?.text = String(session?.state?.value.mode ?? "na".localized)
+        label.text = String(session?.state?.value.mode ?? "na".localized)
     }
 }

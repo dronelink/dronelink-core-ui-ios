@@ -30,6 +30,7 @@ public class GPSWidget: UpdatableWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        gpsIconImageView.addShadow()
         view.addSubview(gpsIconImageView)
         gpsIconImageView.snp.makeConstraints { make in
             make.left.equalToSuperview()
@@ -38,6 +39,7 @@ public class GPSWidget: UpdatableWidget {
             make.bottom.equalToSuperview()
         }
         
+        gpsSignalLevelLabel.addShadow()
         gpsSignalLevelLabel.textColor = .white
         gpsSignalLevelLabel.textAlignment = .left
         gpsSignalLevelLabel.font = UIFont.systemFont(ofSize: 10)
@@ -48,6 +50,7 @@ public class GPSWidget: UpdatableWidget {
             make.bottom.equalToSuperview().offset(-10)
         }
         
+        gpsSignalLevelImageView.addShadow()
         view.addSubview(gpsSignalLevelImageView)
         gpsSignalLevelImageView.snp.makeConstraints { make in
             make.left.equalTo(gpsIconImageView.snp.right).offset(5)

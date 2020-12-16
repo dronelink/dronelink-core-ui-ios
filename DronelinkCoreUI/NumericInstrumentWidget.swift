@@ -21,6 +21,7 @@ open class NumericInstrumentWidget: UpdatableWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
+        prefixLabel.addShadow()
         prefixLabel.textColor = UIColor.white
         prefixLabel.font = UIFont.systemFont(ofSize: tablet ? 28 : 20, weight: .semibold)
         prefixLabel.textAlignment = .center
@@ -32,11 +33,13 @@ open class NumericInstrumentWidget: UpdatableWidget {
             make.width.equalTo(prefixLabel.snp.height).multipliedBy(1.25)
         }
         
+        prefixIcon.addShadow()
         view.addSubview(prefixIcon)
         prefixIcon.snp.makeConstraints { make in
             make.edges.equalTo(prefixLabel)
         }
         
+        valueLabel.addShadow()
         valueLabel.textColor = UIColor.white
         valueLabel.font = UIFont.systemFont(ofSize: tablet ? 32 : 24, weight: .semibold)
         view.addSubview(valueLabel)

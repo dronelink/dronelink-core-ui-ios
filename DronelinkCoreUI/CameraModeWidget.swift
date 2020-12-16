@@ -15,26 +15,26 @@ import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
 public class CameraModeWidget: UpdatableWidget {
-    public override var updateInterval: TimeInterval { 0.5 }
-    
     public var channel: UInt = 0
     private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
     
-    public let cameraModeButton = UIButton()
-    public let cameraPhotoImage = DronelinkUI.loadImage(named: "cameraPhotoMode")?.withRenderingMode(.alwaysTemplate)
-    public let cameraVideoImage = DronelinkUI.loadImage(named: "cameraVideoMode")?.withRenderingMode(.alwaysTemplate)
+    public let button = UIButton()
     
-    private var pendingCommand: KernelCommand?
+    public var photoImage = DronelinkUI.loadImage(named: "cameraPhotoMode")?.withRenderingMode(.alwaysTemplate)
+    public var videoImage = DronelinkUI.loadImage(named: "cameraVideoMode")?.withRenderingMode(.alwaysTemplate)
+    
+    private var pendingCommand: Kernel.ModeCameraCommand?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        cameraModeButton.setImage(cameraState?.mode == .video ? cameraVideoImage : cameraPhotoImage, for: .normal)
-        cameraModeButton.tintColor = .white
-        cameraModeButton.addTarget(self, action: #selector(onTapped(_:)), for: .touchUpInside)
-        view.addSubview(cameraModeButton)
-        cameraModeButton.isEnabled = false
-        cameraModeButton.snp.makeConstraints { make in
+        button.addShadow()
+        button.setImage(cameraState?.mode == .video ? videoImage : photoImage, for: .normal)
+        button.tintColor = .white
+        button.addTarget(self, action: #selector(onTapped(_:)), for: .touchUpInside)
+        view.addSubview(button)
+        button.isEnabled = false
+        button.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview().offset(5)
             make.right.equalToSuperview().offset(-5)
@@ -43,7 +43,7 @@ public class CameraModeWidget: UpdatableWidget {
     }
     
     @objc func onTapped(_ sender: UIButton) {
-        cameraModeButton.isEnabled = false
+        button.isEnabled = false
         var command = Kernel.ModeCameraCommand()
         command.mode = cameraState?.mode == .photo ? .video : .photo
         do {
@@ -54,8 +54,13 @@ public class CameraModeWidget: UpdatableWidget {
     
     @objc public override func update() {
         super.update()
-        cameraModeButton.setImage(cameraState?.mode == .video ? cameraVideoImage : cameraPhotoImage, for: .normal)
-        cameraModeButton.isEnabled = pendingCommand == nil && session != nil && !(session?.cameraState(channel: 0)?.value.isCapturing ?? false)
+        if let pendingCommand = pendingCommand {
+            button.setImage(pendingCommand.mode == .video ? videoImage : photoImage, for: .normal)
+        }
+        else {
+            button.setImage(cameraState?.mode == .video ? videoImage : photoImage, for: .normal)
+        }
+        button.isEnabled = session != nil && pendingCommand == nil
     }
     
     public override func onClosed(session: DroneSession) {
@@ -66,6 +71,13 @@ public class CameraModeWidget: UpdatableWidget {
         super.onCommandFinished(session: session, command: command, error: error)
         if pendingCommand?.id == command.id {
             pendingCommand = nil
+            if let error = error {
+                DronelinkUI.shared.showSnackbar(text: error.localizedDescription)
+            }
+            
+            DispatchQueue.main.async {
+                self.update()
+            }
         }
     }
 }

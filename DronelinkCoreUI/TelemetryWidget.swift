@@ -19,10 +19,6 @@ public class TelemetryWidget: Widget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.addShadow()
-        view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
-        view.backgroundColor = DronelinkUI.Constants.overlayColor
-        
         guard
             let distanceWidget = distanceWidget,
             let altitudeWidget = altitudeWidget,

@@ -122,7 +122,7 @@ public class DashboardWidget: DelegateWidget {
     private var batteryWidget: Widget?
     private var primaryIndicatorWidgets: [(widget: Widget, widthRatio: CGFloat)] {
         var widgets: [(widget: Widget, widthRatio: CGFloat)] = []
-        if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 5.5)) }
+        if let widget = flightModeWidget { widgets.append((widget: widget, widthRatio: 4)) }
         if let widget = gpsWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
         if let widget = visionWidget { widgets.append((widget: widget, widthRatio: 1.35)) }
         if let widget = uplinkWidget { widgets.append((widget: widget, widthRatio: 2.5)) }
@@ -192,7 +192,7 @@ public class DashboardWidget: DelegateWidget {
             make.edges.equalToSuperview()
         }
         
-        contentSettingsButton.backgroundColor = DronelinkUI.Constants.overlayColor.withAlphaComponent(0.5)
+        contentSettingsButton.addShadow()
         contentSettingsButton.tintColor = UIColor.white
         contentSettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_more_horiz_white_36pt"), for: .normal)
         contentSettingsButton.addTarget(self, action: #selector(onContentSettings(sender:)), for: .touchUpInside)
@@ -204,7 +204,7 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(contentSettingsButton.snp.width)
         }
 
-        contentLayoutVisibilityButton.backgroundColor = DronelinkUI.Constants.overlayColor.withAlphaComponent(0.5)
+        contentLayoutVisibilityButton.addShadow()
         contentLayoutVisibilityButton.tintColor = UIColor.white
         contentLayoutVisibilityButton.setImage(DronelinkUI.loadImage(named: "baseline_map_white_36pt"), for: .normal)
         contentLayoutVisibilityButton.addTarget(self, action: #selector(onContentLayoutVisibility(sender:)), for: .touchUpInside)
@@ -216,7 +216,7 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(contentLayoutVisibilityButton.snp.width)
         }
         
-        contentLayoutExpandButton.backgroundColor = DronelinkUI.Constants.overlayColor.withAlphaComponent(0.5)
+        contentLayoutExpandButton.addShadow()
         contentLayoutExpandButton.tintColor = UIColor.white
         contentLayoutExpandButton.setImage(DronelinkUI.loadImage(named: "baseline_zoom_out_map_white_36pt"), for: .normal)
         contentLayoutExpandButton.addTarget(self, action: #selector(onContentLayoutExpand(sender:)), for: .touchUpInside)
@@ -228,11 +228,9 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(contentLayoutExpandButton.snp.width)
         }
 
-        cameraControlsView.addShadow()
-        cameraControlsView.backgroundColor = DronelinkUI.Constants.overlayColor
-        cameraControlsView.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.addSubview(cameraControlsView)
         
+        cameraMenuButton.addShadow()
         cameraMenuButton.setTitle("DashboardWidget.cameraMenu".localized, for: .normal)
         cameraMenuButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
         cameraMenuButton.addTarget(self, action: #selector(onCameraMenu(sender:)), for: .touchUpInside)
@@ -244,6 +242,7 @@ public class DashboardWidget: DelegateWidget {
             make.width.equalTo(48)
         }
         
+        cameraExposureMenuButton.addShadow()
         cameraExposureMenuButton.tintColor = UIColor.white
         cameraExposureMenuButton.setImage(DronelinkUI.loadImage(named: "baseline_tune_white_36pt"), for: .normal)
         cameraExposureMenuButton.addTarget(self, action: #selector(onCameraExposureMenu(sender:)), for: .touchUpInside)
@@ -255,6 +254,7 @@ public class DashboardWidget: DelegateWidget {
             make.width.equalTo(28)
         }
         
+        offsetsButton.addShadow()
         offsetsButton.setImage(DronelinkUI.loadImage(named: "baseline_control_camera_white_36pt"), for: .normal)
         offsetsButton.addTarget(self, action: #selector(onOffsets(sender:)), for: .touchUpInside)
         view.addSubview(offsetsButton)
@@ -273,6 +273,7 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(statusWidgetHeight)
         }
 
+        dismissButton.addShadow()
         dismissButton.tintColor = UIColor.white
         dismissButton.setImage(DronelinkUI.loadImage(named: "dronelink-logo"), for: .normal)
         dismissButton.imageView?.contentMode = .scaleAspectFit
@@ -602,7 +603,7 @@ public class DashboardWidget: DelegateWidget {
         remainingFlightTimeWidget = refreshWidget(current: remainingFlightTimeWidget, next: widgetFactory.createRemainingFlightTimeWidget(current: remainingFlightTimeWidget))
         remainingFlightTimeWidget?.view.snp.remakeConstraints { make in
             let topOffset = -9
-            if portrait, let cameraFeedView = cameraFeedWidget?.view {
+            if portrait, !tablet, let cameraFeedView = cameraFeedWidget?.view {
                 make.top.equalTo(cameraFeedView.snp.top).offset(topOffset)
             }
             else {
@@ -622,7 +623,7 @@ public class DashboardWidget: DelegateWidget {
         var primaryIndicatorWidgetPrevious: Widget?
         primaryIndicatorWidgets.reversed().forEach { item in
             item.widget.view.snp.remakeConstraints { make in
-                let paddingRight: CGFloat = 5
+                let paddingRight: CGFloat = tablet ? 9 : 7
                 if let widgetPrevious = primaryIndicatorWidgetPrevious {
                     make.right.equalTo(widgetPrevious.view.snp.left).offset(-paddingRight)
                 }
@@ -649,25 +650,25 @@ public class DashboardWidget: DelegateWidget {
             let constrainTo: UIView = statusBackgroundWidget?.view ?? view
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.equalTo(dismissButton.snp.right).offset(5)
-            make.right.equalTo(primaryIndicatorWidgetPrevious?.view.snp.left ?? view.snp.right).offset(-defaultPadding)
+            if (portrait && !tablet) {
+                make.right.equalTo(view.safeAreaLayoutGuide.snp.right)
+            }
+            else {
+                make.right.equalTo(primaryIndicatorWidgetPrevious?.view.snp.left ?? constrainTo.snp.right).offset(-defaultPadding)
+            }
             make.height.equalTo(statusWidgetHeight)
         }
         (statusForegroundWidget as? StatusLabelWidget)?.onTapped = onMainMenu
         
         cameraExposureWidget = refreshWidget(current: cameraExposureWidget, next: widgetFactory.createCameraExposureWidget(current: cameraExposureWidget))
-        cameraExposureWidget?.view.addShadow()
         
         cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
-        cameraStorageWidget?.view.addShadow()
         
         cameraAutoExposureWidget = refreshWidget(current: cameraAutoExposureWidget, next: widgetFactory.createCameraAutoExposureWidget(current: cameraAutoExposureWidget))
-        cameraAutoExposureWidget?.view.addShadow()
         
         cameraExposureFocusWidget = refreshWidget(current: cameraExposureFocusWidget, next: widgetFactory.createCameraExposureFocusWidget(current: cameraExposureFocusWidget))
-        cameraExposureFocusWidget?.view.addShadow()
         
         cameraFocusModeWidget = refreshWidget(current: cameraFocusModeWidget, next: widgetFactory.createCameraFocusModeWidget(current: cameraFocusModeWidget))
-        cameraFocusModeWidget?.view.addShadow()
         
         let cameraWidgetSize = statusWidgetHeight * 0.65
         var cameraIndicatorWidgetPrevious: Widget?
@@ -692,7 +693,7 @@ public class DashboardWidget: DelegateWidget {
         
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
-            make.top.equalTo(cameraMenuButton.snp.bottom).offset(-6)
+            make.top.equalTo(cameraMenuButton.snp.bottom).offset(-13)
             make.left.equalToSuperview().offset(3)
             make.height.equalTo(cameraModeWidget!.view.snp.width)
             make.right.equalToSuperview().offset(-3)
@@ -703,7 +704,7 @@ public class DashboardWidget: DelegateWidget {
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(cameraCaptureWidget!.view.snp.width).offset(20)
-            make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-2)
+            make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-5)
         }
 
         compassWidget = refreshWidget(current: compassWidget, next: widgetFactory.createCompassWidget(current: compassWidget))
