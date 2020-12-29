@@ -5,14 +5,10 @@
 //  Created by Nicolas Torres on 9/12/20.
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
-
 import Foundation
 import UIKit
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
-import MaterialComponents.MaterialButtons
-import MaterialComponents.MaterialButtons_Theming
-import MarqueeLabel
 import SnapKit
 
 public class BatteryWidget: UpdatableWidget {
@@ -26,7 +22,6 @@ public class BatteryWidget: UpdatableWidget {
         
         imageView.addShadow()
         imageView.image = DronelinkUI.loadImage(named: "batteryIcon")?.withRenderingMode(.alwaysTemplate)
-        imageView.tintColor = .white
         view.addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.left.equalToSuperview()
@@ -38,7 +33,7 @@ public class BatteryWidget: UpdatableWidget {
         label.addShadow()
         label.minimumScaleFactor = 0.5
         label.adjustsFontSizeToFitWidth = true
-        label.textColor = .green
+        label.textColor = .white
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
@@ -55,11 +50,11 @@ public class BatteryWidget: UpdatableWidget {
         
         guard let batteryPercent = session?.state?.value.batteryPercent else {
             label.text = "na".localized
-            label.textColor = .white
+            imageView.tintColor = .white
             return
         }
         
         label.text = Dronelink.shared.format(formatter: "percent", value: batteryPercent)
-        label.textColor = batteryPercent < (session?.state?.value.lowBatteryThreshold ?? 0) ? lowColor : normalColor
+        imageView.tintColor = batteryPercent < (session?.state?.value.lowBatteryThreshold ?? 0) ? lowColor : normalColor
     }
 }

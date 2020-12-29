@@ -9,10 +9,6 @@
 import Foundation
 import UIKit
 import DronelinkCore
-import MaterialComponents.MaterialPalettes
-import MaterialComponents.MaterialButtons
-import MaterialComponents.MaterialButtons_Theming
-import MarqueeLabel
 
 public class FlightModeWidget: UpdatableWidget {
     public override var updateInterval: TimeInterval { 0.5 }

@@ -787,8 +787,8 @@ public class DashboardWidget: DelegateWidget {
             }
         }
         
-        cameraMenuButton.isEnabled = widgetFactory.cameraMenuWidgetEnabled
-        cameraExposureMenuButton.isEnabled = widgetFactory.cameraExposureMenuWidgetEnabled
+        cameraMenuButton.isHidden = !widgetFactory.cameraMenuWidgetEnabled
+        cameraExposureMenuButton.isHidden = !widgetFactory.cameraExposureMenuWidgetEnabled
 
         cameraControlsView.snp.remakeConstraints { make in
             make.centerY.equalTo(primaryContentView.snp.centerY)

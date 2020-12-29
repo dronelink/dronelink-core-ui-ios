@@ -9,51 +9,47 @@
 import Foundation
 import UIKit
 import DronelinkCore
-import MaterialComponents.MaterialPalettes
-import MaterialComponents.MaterialButtons
-import MaterialComponents.MaterialButtons_Theming
-import MarqueeLabel
 
 public class GPSWidget: UpdatableWidget {
     
-    public let gpsIconImageView = UIImageView(image: DronelinkUI.loadImage(named: "signalIcon")?.withRenderingMode(.alwaysOriginal))
-    public let gpsSignalLevelLabel = UILabel()
-    public let gpsSignalLevelImageView = UIImageView(image: DronelinkUI.loadImage(named: "signal0")?.withRenderingMode(.alwaysOriginal))
+    public let iconImageView = UIImageView(image: DronelinkUI.loadImage(named: "signalIcon")?.withRenderingMode(.alwaysOriginal))
+    public let signalLevelLabel = UILabel()
+    public let signalLevelImageView = UIImageView(image: DronelinkUI.loadImage(named: "signal0")?.withRenderingMode(.alwaysOriginal))
     
-    public let signal_0_Image = DronelinkUI.loadImage(named: "signal0")?.withRenderingMode(.alwaysOriginal)
-    public let signal_1_Image = DronelinkUI.loadImage(named: "signal1")?.withRenderingMode(.alwaysOriginal)
-    public let signal_2_Image = DronelinkUI.loadImage(named: "signal2")?.withRenderingMode(.alwaysOriginal)
-    public let signal_3_Image = DronelinkUI.loadImage(named: "signal3")?.withRenderingMode(.alwaysOriginal)
-    public let signal_4_Image = DronelinkUI.loadImage(named: "signal4")?.withRenderingMode(.alwaysOriginal)
-    public let signal_5_Image = DronelinkUI.loadImage(named: "signal5")?.withRenderingMode(.alwaysOriginal)
+    public let signal0Image = DronelinkUI.loadImage(named: "signal0")?.withRenderingMode(.alwaysOriginal)
+    public let signal1Image = DronelinkUI.loadImage(named: "signal1")?.withRenderingMode(.alwaysOriginal)
+    public let signal2Image = DronelinkUI.loadImage(named: "signal2")?.withRenderingMode(.alwaysOriginal)
+    public let signal3Image = DronelinkUI.loadImage(named: "signal3")?.withRenderingMode(.alwaysOriginal)
+    public let signal4Image = DronelinkUI.loadImage(named: "signal4")?.withRenderingMode(.alwaysOriginal)
+    public let signal5Image = DronelinkUI.loadImage(named: "signal5")?.withRenderingMode(.alwaysOriginal)
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        gpsIconImageView.addShadow()
-        view.addSubview(gpsIconImageView)
-        gpsIconImageView.snp.makeConstraints { make in
+        iconImageView.addShadow()
+        view.addSubview(iconImageView)
+        iconImageView.snp.makeConstraints { make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
             make.width.equalTo(self.view.snp.height)
             make.bottom.equalToSuperview()
         }
         
-        gpsSignalLevelLabel.addShadow()
-        gpsSignalLevelLabel.textColor = .white
-        gpsSignalLevelLabel.textAlignment = .left
-        gpsSignalLevelLabel.font = UIFont.systemFont(ofSize: 10)
-        view.addSubview(gpsSignalLevelLabel)
-        gpsSignalLevelLabel.snp.makeConstraints { make in
-            make.left.equalTo(gpsIconImageView.snp.right).offset(1)
+        signalLevelLabel.addShadow()
+        signalLevelLabel.textColor = .white
+        signalLevelLabel.textAlignment = .left
+        signalLevelLabel.font = UIFont.systemFont(ofSize: 10)
+        view.addSubview(signalLevelLabel)
+        signalLevelLabel.snp.makeConstraints { make in
+            make.left.equalTo(iconImageView.snp.right).offset(1)
             make.top.equalTo(0)
             make.bottom.equalToSuperview().offset(-10)
         }
         
-        gpsSignalLevelImageView.addShadow()
-        view.addSubview(gpsSignalLevelImageView)
-        gpsSignalLevelImageView.snp.makeConstraints { make in
-            make.left.equalTo(gpsIconImageView.snp.right).offset(5)
+        signalLevelImageView.addShadow()
+        view.addSubview(signalLevelImageView)
+        signalLevelImageView.snp.makeConstraints { make in
+            make.left.equalTo(iconImageView.snp.right).offset(5)
             make.top.equalToSuperview()
             make.width.equalTo(self.view.snp.height)
             make.bottom.equalToSuperview()
@@ -67,32 +63,32 @@ public class GPSWidget: UpdatableWidget {
             let satellites = session?.state?.value.gpsSatellites,
             let strength = session?.state?.value.gpsSignalStrength
         else {
-            gpsSignalLevelLabel.text = ""
-            gpsSignalLevelLabel.isHidden = true
-            gpsSignalLevelImageView.image = signal_0_Image
+            signalLevelLabel.text = ""
+            signalLevelLabel.isHidden = true
+            signalLevelImageView.image = signal0Image
             return
         }
         
-        gpsSignalLevelLabel.text = "\(satellites)"
-        gpsSignalLevelLabel.isHidden = false
+        signalLevelLabel.text = "\(satellites)"
+        signalLevelLabel.isHidden = false
         
         if strength == 0 {
-            gpsSignalLevelImageView.image = signal_0_Image
+            signalLevelImageView.image = signal0Image
         }
         else if strength <= 0.2 {
-            gpsSignalLevelImageView.image = signal_1_Image
+            signalLevelImageView.image = signal1Image
         }
         else if strength <= 0.4 {
-            gpsSignalLevelImageView.image = signal_2_Image
+            signalLevelImageView.image = signal2Image
         }
         else if strength <= 0.6 {
-            gpsSignalLevelImageView.image = signal_3_Image
+            signalLevelImageView.image = signal3Image
         }
         else if strength <= 0.8 {
-            gpsSignalLevelImageView.image = signal_4_Image
+            signalLevelImageView.image = signal4Image
         }
         else {
-            gpsSignalLevelImageView.image = signal_5_Image
+            signalLevelImageView.image = signal5Image
         }
     }
 }

@@ -95,6 +95,7 @@ open class DistanceWidget: NumericInstrumentWidget {
                         distance = homeLocation.distance(from: droneLocation)
                     }
                 }
+                distance = distance ?? 0
             }
             
             return Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: "NumericInstrumentWidget.empty".localized)
@@ -109,8 +110,11 @@ open class DistanceHomeWidget: NumericInstrumentWidget {
         prefixText = "DistanceWidget.prefix".localized
         valueGenerator = {
             var distance: Double?
-            if let state = self.session?.state?.value, let droneLocation = state.location {
-                distance = state.homeLocation?.distance(from: droneLocation)
+            if let state = self.session?.state?.value {
+                if let droneLocation = state.location {
+                    distance = state.homeLocation?.distance(from: droneLocation)
+                }
+                distance = distance ?? 0
             }
             
             return Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: "NumericInstrumentWidget.empty".localized)
@@ -125,8 +129,11 @@ open class DistanceUserWidget: NumericInstrumentWidget {
         prefixText = "DistanceWidget.prefix".localized
         valueGenerator = {
             var distance: Double?
-            if let state = self.session?.state?.value, let droneLocation = state.location {
-                distance = Dronelink.shared.location?.value.distance(from: droneLocation)
+            if let state = self.session?.state?.value {
+                if let droneLocation = state.location {
+                    distance = state.homeLocation?.distance(from: droneLocation)
+                }
+                distance = distance ?? 0
             }
             
             return Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: "NumericInstrumentWidget.empty".localized)

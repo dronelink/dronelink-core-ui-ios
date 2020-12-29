@@ -9,10 +9,7 @@ import UIKit
 import AVFoundation
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
-import MaterialComponents.MaterialButtons
-import MaterialComponents.MaterialButtons_Theming
 import MaterialComponents.MaterialActivityIndicator
-import MarqueeLabel
 
 public class CameraCaptureWidget: UpdatableWidget {
     public override var updateInterval: TimeInterval { 0.1 }

@@ -8,8 +8,6 @@
 import UIKit
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
-import MaterialComponents.MaterialButtons
-import MaterialComponents.MaterialButtons_Theming
 import MarqueeLabel
 
 extension Kernel.MessageLevel {
