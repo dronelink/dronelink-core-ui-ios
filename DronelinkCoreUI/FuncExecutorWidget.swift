@@ -700,7 +700,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             primaryButton.isHidden = false
 
             titleLabel.text = funcExecutor.descriptors.name
-            primaryButton.setTitle((executing ? "FuncViewController.primary.executing" : hasInputs ? "FuncViewController.primary.intro" : "FuncViewController.primary.execute").localized, for: .normal)
+            primaryButton.setTitle((executing ? "FuncExecutorWidget.primary.executing" : hasInputs ? "FuncExecutorWidget.primary.intro" : "FuncExecutorWidget.primary.execute").localized, for: .normal)
             
             if let introImageUrl = funcExecutor.introImageUrl, !introImageUrl.isEmpty {
                 variableImageView.isHidden = false

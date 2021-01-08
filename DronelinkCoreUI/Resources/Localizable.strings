@@ -99,6 +99,7 @@
 "NetworkRTKStatus.value.2" = "Connected";
 "NetworkRTKStatus.value.3" = "Connecting";
 "NetworkRTKStatus.value.4" = "Error";
+"NetworkRTKStatus.value.5" = "Timeout";
 
 "RTKSettingsWidget.popover.status.heading" = "RTK Status";
 "RTKSettingsWidget.popover.status.channel" = "Network Service";

@@ -24,6 +24,8 @@ open class NumericInstrumentWidget: UpdatableWidget {
         prefixLabel.addShadow()
         prefixLabel.textColor = UIColor.white
         prefixLabel.font = UIFont.systemFont(ofSize: tablet ? 28 : 20, weight: .semibold)
+        valueLabel.minimumScaleFactor = 0.5
+        valueLabel.adjustsFontSizeToFitWidth = true
         prefixLabel.textAlignment = .center
         view.addSubview(prefixLabel)
         prefixLabel.snp.makeConstraints { make in
@@ -42,6 +44,8 @@ open class NumericInstrumentWidget: UpdatableWidget {
         valueLabel.addShadow()
         valueLabel.textColor = UIColor.white
         valueLabel.font = UIFont.systemFont(ofSize: tablet ? 32 : 24, weight: .semibold)
+        valueLabel.minimumScaleFactor = 0.5
+        valueLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(valueLabel)
         valueLabel.snp.makeConstraints { make in
             make.top.equalToSuperview()

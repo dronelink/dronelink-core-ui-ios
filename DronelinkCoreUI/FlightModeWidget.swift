@@ -38,7 +38,7 @@ public class FlightModeWidget: UpdatableWidget {
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
         label.snp.makeConstraints { make in
-            make.left.equalTo(imgageView.snp.right).offset(defaultPadding)
+            make.left.equalTo(imgageView.snp.right).offset(7)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
