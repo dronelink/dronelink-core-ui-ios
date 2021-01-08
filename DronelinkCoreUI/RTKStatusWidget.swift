@@ -16,9 +16,10 @@ import MaterialComponents.MaterialPalettes
 import Kingfisher
 import SwiftyUserDefaults
 
-public class RTKStatusWidget: Widget {
+public class RTKStatusWidget: DelegateWidget {
     let statusLabel = UILabel()
     let rtkLabel = UILabel()
+    public var createManager: (() -> RTKManager?)?
     private var manager: RTKManager?
     
     public override func viewDidLoad() {
@@ -40,40 +41,40 @@ public class RTKStatusWidget: Widget {
         
         let tapRtk = UITapGestureRecognizer(target: self, action: #selector(onRtkConfiguration))
         view.addGestureRecognizer(tapRtk)
-    }
-    
-    @objc func onRtkConfiguration() {
-        guard let manager = manager else {
-            return
-        }
         
-        if let widget = widgetFactory.createRTKMenuWidget(current: nil) as? RTKSettingsWidget {
-            widget.set(manager: manager)
-            present(widget, animated: true, completion: nil)
-        }
+        view.isHidden = true
     }
     
-    public func set(manager: RTKManager?) {
-        self.manager = manager
+    public override func onInitialized(session: DroneSession) {
+        manager = createManager?()
         
         view.isHidden = manager == nil
 
         manager?.addUpdateListner(key: "RtkStatus") { (state: RTKState) in
-            if (state.networkRTKStatus != .notSupported)
-            {
-                self.updateLabel(state)
-                self.view.isHidden = false
+            DispatchQueue.main.async {
+                if (state.networkRTKStatus != .notSupported)
+                {
+                    self.updateLabel(state)
+                    self.view.isHidden = false
+                }
+                else {
+                    self.view.isHidden = true
+                }
             }
-            else {
-                self.view.isHidden = true
-            }
+        }
+    }
+    
+    @objc func onRtkConfiguration() {
+        if let manager = manager, let widget = widgetFactory.createRTKMenuWidget(current: nil) as? RTKSettingsWidget {
+            widget.set(manager: manager)
+            present(widget, animated: true, completion: nil)
         }
     }
     
     func updateLabel(_ state: RTKState) {
         switch state.networkRTKStatus {
         
-        case .notSupported, .disabled, .connecting, .connected:
+        case .notSupported, .disabled, .connecting, .connected, .timeout:
             statusLabel.text = "NetworkRTKStatus.value.\(state.networkRTKStatus.rawValue)".localized
             break
             
