@@ -84,7 +84,16 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
         return dashboardViewController
     }
     
-    private var interfaceVisible = true
+    private var _interfaceVisible = true
+    public var interfaceVisible: Bool {
+        get {
+            _interfaceVisible
+        }
+        set {
+            _interfaceVisible = newValue
+            view.needsUpdateConstraints()
+        }
+    }
     private var statusWidgetHeight: CGFloat { return tablet ? 50 : 40 }
     
     private var microsoftMapCredentialsKey: String?
@@ -103,7 +112,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
     private let cameraMenuButton = UIButton(type: .custom)
     private let cameraExposureMenuButton = UIButton(type: .custom)
     private let offsetsButton = UIButton(type: .custom)
-    private var offsetsButtonEnabled = false
+    private var offsetsButtonEnabled = true
     private let frameProcessorUpdateInterval: TimeInterval = 1 / 30
     private var frameProcessorUpdateTimer: Timer?
     private var frameProcessorFullscreen = false
@@ -111,7 +120,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
     private let hideOverlayButton = UIButton(type: .custom)
     private let disconnectedImageView = UIImageView()
     private var cameraFeedWidget: Widget?
-    private var cameraFeedContentView: UIView { contentLayout.cameraFeedPrimary(interfaceVisible: interfaceVisible) ? primaryContentView : secondaryContentView }
+    private var cameraFeedContentView: UIView { contentLayout.cameraFeedPrimary(interfaceVisible: _interfaceVisible) ? primaryContentView : secondaryContentView }
     private var mapWidget: Widget?
     private var mapContentView: UIView? {
         switch contentLayout {
@@ -468,8 +477,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
     }
     
     @objc func onHideInterface() {
-        self.interfaceVisible = false
-        self.view.setNeedsUpdateConstraints()
+        interfaceVisible = false
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             RPScreenRecorder.shared().startRecording{ error in }
@@ -494,7 +502,6 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 self.interfaceVisible = true
-                self.view.setNeedsUpdateConstraints()
             }
         }
     }
@@ -531,7 +538,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
     }
     
     @objc func onContentLayoutExpand(sender: Any) {
-        contentLayout = contentLayout.cameraFeedPrimary(interfaceVisible: interfaceVisible) ? .mapCameraFeed : .cameraFeedMap
+        contentLayout = contentLayout.cameraFeedPrimary(interfaceVisible: _interfaceVisible) ? .mapCameraFeed : .cameraFeedMap
         view.setNeedsUpdateConstraints()
     }
     
@@ -645,7 +652,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             toggleOffsets(visible: droneOffsetsVisible)
         }
         else {
-            offsetsButtonEnabled = false
+            offsetsButtonEnabled = true
             toggleOffsets(visible: false)
         }
         
@@ -654,12 +661,12 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
     
     private func refreshWidgets() {
         let cameraFeedWidgetPrevious = cameraFeedWidget
-        cameraFeedWidget = refreshWidget(current: cameraFeedWidget, next: widgetFactory.createCameraFeedWidget(current: cameraFeedWidget, primary: interfaceVisible && contentLayout.cameraFeedPrimary(interfaceVisible: interfaceVisible)), subview: cameraFeedContentView)
+        cameraFeedWidget = refreshWidget(current: cameraFeedWidget, next: widgetFactory.createCameraFeedWidget(current: cameraFeedWidget, primary: _interfaceVisible && contentLayout.cameraFeedPrimary(interfaceVisible: _interfaceVisible)), subview: cameraFeedContentView)
         cameraFeedWidget?.view.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
 
-        if interfaceVisible {
+        if _interfaceVisible {
             if let contentView = mapContentView, mapStyle != .none {
                 switch mapStyle {
                 case .mapbox:
@@ -686,7 +693,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             mapWidget = refreshWidget(current: mapWidget, next: nil)
         }
 
-        remainingFlightTimeWidget = refreshWidget(current: remainingFlightTimeWidget, next: !interfaceVisible ? nil : widgetFactory.createRemainingFlightTimeWidget(current: remainingFlightTimeWidget))
+        remainingFlightTimeWidget = refreshWidget(current: remainingFlightTimeWidget, next: !_interfaceVisible ? nil : widgetFactory.createRemainingFlightTimeWidget(current: remainingFlightTimeWidget))
         remainingFlightTimeWidget?.view.snp.remakeConstraints { make in
             let topOffset = -9
             if portrait, !tablet, let cameraFeedView = cameraFeedWidget?.view {
@@ -699,12 +706,12 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             make.right.equalTo(topBarView.snp.right)
         }
         
-        flightModeWidget = refreshWidget(current: flightModeWidget, next: !interfaceVisible ? nil : widgetFactory.createFlightModeWidget(current: flightModeWidget))
-        gpsWidget = refreshWidget(current: gpsWidget, next: !interfaceVisible ? nil : widgetFactory.createGPSWidget(current: gpsWidget))
-        visionWidget = refreshWidget(current: visionWidget, next: !interfaceVisible ? nil : widgetFactory.createVisionWidget(current: visionWidget))
-        uplinkWidget = refreshWidget(current: uplinkWidget, next: !interfaceVisible ? nil : widgetFactory.createUplinkWidget(current: uplinkWidget))
-        downlinkWidget = refreshWidget(current: downlinkWidget, next: !interfaceVisible ? nil : widgetFactory.createDownlinkWidget(current: downlinkWidget))
-        batteryWidget = refreshWidget(current: batteryWidget, next: !interfaceVisible ? nil : widgetFactory.createBatteryWidget(current: batteryWidget))
+        flightModeWidget = refreshWidget(current: flightModeWidget, next: !_interfaceVisible ? nil : widgetFactory.createFlightModeWidget(current: flightModeWidget))
+        gpsWidget = refreshWidget(current: gpsWidget, next: !_interfaceVisible ? nil : widgetFactory.createGPSWidget(current: gpsWidget))
+        visionWidget = refreshWidget(current: visionWidget, next: !_interfaceVisible ? nil : widgetFactory.createVisionWidget(current: visionWidget))
+        uplinkWidget = refreshWidget(current: uplinkWidget, next: !_interfaceVisible ? nil : widgetFactory.createUplinkWidget(current: uplinkWidget))
+        downlinkWidget = refreshWidget(current: downlinkWidget, next: !_interfaceVisible ? nil : widgetFactory.createDownlinkWidget(current: downlinkWidget))
+        batteryWidget = refreshWidget(current: batteryWidget, next: !_interfaceVisible ? nil : widgetFactory.createBatteryWidget(current: batteryWidget))
         
         var primaryIndicatorWidgetPrevious: Widget?
         primaryIndicatorWidgets.reversed().forEach { item in
@@ -726,12 +733,12 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             primaryIndicatorWidgetPrevious = item.widget
         }
         
-        statusBackgroundWidget = refreshWidget(current: statusBackgroundWidget, next: !interfaceVisible ? nil : widgetFactory.createStatusBackgroundWidget(current: statusBackgroundWidget), subview: topBarView)
+        statusBackgroundWidget = refreshWidget(current: statusBackgroundWidget, next: !_interfaceVisible ? nil : widgetFactory.createStatusBackgroundWidget(current: statusBackgroundWidget), subview: topBarView)
         statusBackgroundWidget?.view.snp.remakeConstraints { make in
             make.edges.equalToSuperview()
         }
 
-        statusForegroundWidget = refreshWidget(current: statusForegroundWidget, next: !interfaceVisible ? nil : widgetFactory.createStatusForegroundWidget(current: statusForegroundWidget), subview: topBarView)
+        statusForegroundWidget = refreshWidget(current: statusForegroundWidget, next: !_interfaceVisible ? nil : widgetFactory.createStatusForegroundWidget(current: statusForegroundWidget), subview: topBarView)
         statusForegroundWidget?.view.snp.remakeConstraints { make in
             let constrainTo: UIView = statusBackgroundWidget?.view ?? view
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
@@ -746,15 +753,15 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
         }
         (statusForegroundWidget as? StatusLabelWidget)?.onTapped = onMainMenu
         
-        cameraExposureWidget = refreshWidget(current: cameraExposureWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraExposureWidget(current: cameraExposureWidget))
+        cameraExposureWidget = refreshWidget(current: cameraExposureWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraExposureWidget(current: cameraExposureWidget))
         
-        cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
+        cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
         
-        cameraAutoExposureWidget = refreshWidget(current: cameraAutoExposureWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraAutoExposureWidget(current: cameraAutoExposureWidget))
+        cameraAutoExposureWidget = refreshWidget(current: cameraAutoExposureWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraAutoExposureWidget(current: cameraAutoExposureWidget))
         
-        cameraExposureFocusWidget = refreshWidget(current: cameraExposureFocusWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraExposureFocusWidget(current: cameraExposureFocusWidget))
+        cameraExposureFocusWidget = refreshWidget(current: cameraExposureFocusWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraExposureFocusWidget(current: cameraExposureFocusWidget))
         
-        cameraFocusModeWidget = refreshWidget(current: cameraFocusModeWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraFocusModeWidget(current: cameraFocusModeWidget))
+        cameraFocusModeWidget = refreshWidget(current: cameraFocusModeWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraFocusModeWidget(current: cameraFocusModeWidget))
         
         let cameraWidgetSize = statusWidgetHeight * 0.65
         var cameraIndicatorWidgetPrevious: Widget?
@@ -777,7 +784,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             cameraIndicatorWidgetPrevious = item.widget
         }
         
-        cameraModeWidget = refreshWidget(current: cameraModeWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
+        cameraModeWidget = refreshWidget(current: cameraModeWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
         cameraModeWidget?.view.snp.remakeConstraints { make in
             make.top.equalTo(cameraMenuButton.snp.bottom).offset(-13)
             make.left.equalToSuperview().offset(3)
@@ -785,7 +792,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             make.right.equalToSuperview().offset(-3)
         }
 
-        cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: !interfaceVisible ? nil : widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
+        cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: !_interfaceVisible ? nil : widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
         cameraCaptureWidget?.view.snp.remakeConstraints { make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
@@ -793,13 +800,13 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-5)
         }
 
-        compassWidget = refreshWidget(current: compassWidget, next: !interfaceVisible ? nil : widgetFactory.createCompassWidget(current: compassWidget))
+        compassWidget = refreshWidget(current: compassWidget, next: !_interfaceVisible ? nil : widgetFactory.createCompassWidget(current: compassWidget))
        
-        telemetryWidget = refreshWidget(current: telemetryWidget, next: !interfaceVisible ? nil : widgetFactory.createTelemetryWidget(current: telemetryWidget))
+        telemetryWidget = refreshWidget(current: telemetryWidget, next: !_interfaceVisible ? nil : widgetFactory.createTelemetryWidget(current: telemetryWidget))
         
-        executorWidget = refreshWidget(current: executorWidget, next: !interfaceVisible ? nil : widgetFactory.createExecutorWidget(current: executorWidget)) as? ExecutorWidget
+        executorWidget = refreshWidget(current: executorWidget, next: !_interfaceVisible ? nil : widgetFactory.createExecutorWidget(current: executorWidget)) as? ExecutorWidget
         
-        rtkStatusWidget = refreshWidget(current: rtkStatusWidget, next: !interfaceVisible ? nil : widgetFactory.createRTKStatusWidget(current: rtkStatusWidget))
+        rtkStatusWidget = refreshWidget(current: rtkStatusWidget, next: !_interfaceVisible ? nil : widgetFactory.createRTKStatusWidget(current: rtkStatusWidget))
         rtkStatusWidget?.view.snp.remakeConstraints { make in
             make.bottom.equalTo(cameraControlsView.snp.top).offset(-defaultPadding)
             make.right.equalTo(cameraControlsView.snp.right)
@@ -817,15 +824,15 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
 
         refreshWidgets()
         
-        dismissButton.isHidden = !interfaceVisible
-        disconnectedImageView.isHidden = session != nil || !interfaceVisible
-        contentSettingsButton.isHidden = !contentLayoutStatic && contentLayout == .cameraFeed || !interfaceVisible
-        contentLayoutVisibilityButton.isHidden = contentLayoutStatic || !interfaceVisible
-        contentLayoutExpandButton.isHidden = contentLayoutStatic || contentLayout == .cameraFeed || !interfaceVisible
+        dismissButton.isHidden = !_interfaceVisible
+        disconnectedImageView.isHidden = session != nil || !_interfaceVisible
+        contentSettingsButton.isHidden = !contentLayoutStatic && contentLayout == .cameraFeed || !_interfaceVisible
+        contentLayoutVisibilityButton.isHidden = contentLayoutStatic || !_interfaceVisible
+        contentLayoutExpandButton.isHidden = contentLayoutStatic || contentLayout == .cameraFeed || !_interfaceVisible
 
         let darkBackground = UIColor(red: 20, green: 20, blue: 20)
         let darkerBackground = UIColor(red: 10, green: 10, blue: 10)
-        primaryContentView.backgroundColor = contentLayout.cameraFeedPrimary(interfaceVisible: interfaceVisible) ? darkerBackground : darkBackground
+        primaryContentView.backgroundColor = contentLayout.cameraFeedPrimary(interfaceVisible: _interfaceVisible) ? darkerBackground : darkBackground
         primaryContentView.snp.remakeConstraints { make in
             if (portrait && !tablet) {
                 make.top.equalTo(topBarView.safeAreaLayoutGuide.snp.bottom).offset(statusWidgetHeight * 2)
@@ -846,8 +853,8 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             }
         }
 
-        secondaryContentView.isHidden = contentLayout == .cameraFeed || !interfaceVisible
-        secondaryContentView.backgroundColor = contentLayout.cameraFeedPrimary(interfaceVisible: interfaceVisible) ? darkBackground : darkerBackground
+        secondaryContentView.isHidden = contentLayout == .cameraFeed || !_interfaceVisible
+        secondaryContentView.backgroundColor = contentLayout.cameraFeedPrimary(interfaceVisible: _interfaceVisible) ? darkBackground : darkerBackground
         secondaryContentView.snp.remakeConstraints { make in
             if (portrait) {
                 make.top.equalTo(primaryContentView.snp.bottom).offset(tablet ? 0 : statusWidgetHeight * 2)
@@ -874,8 +881,8 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             }
         }
         
-        cameraMenuButton.isHidden = !widgetFactory.cameraMenuWidgetEnabled || !interfaceVisible
-        cameraExposureMenuButton.isHidden = !widgetFactory.cameraExposureMenuWidgetEnabled || !interfaceVisible
+        cameraMenuButton.isHidden = !widgetFactory.cameraMenuWidgetEnabled || !_interfaceVisible
+        cameraExposureMenuButton.isHidden = !widgetFactory.cameraExposureMenuWidgetEnabled || !_interfaceVisible
 
         cameraControlsView.snp.remakeConstraints { make in
             make.centerY.equalTo(primaryContentView.snp.centerY)
@@ -912,7 +919,7 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             make.width.equalTo(compassWidget!.view.snp.height)
         }
         
-        offsetsButton.isHidden = !offsetsButtonEnabled || !interfaceVisible
+        offsetsButton.isHidden = !offsetsButtonEnabled || !_interfaceVisible
         offsetsButton.tintColor = droneOffsetsWidget1 == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
         
         telemetryWidget?.view.snp.remakeConstraints { make in
@@ -1045,7 +1052,11 @@ public class DashboardWidget: DelegateWidget, RPPreviewViewControllerDelegate {
             }
         }
         
-        view.animateLayout()
+        droneOffsetsWidget1?.view.isHidden = !interfaceVisible
+        droneOffsetsWidget2?.view.isHidden = !interfaceVisible
+        cameraOffsetsWidget?.view.isHidden = !interfaceVisible
+        
+        //view.animateLayout()
     }
     
     //work-around for this: https://github.com/flutter/flutter/issues/35784
