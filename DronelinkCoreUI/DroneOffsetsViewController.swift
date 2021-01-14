@@ -548,8 +548,8 @@ public class DroneOffsetsViewController: UIViewController {
             case .position:
                 c1Button.isHidden = !debug
                 c2Button.isHidden = false
-                leftButton.isHidden = true
-                rightButton.isHidden = true
+                leftButton.isHidden = false
+                rightButton.isHidden = false
                 upButton.isHidden = false
                 downButton.isHidden = false
                 rcInputsToggleButton.isHidden = session == nil
