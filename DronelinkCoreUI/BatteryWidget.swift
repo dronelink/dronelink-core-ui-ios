@@ -55,6 +55,6 @@ public class BatteryWidget: UpdatableWidget {
         }
         
         label.text = Dronelink.shared.format(formatter: "percent", value: batteryPercent)
-        imageView.tintColor = batteryPercent < (session?.state?.value.lowBatteryThreshold ?? 0) ? lowColor : normalColor
+        imageView.tintColor = batteryPercent <= (session?.state?.value.lowBatteryThreshold ?? 0) ? lowColor : normalColor
     }
 }

@@ -957,8 +957,6 @@ public class DashboardWidget: DelegateWidget {
                 }
             }
         }
-        
-        view.animateLayout()
     }
     
     //work-around for this: https://github.com/flutter/flutter/issues/35784
