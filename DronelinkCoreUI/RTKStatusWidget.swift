@@ -48,7 +48,9 @@ public class RTKStatusWidget: DelegateWidget {
     public override func onInitialized(session: DroneSession) {
         manager = createManager?()
         
-        view.isHidden = manager == nil
+        DispatchQueue.main.async {
+            self.view.isHidden = self.manager == nil
+        }
 
         manager?.addUpdateListner(key: "RtkStatus") { (state: RTKState) in
             DispatchQueue.main.async {

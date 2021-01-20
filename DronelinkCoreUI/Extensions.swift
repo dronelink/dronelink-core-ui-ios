@@ -38,7 +38,7 @@ extension UIApplication {
 }
 
 public extension UIView {
-    func addShadow(color: UIColor = UIColor.black, opacity: Float = 0.75, radius: CGFloat = 5) {
+    func addShadow(color: UIColor = UIColor.black, opacity: Float = 0.75, radius: CGFloat = 3) {
         layer.shadowColor = color.cgColor
         layer.shadowOpacity = opacity
         layer.shadowRadius = radius
