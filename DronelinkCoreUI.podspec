@@ -15,6 +15,7 @@ Pod::Spec.new do |s|
   s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   s.dependency "DronelinkCore", "~> 2.1.0"
   s.dependency "SnapKit", "~> 5.0.1"
+  s.dependency "SwiftyUserDefaults", "~> 5.0.0"
   s.dependency "MicrosoftMapsSDK", "~> 1.1.4"
   s.dependency "Mapbox-iOS-SDK", "~> 6.3.0"
   s.dependency "MaterialComponents/Palettes", "~> 119.0.0"
@@ -29,4 +30,5 @@ Pod::Spec.new do |s|
   s.dependency "Kingfisher", "~> 5.15.7"
   s.dependency "Agrume", "~> 5.6.10"
   s.dependency "IQKeyboardManager", "~> 6.5.6"
+  s.dependency "MarqueeLabel", "~> 4.0.5"
 end

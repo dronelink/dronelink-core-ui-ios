@@ -14,71 +14,104 @@
 "next" = "Next";
 "resume" = "Resume";
 "learnMore" = "Learn More";
+"na" = "N/A";
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
 
 "ModeDisengageReason.user.disengaged" = "Mode Paused";
 
-"FuncViewController.cachedInputs.title" = "Previous Inputs Available";
-"FuncViewController.cachedInputs.message" = "Do you want to load the previous inputs or start over?";
-"FuncViewController.cachedInputs.action.new" = "Start Over";
-"FuncViewController.cachedInputs.action.previous" = "Load Previous";
-"FuncViewController.primary.intro" = "Get Started";
-"FuncViewController.primary.execute" = "Continue";
-"FuncViewController.primary.executing" = "Generating...";
-"FuncViewController.input.required" = "This input is required";
-"FuncViewController.input.location.unavailable" = "Drone location unavailable";
-"FuncViewController.input.drone" = "Mark";
-"FuncViewController.input.drone.unavailable" = "Please connect a drone.";
-"FuncViewController.input.summary" = "Input Summary";
-"FuncViewController.input.none" = "No Input";
-"FuncViewController.input.choose" = "Choose...";
+"MissionExecutorWidget.estimating" = "Estimating flight path and time...";
+"MissionExecutorWidget.start.takeoffLocationWarning.title" = "Confirm Takeoff Location";
+"MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.";
+"MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.";
+"MissionExecutorWidget.engaging" = "Starting Mission";
+"MissionExecutorWidget.disengaged" = "Mission Stopped";
 
-"ExecutableViewController.start.countdown" = "Starting in %d";
-"ExecutableViewController.start.engaging" = "Preparing to execute...";
-"ExecutableViewController.start.cancelled" = "Countdown Stopped";
-"ExecutableViewController.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
-"ExecutableViewController.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
-"ExecutableViewController.executionDuration.empty" = "--:--";
+"ModeExecutorWidget.disconnected" = "Waiting for drone...";
+"ModeExecutorWidget.ready" = "Ready to start";
+"ModeExecutorWidget.engaging" = "Starting Mode";
+"ModeExecutorWidget.disengaged" = "Mode Stopped";
 
-"MissionViewController.estimating" = "Estimating flight path and time...";
-"MissionViewController.start.takeoffLocationWarning.title" = "Confirm Takeoff Location";
-"MissionViewController.start.takeoffLocationWarning.message.device.altitude.available" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.";
-"MissionViewController.start.takeoffLocationWarning.message.device.altitude.unavailable" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.";
-"MissionViewController.engaging" = "Starting Mission";
-"MissionViewController.disengaged" = "Mission Stopped";
+"FuncExecutorWidget.cachedInputs.title" = "Previous Inputs Available";
+"FuncExecutorWidget.cachedInputs.message" = "Do you want to load the previous inputs or start over?";
+"FuncExecutorWidget.cachedInputs.action.new" = "Start Over";
+"FuncExecutorWidget.cachedInputs.action.previous" = "Load Previous";
+"FuncExecutorWidget.primary.intro" = "Get Started";
+"FuncExecutorWidget.primary.execute" = "Continue";
+"FuncExecutorWidget.primary.executing" = "Generating...";
+"FuncExecutorWidget.input.required" = "This input is required";
+"FuncExecutorWidget.input.location.unavailable" = "Drone location unavailable";
+"FuncExecutorWidget.input.drone" = "Mark";
+"FuncExecutorWidget.input.drone.unavailable" = "Please connect a drone.";
+"FuncExecutorWidget.input.summary" = "Input Summary";
+"FuncExecutorWidget.input.none" = "No Input";
+"FuncExecutorWidget.input.choose" = "Choose...";
 
-"ModeViewController.disconnected" = "Waiting for drone...";
-"ModeViewController.ready" = "Ready to start";
-"ModeViewController.engaging" = "Starting Mode";
-"ModeViewController.disengaged" = "Mode Stopped";
-
-"DroneOffsetsViewController.altitudeYaw" = "ALT/YAW";
-"DroneOffsetsViewController.position" = "POSITION";
-"DroneOffsetsViewController.more" = "Gimbal Options";
-"DroneOffsetsViewController.resetGimbal" = "Reset";
-"DroneOffsetsViewController.levelGimbal" = "0° (Level)";
-"DroneOffsetsViewController.nadirGimbal" = "-90° (Nadir)";
-"DroneOffsetsViewController.rollTrim" = "Roll Trim";
-"DroneOffsetsViewController.rc.inputs" = "Caution: RC sticks enabled";
+"ExecutableWidget.start.countdown" = "Starting in %d";
+"ExecutableWidget.start.engaging" = "Preparing to execute...";
+"ExecutableWidget.start.cancelled" = "Countdown Stopped";
+"ExecutableWidget.start.engage.droneSerialNumberUnavailable.title" = "Unidentified Drone";
+"ExecutableWidget.start.engage.droneSerialNumberUnavailable.message" = "Unable to determine the serial number of your drone. Try reconnecting or power-cycling.";
+"ExecutableWidget.executionDuration.empty" = "--:--";
 
 "InstrumentsViewController.empty" = "--";
 
-"TelemetryViewController.distance.prefix" = "D";
-"TelemetryViewController.altitude.prefix" = "A";
-"TelemetryViewController.horizontalSpeed.prefix" = "H/S";
-"TelemetryViewController.verticalSpeed.prefix" = "V/S";
-"TelemetryViewController.unit.distance.metric" = "m";
-"TelemetryViewController.unit.distance.imperial" = "ft";
-"TelemetryViewController.unit.horizontalSpeed.metric" = "km/h";
-"TelemetryViewController.unit.horizontalSpeed.imperial" = "mph";
-"TelemetryViewController.unit.verticalSpeed.metric" = "m/s";
-"TelemetryViewController.unit.verticalSpeed.imperial" = "fps";
+"NumericInstrumentWidget.empty" = "--";
 
-"MicrosoftMapViewController.more" = "Map Options";
-"MicrosoftMapViewController.reset" = "Reset";
-"MicrosoftMapViewController.follow" = "Follow";
-"MicrosoftMapViewController.chase.plane" = "Chase Plane (Beta)";
-"MicrosoftMapViewController.fpv" = "FPV (Beta)";
-"MicrosoftMapViewController.satellite" = "Satellite";
-"MicrosoftMapViewController.streets" = "Streets & Buildings";
+"DistanceWidget.prefix" = "D";
+"AltitudeWidget.prefix" = "A";
+"HorizontalSpeedWidget.prefix" = "H/S";
+"VerticalSpeedWidget.prefix" = "V/S";
+
+"StatusWidget.disconnected" = "Disconnected";
+"StatusWidget.ready" = "All Systems Go";
+"StatusWidget.manual" = "Manual Flight";
+
+"DashboardWidget.device.legacy.title" = "Low Performance Device";
+"DashboardWidget.device.legacy.details" = "Using this device may result in poor flight performance or other unexpected issues. Please consider upgrading to a modern device for a safer and more reliable experience.";
+"DashboardWidget.device.legacy.confirm" = "I Understand";
+"DashboardWidget.device.legacy.confirm.dismiss" = "Don't Warn Again";
+"DashboardWidget.camera.noSDCard.title" = "SD Card Missing";
+"DashboardWidget.camera.noSDCard.details" = "Please make sure to insert an SD card before running a mission with data capture.";
+"DashboardWidget.cameraMenu" = "MENU";
+"DashboardWidget.contentSettings" = "Map Options";
+"DashboardWidget.map.mapbox" = "2D (Satellite)";
+"DashboardWidget.map.microsoft" = "3D (Beta)";
+
+"MicrosoftMapWidget.reset" = "Reset";
+"MicrosoftMapWidget.follow" = "Follow";
+"MicrosoftMapWidget.chase.plane" = "Chase Plane (Beta)";
+"MicrosoftMapWidget.fpv" = "FPV (Beta)";
+"MicrosoftMapWidget.satellite" = "Satellite";
+"MicrosoftMapWidget.streets" = "Streets & Buildings";
+
+"DroneOffsetsWidget.altitudeYaw" = "ALT/YAW";
+"DroneOffsetsWidget.position" = "POSITION";
+"DroneOffsetsWidget.more" = "Gimbal Options";
+"DroneOffsetsWidget.resetGimbal" = "Reset";
+"DroneOffsetsWidget.levelGimbal" = "0° (Level)";
+"DroneOffsetsWidget.nadirGimbal" = "-90° (Nadir)";
+"DroneOffsetsWidget.rollTrim" = "Roll Trim";
+"DroneOffsetsWidget.rc.inputs" = "Caution: RC sticks enabled";
+
+"NetworkRTKStatus.value.0" = "N/A";
+"NetworkRTKStatus.value.1" = "Disabled";
+"NetworkRTKStatus.value.2" = "Connected";
+"NetworkRTKStatus.value.3" = "Connecting";
+"NetworkRTKStatus.value.4" = "Error";
+"NetworkRTKStatus.value.5" = "Timeout";
+
+"RTKSettingsWidget.popover.status.heading" = "RTK Status";
+"RTKSettingsWidget.popover.status.channel" = "Network Service";
+"RTKSettingsWidget.popover.status.configuration" = "Configuration Status";
+"RTKSettingsWidget.popover.configuration.heading" = "RTK Network Configuration";
+"RTKSettingsWidget.popover.configuration.enabled" = "Enabled";
+"RTKSettingsWidget.popover.configuration.autoconnect" = "Auto connect";
+"RTKSettingsWidget.popover.configuration.serveraddress" = "Server address";
+"RTKSettingsWidget.popover.configuration.port" = "Port";
+"RTKSettingsWidget.popover.configuration.username" = "Username";
+"RTKSettingsWidget.popover.configuration.password" = "Password";
+"RTKSettingsWidget.popover.configuration.confirm" = "Confirm";
+"RTKSettingsWidget.popover.configuration.mountpoint" = "Mount point";
+
+"RTKStatusWidget.status.label" = "Network RTK";

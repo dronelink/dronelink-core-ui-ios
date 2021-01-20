@@ -10,6 +10,8 @@ import JavaScriptCore
 import CoreLocation
 import UIKit
 import os
+import MaterialComponents
+import Kingfisher
 
 extension String {
     internal static let LocalizationMissing = "MISSING STRING LOCALIZATION"
@@ -36,7 +38,7 @@ extension UIApplication {
 }
 
 public extension UIView {
-    func addShadow(color: UIColor = UIColor.black, opacity: Float = 0.5, radius: CGFloat = 5) {
+    func addShadow(color: UIColor = UIColor.black, opacity: Float = 0.75, radius: CGFloat = 5) {
         layer.shadowColor = color.cgColor
         layer.shadowOpacity = opacity
         layer.shadowRadius = radius
@@ -48,6 +50,20 @@ public extension UIView {
         UIView.animate(withDuration: duration, delay: 0.0, options: .curveEaseInOut, animations: {
             self.layoutIfNeeded()
         })
+    }
+}
+
+extension UIViewController {
+    public func install(inParent: UIViewController, insideSubview: UIView? = nil) {
+        willMove(toParent: inParent)
+        inParent.addChild(self)
+        (insideSubview ?? inParent.view).addSubview(view)
+        didMove(toParent: inParent)
+    }
+    
+    public func uninstallFromParent() {
+        removeFromParent()
+        view.removeFromSuperview()
     }
 }
 
@@ -115,4 +131,7 @@ extension UIColor {
             blue: rgb & 0xFF
         )
     }
+}
+
+extension MDCActivityIndicator: Placeholder {
 }
