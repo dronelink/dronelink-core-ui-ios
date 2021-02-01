@@ -276,7 +276,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
                 switch restrictionZone.zone.shape {
                 case .circle:
                     let center = coordinates[0].coordinate
-                    let radius = coordinates[0].coordinate.distance(to: coordinates[1].coordinate)
+                    let radius = center.distance(to: coordinates[1].coordinate)
                     polygon.shapes = [
                         MSGeocircle(
                             center: positionAboveDroneTakeoffLocation(coordinate: center, altitude: restrictionZone.zone.minAltitude.value),

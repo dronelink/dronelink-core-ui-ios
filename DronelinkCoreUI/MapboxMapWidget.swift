@@ -21,6 +21,7 @@ public class MapboxMapWidget: UpdatableWidget {
     private var droneAnnotationView: MGLAnnotationView?
     private var userDroneAnnotation: MGLAnnotation?
     private var missionRequiredTakeoffAreaAnnotation: MGLAnnotation?
+    private var missionRestrictionZoneAnnotations: [MGLAnnotation] = []
     private var missionEstimateBackgroundAnnotation: MGLAnnotation?
     private var missionEstimateForegroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateBackgroundAnnotation: MGLAnnotation?
@@ -90,6 +91,43 @@ public class MapboxMapWidget: UpdatableWidget {
             }
             missionRequiredTakeoffAreaAnnotation = MGLPolygon(coordinates: coordinates, count: UInt(coordinates.count))
             mapView.addAnnotation(missionRequiredTakeoffAreaAnnotation!)
+        }
+    }
+    
+    private func updateMissionRestrictionZones() {
+        missionRestrictionZoneAnnotations.forEach {
+            mapView.removeAnnotation($0)
+        }
+        missionRestrictionZoneAnnotations.removeAll()
+
+        if let restrictionZones = missionExecutor?.restrictionZones {
+            restrictionZones.enumerated().forEach {
+                guard let coordinates = missionExecutor?.restrictionZoneBoundaryCoordinates(index: $0.offset) else {
+                    return
+                }
+
+                let restrictionZone = $0.element
+                switch restrictionZone.zone.shape {
+                case .circle:
+                    let center = coordinates[0].coordinate
+                    let radius = center.distance(to: coordinates[1].coordinate)
+                    let segments = 100
+                    let points = (0...segments).map { index -> CLLocationCoordinate2D in
+                        let percent = Double(index) / Double(segments)
+                        return center.coordinate(bearing: percent * Double.pi * 2, distance: radius)
+                    }
+                    let missionRestrictionZoneAnnotation = MGLPolygon(coordinates: points, count: UInt(points.count))
+                    missionRestrictionZoneAnnotations.append(missionRestrictionZoneAnnotation)
+                    mapView.addAnnotation(missionRestrictionZoneAnnotation)
+                    break
+
+                case .polygon:
+                    let missionRestrictionZoneAnnotation = MGLPolygon(coordinates: coordinates.map { $0.coordinate }, count: UInt(coordinates.count))
+                    missionRestrictionZoneAnnotations.append(missionRestrictionZoneAnnotation)
+                    mapView.addAnnotation(missionRestrictionZoneAnnotation)
+                    break
+                }
+            }
         }
     }
     
@@ -181,6 +219,7 @@ public class MapboxMapWidget: UpdatableWidget {
         DispatchQueue.main.async {
             self.missionCentered = false
             self.updateMissionRequiredTakeoffArea()
+            self.updateMissionRestrictionZones()
             if executor.estimated {
                 self.updateMissionEstimate()
             }
@@ -193,6 +232,7 @@ public class MapboxMapWidget: UpdatableWidget {
         DispatchQueue.main.async {
             self.missionCentered = false
             self.updateMissionRequiredTakeoffArea()
+            self.updateMissionRestrictionZones()
             self.updateMissionEstimate()
         }
     }
@@ -296,6 +336,12 @@ extension MapboxMapWidget: MGLMapViewDelegate {
         if (annotation === missionReengagementEstimateForegroundAnnotation) {
             return MDCPalette.purple.accent200!
         }
+        
+        for missionRestrictionZoneAnnotation in missionRestrictionZoneAnnotations {
+            if (annotation === missionRestrictionZoneAnnotation) {
+                return MDCPalette.pink.accent400!
+            }
+        }
 
         return MDCPalette.cyan.accent400!
     }
@@ -304,6 +350,12 @@ extension MapboxMapWidget: MGLMapViewDelegate {
         if (annotation === missionRequiredTakeoffAreaAnnotation) {
             return MDCPalette.orange.accent400!
         }
+        
+        for missionRestrictionZoneAnnotation in missionRestrictionZoneAnnotations {
+            if (annotation === missionRestrictionZoneAnnotation) {
+                return MDCPalette.pink.accent400!
+            }
+        }
 
         return MDCPalette.cyan.accent400!
     }
@@ -311,6 +363,12 @@ extension MapboxMapWidget: MGLMapViewDelegate {
     public func mapView(_ mapView: MGLMapView, alphaForShapeAnnotation annotation: MGLShape) -> CGFloat {
         if (annotation === missionRequiredTakeoffAreaAnnotation) {
             return 0.25
+        }
+        
+        for missionRestrictionZoneAnnotation in missionRestrictionZoneAnnotations {
+            if (annotation === missionRestrictionZoneAnnotation) {
+                return 0.5
+            }
         }
 
         return 1.0

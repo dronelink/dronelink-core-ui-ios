@@ -229,7 +229,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         }
         
         if style == .altYaw {
-            styleSegmentedControl.setTitle(rollVisible ? "DroneOffsetsViewController.rollTrim".localized.uppercased() : style.display, forSegmentAt: style.rawValue)
+            styleSegmentedControl.setTitle(rollVisible ? "DroneOffsetsWidget.rollTrim".localized.uppercased() : style.display, forSegmentAt: style.rawValue)
         }
         
         update()
@@ -243,31 +243,31 @@ public class DroneOffsetsWidget: UpdatableWidget {
     @objc func onRCInputsToggle(sender: Any) {
         rcInputsEnabled = !rcInputsEnabled
         if rcInputsEnabled {
-            DronelinkUI.shared.showSnackbar(text: "DroneOffsetsViewController.rc.inputs".localized)
+            DronelinkUI.shared.showSnackbar(text: "DroneOffsetsWidget.rc.inputs".localized)
         }
         update()
     }
     
     @objc func onMore(sender: Any) {
-        let alert = UIAlertController(title: "DroneOffsetsViewController.more".localized, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "DroneOffsetsWidget.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.levelGimbal".localized, style: .default , handler:{ _ in
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.levelGimbal".localized, style: .default , handler:{ _ in
             var command = Kernel.OrientationGimbalCommand()
             command.orientation.x = 0
             try? self.session?.add(command: command)
         }))
         
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.nadirGimbal".localized, style: .default , handler:{ _ in
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.nadirGimbal".localized, style: .default , handler:{ _ in
             var command = Kernel.OrientationGimbalCommand()
             command.orientation.x = -90.convertDegreesToRadians
             try? self.session?.add(command: command)
         }))
         
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.resetGimbal".localized, style: .default , handler:{ _ in
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.resetGimbal".localized, style: .default , handler:{ _ in
             self.session?.drone.gimbal(channel: 0)?.reset()
         }))
         
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.rollTrim".localized, style: .default , handler:{ _ in
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.rollTrim".localized, style: .default , handler:{ _ in
             self.updateRoll(visible: true)
         }))
         
@@ -557,27 +557,44 @@ public class DroneOffsetsWidget: UpdatableWidget {
             let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
             let deadband = 0.15
             
-            let yawPercent = remoteControllerState.leftStick.x
-            if abs(yawPercent) > deadband {
-                offsets.droneYaw += (1.0 * yawPercent).convertDegreesToRadians
-            }
+            switch style {
+            case .altYaw:
+                let yawPercent = remoteControllerState.leftStick.x
+                if abs(yawPercent) > deadband {
+                    offsets.droneYaw += (1.0 * yawPercent).convertDegreesToRadians
+                }
 
-            let altitudePercent = remoteControllerState.leftStick.y
-            if abs(altitudePercent) > deadband {
-                offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
-            }
-            
-            
-            let positionPercent = remoteControllerState.rightStick.y
-            if abs(positionPercent) > deadband {
-                guard let state = session?.state?.value else {
-                    return
+                let altitudePercent = remoteControllerState.leftStick.y
+                if abs(altitudePercent) > deadband {
+                    offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
+                }
+                break
+                    
+            case .position:
+                let positionXPercent = remoteControllerState.rightStick.x
+                if abs(positionXPercent) > deadband {
+                    guard let state = session?.state?.value else {
+                        return
+                    }
+                    
+                    offsets.droneCoordinate = offsets.droneCoordinate.add(
+                        vector: Kernel.Vector2(
+                            direction: state.orientation.yaw + (positionXPercent >= 0 ? (Double.pi / 2) : -(Double.pi / 2)),
+                            magnitude: (0.4 * abs(positionXPercent)).convertFeetToMeters))
                 }
                 
-                offsets.droneCoordinate = offsets.droneCoordinate.add(
-                    vector: Kernel.Vector2(
-                        direction: state.orientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
-                        magnitude: (0.4 * abs(positionPercent)).convertFeetToMeters))
+                let positionYPercent = remoteControllerState.rightStick.y
+                if abs(positionYPercent) > deadband {
+                    guard let state = session?.state?.value else {
+                        return
+                    }
+                    
+                    offsets.droneCoordinate = offsets.droneCoordinate.add(
+                        vector: Kernel.Vector2(
+                            direction: state.orientation.yaw + (positionYPercent >= 0 ? 0 : Double.pi),
+                            magnitude: (0.4 * abs(positionYPercent)).convertFeetToMeters))
+                }
+                break
             }
         }
     }

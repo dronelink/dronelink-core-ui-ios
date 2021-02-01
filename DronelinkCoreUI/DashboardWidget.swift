@@ -91,7 +91,7 @@ public class DashboardWidget: DelegateWidget {
     private let contentLayoutVisibilityButton = UIButton(type: .custom)
     private let contentLayoutExpandButton = UIButton(type: .custom)
     private let primaryContentView = UIView()
-    private let reticalImageView = UIImageView()
+    private let reticleImageView = UIImageView()
     private let secondaryContentView = UIView()
     private let cameraControlsView = UIView()
     private let cameraMenuButton = UIButton(type: .custom)
@@ -172,10 +172,10 @@ public class DashboardWidget: DelegateWidget {
 
         view.addSubview(primaryContentView)
         
-        reticalImageView.isUserInteractionEnabled = false
-        reticalImageView.contentMode = .scaleAspectFit
-        view.addSubview(reticalImageView)
-        reticalImageView.snp.makeConstraints { make in
+        reticleImageView.isUserInteractionEnabled = false
+        reticleImageView.contentMode = .scaleAspectFit
+        view.addSubview(reticleImageView)
+        reticleImageView.snp.makeConstraints { make in
             make.center.equalTo(primaryContentView)
             make.height.equalTo(primaryContentView)
         }
@@ -555,9 +555,9 @@ public class DashboardWidget: DelegateWidget {
     }
     
     private func apply(userInterfaceSettings: Kernel.UserInterfaceSettings?) {
-        reticalImageView.image = nil
-        if let reticalImageUrl = userInterfaceSettings?.reticalImageUrl {
-            reticalImageView.kf.setImage(with: URL(string: reticalImageUrl))
+        reticleImageView.image = nil
+        if let reticleImageUrl = userInterfaceSettings?.reticleImageUrl {
+            reticleImageView.kf.setImage(with: URL(string: reticleImageUrl))
         }
         
         if let droneOffsetsVisible = userInterfaceSettings?.droneOffsetsVisible {
