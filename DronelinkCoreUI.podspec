@@ -11,8 +11,7 @@ Pod::Spec.new do |s|
   s.source = { :git => "https://github.com/dronelink/dronelink-core-ui-ios.git", :tag => "#{s.version}" }
   s.source_files  = "DronelinkCoreUI/**/*.swift"
   s.resources = "DronelinkCoreUI/**/*.{strings,xcassets}"
-  s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-  s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  s.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
   s.dependency "DronelinkCore", "~> 2.1.0"
   s.dependency "SnapKit", "~> 5.0.1"
   s.dependency "SwiftyUserDefaults", "~> 5.0.0"
