@@ -89,6 +89,8 @@ public class DashboardWidget: DelegateWidget {
     private let topBarView = UIView()
     private let contentSettingsButton = UIButton(type: .custom)
     private let contentLayoutVisibilityButton = UIButton(type: .custom)
+    private let contentLayoutMapHideImage = DronelinkUI.loadImage(named: "eye-off")
+    private let contentLayoutMapShowImage = DronelinkUI.loadImage(named: "baseline_map_white_36pt")
     private let contentLayoutExpandButton = UIButton(type: .custom)
     private let primaryContentView = UIView()
     private let reticleImageView = UIImageView()
@@ -194,7 +196,7 @@ public class DashboardWidget: DelegateWidget {
         
         contentSettingsButton.addShadow()
         contentSettingsButton.tintColor = UIColor.white
-        contentSettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_more_horiz_white_36pt"), for: .normal)
+        contentSettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_settings_white_36pt"), for: .normal)
         contentSettingsButton.addTarget(self, action: #selector(onContentSettings(sender:)), for: .touchUpInside)
         view.addSubview(contentSettingsButton)
         contentSettingsButton.snp.remakeConstraints { make in
@@ -206,7 +208,7 @@ public class DashboardWidget: DelegateWidget {
 
         contentLayoutVisibilityButton.addShadow()
         contentLayoutVisibilityButton.tintColor = UIColor.white
-        contentLayoutVisibilityButton.setImage(DronelinkUI.loadImage(named: "baseline_map_white_36pt"), for: .normal)
+        contentLayoutVisibilityButton.setImage(contentLayoutMapShowImage, for: .normal)
         contentLayoutVisibilityButton.addTarget(self, action: #selector(onContentLayoutVisibility(sender:)), for: .touchUpInside)
         view.addSubview(contentLayoutVisibilityButton)
         contentLayoutVisibilityButton.snp.remakeConstraints { make in
@@ -218,7 +220,7 @@ public class DashboardWidget: DelegateWidget {
         
         contentLayoutExpandButton.addShadow()
         contentLayoutExpandButton.tintColor = UIColor.white
-        contentLayoutExpandButton.setImage(DronelinkUI.loadImage(named: "baseline_zoom_out_map_white_36pt"), for: .normal)
+        contentLayoutExpandButton.setImage(DronelinkUI.loadImage(named: "vector-arrange-below"), for: .normal)
         contentLayoutExpandButton.addTarget(self, action: #selector(onContentLayoutExpand(sender:)), for: .touchUpInside)
         view.addSubview(contentLayoutExpandButton)
         contentLayoutExpandButton.snp.remakeConstraints { make in
@@ -731,9 +733,10 @@ public class DashboardWidget: DelegateWidget {
 
         refreshWidgets()
         
-        disconnectedImageView.isHidden = session != nil
+        disconnectedImageView.isHidden = true //session != nil
         contentSettingsButton.isHidden = !contentLayoutStatic && contentLayout == .cameraFeed
         contentLayoutVisibilityButton.isHidden = contentLayoutStatic
+        contentLayoutVisibilityButton.setImage(contentLayout == .cameraFeed ? contentLayoutMapShowImage : contentLayoutMapHideImage, for: .normal)
         contentLayoutExpandButton.isHidden = contentLayoutStatic || contentLayout == .cameraFeed
 
         let darkBackground = UIColor(red: 20, green: 20, blue: 20)
