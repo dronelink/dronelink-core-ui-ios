@@ -580,7 +580,7 @@ public class DashboardWidget: DelegateWidget {
             make.edges.equalToSuperview()
         }
 
-        if let contentView = mapContentView, mapStyle != .none {
+        if let _ = mapContentView, mapStyle != .none {
             switch mapStyle {
             case .mapbox:
                 mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MapboxMapWidget) ?? MapboxMapWidget(), subview: mapContentView)
@@ -878,7 +878,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         executorWidget?.view.snp.remakeConstraints { make in
-            let preferredSize = (executorWidget as? ExecutorWidget)?.preferredSize ?? CGSize(width: 0, height: 0)
+            let preferredSize = executorWidget?.preferredSize ?? CGSize(width: 0, height: 0)
             if executorWidget is FuncExecutorWidget {
                 let large = tablet || portrait
                 if (executorLayout == .large) {
