@@ -246,7 +246,12 @@ open class WidgetFactory {
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open var cameraMenuWidgetEnabled: Bool { false }
     open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureWidget) ?? CameraExposureWidget() }
+    open func createISOWidget(current: Widget? = nil) -> Widget? { (current as? ISOWidget) ?? ISOWidget()}
+    open func createShutterWidget(current: Widget? = nil) -> Widget? { (current as? ShutterWidget) ?? ShutterWidget()}
+    open func createFStopWidget(current: Widget? = nil) -> Widget? { (current as? FStopWidget) ?? FStopWidget()}
+    open func createEVWidget(current: Widget? = nil) -> Widget? { (current as? EVWidget) ?? EVWidget()}
+    open func createWBWidget(current: Widget? = nil) -> Widget? { (current as? WBWidget) ?? WBWidget()}
     open func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureFocusWidget(current: Widget? = nil) -> Widget? { nil }
