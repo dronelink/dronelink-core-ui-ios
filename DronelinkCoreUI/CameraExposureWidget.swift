@@ -12,58 +12,58 @@ import DronelinkCore
 import SnapKit
     
 public class CameraExposureWidget: Widget {
-    private let isoWidget = WidgetFactory.shared.createISOWidget()
-    private let shutterWidget = WidgetFactory.shared.createShutterWidget()
-    private let fStopWidget = WidgetFactory.shared.createFStopWidget()
-    private let evWidget = WidgetFactory.shared.createEVWidget()
-    private let wbWidget = WidgetFactory.shared.createWBWidget()
+    private let cameraIsoWidget = WidgetFactory.shared.createCameraISOWidget()
+    private let cameraShutterWidget = WidgetFactory.shared.createCameraShutterWidget()
+    private let cameraApertureWidget = WidgetFactory.shared.createCameraApertureWidget()
+    private let cameraExposureCompensationWidget = WidgetFactory.shared.createCameraExposureCompensationWidget()
+    private let cameraWhiteBalanceWidget = WidgetFactory.shared.createCameraWhiteBalanceWidget()
     public var itemSpacing = 8
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         guard
-            let isoWidget = isoWidget,
-            let shutterWidget = shutterWidget,
-            let fStopWidget = fStopWidget,
-            let evWidget = evWidget,
-            let wbWidget = wbWidget
+            let cameraIsoWidget = cameraIsoWidget,
+            let cameraShutterWidget = cameraShutterWidget,
+            let cameraApertureWidget = cameraApertureWidget,
+            let cameraExposureCompensationWidget = cameraExposureCompensationWidget,
+            let cameraWhiteBalanceWidget = cameraWhiteBalanceWidget
         else {
             return
         }
         
-        view.addSubview(isoWidget.view)
-        isoWidget.view.snp.makeConstraints { make in
+        view.addSubview(cameraIsoWidget.view)
+        cameraIsoWidget.view.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
             make.left.equalToSuperview().offset(itemSpacing)
         }
         
-        view.addSubview(shutterWidget.view)
-        shutterWidget.view.snp.makeConstraints { make in
+        view.addSubview(cameraShutterWidget.view)
+        cameraShutterWidget.view.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.left.equalTo(isoWidget.view.snp.right).offset(itemSpacing)
+            make.left.equalTo(cameraIsoWidget.view.snp.right).offset(itemSpacing)
         }
         
-        view.addSubview(fStopWidget.view)
-        fStopWidget.view.snp.makeConstraints { make in
+        view.addSubview(cameraApertureWidget.view)
+        cameraApertureWidget.view.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.left.equalTo(shutterWidget.view.snp.right).offset(itemSpacing)
+            make.left.equalTo(cameraShutterWidget.view.snp.right).offset(itemSpacing)
         }
         
-        view.addSubview(evWidget.view)
-        evWidget.view.snp.makeConstraints { make in
+        view.addSubview(cameraExposureCompensationWidget.view)
+        cameraExposureCompensationWidget.view.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.left.equalTo(fStopWidget.view.snp.right).offset(itemSpacing)
+            make.left.equalTo(cameraApertureWidget.view.snp.right).offset(itemSpacing)
         }
         
-        view.addSubview(wbWidget.view)
-        wbWidget.view.snp.makeConstraints { make in
+        view.addSubview(cameraWhiteBalanceWidget.view)
+        cameraWhiteBalanceWidget.view.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
-            make.left.equalTo(evWidget.view.snp.right).offset(itemSpacing)
+            make.left.equalTo(cameraExposureCompensationWidget.view.snp.right).offset(itemSpacing)
             make.right.equalToSuperview()
         }
        

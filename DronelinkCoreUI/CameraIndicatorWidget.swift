@@ -55,7 +55,7 @@ open class CameraIndicatorWidget: UpdatableWidget {
     }
 }
 
-open class ISOWidget: CameraIndicatorWidget {
+open class CameraISOWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.iso.title".localized
@@ -71,7 +71,7 @@ open class ISOWidget: CameraIndicatorWidget {
     }
 }
 
-open class ShutterWidget: CameraIndicatorWidget {
+open class CameraShutterWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.shutter.title".localized
@@ -87,7 +87,7 @@ open class ShutterWidget: CameraIndicatorWidget {
     }
 }
 
-open class FStopWidget: CameraIndicatorWidget {
+open class CameraApertureWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.fstop.title".localized
@@ -103,7 +103,7 @@ open class FStopWidget: CameraIndicatorWidget {
     }
 }
 
-open class EVWidget: CameraIndicatorWidget {
+open class CameraExposureCompensationWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.ev.title".localized
@@ -119,7 +119,7 @@ open class EVWidget: CameraIndicatorWidget {
     }
 }
 
-open class WBWidget: CameraIndicatorWidget {
+open class CameraWhiteBalanceWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.wb.title".localized
