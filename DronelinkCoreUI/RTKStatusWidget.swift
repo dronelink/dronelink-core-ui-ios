@@ -19,7 +19,7 @@ import SwiftyUserDefaults
 public class RTKStatusWidget: DelegateWidget {
     let statusLabel = UILabel()
     let rtkLabel = UILabel()
-    public var createManager: (() -> RTKManager?)?
+    public var createManager: ((_ session: DroneSession) -> RTKManager?)?
     private var manager: RTKManager?
     
     public override func viewDidLoad() {
@@ -46,7 +46,7 @@ public class RTKStatusWidget: DelegateWidget {
     }
     
     public override func onInitialized(session: DroneSession) {
-        manager = createManager?()
+        manager = createManager?(session)
         
         DispatchQueue.main.async {
             self.view.isHidden = self.manager == nil
