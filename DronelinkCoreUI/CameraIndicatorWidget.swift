@@ -64,9 +64,22 @@ open class CameraISOWidget: CameraIndicatorWidget {
                 return "na".localized
             }
             
+            if iso == .auto, let isoSensitivity = self.cameraState?.isoSensitivity {
+                return Dronelink.shared.format(formatter: "integer", value: isoSensitivity)
+            }
             return Dronelink.shared.formatEnum(name: "CameraISO",
                                                value: iso.rawValue,
                                                defaultValue: "na".localized)
+        }
+    }
+    
+    open override func update() {
+        super.update()
+        guard let iso = self.cameraState?.iso else { return }
+        if iso == .auto {
+            titleLabel.text = "CameraExposureWidget.autoiso.title".localized
+        } else {
+            titleLabel.text = "CameraExposureWidget.iso.title".localized
         }
     }
 }
@@ -128,9 +141,9 @@ open class CameraWhiteBalanceWidget: CameraIndicatorWidget {
                 return "na".localized
             }
             
-            if wb == .custom, let whiteBalanceValue = self.cameraState?.whiteBalanceCustom {
+            if wb == .custom, let whiteBalanceColorTemperature = self.cameraState?.whiteBalanceColorTemperature {
                 return Dronelink.shared.format(formatter: "absoluteTemperature",
-                                               value: whiteBalanceValue,
+                                               value: whiteBalanceColorTemperature,
                                                defaultValue: "na".localized)
             }
             return Dronelink.shared.formatEnum(name: "CameraWhiteBalancePreset",
