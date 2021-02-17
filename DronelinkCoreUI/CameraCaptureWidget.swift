@@ -258,7 +258,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         if pendingCommand?.id == command.id {
             pendingCommand = nil
             if let error = error {
-                DronelinkUI.shared.showSnackbar(text: error.localizedDescription)
+                DronelinkUI.shared.showSnackbar(text: error as? String ?? error.localizedDescription)
             }
             
             DispatchQueue.main.async {

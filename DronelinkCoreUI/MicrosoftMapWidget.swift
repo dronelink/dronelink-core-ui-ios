@@ -463,8 +463,8 @@ public class MicrosoftMapWidget: UpdatableWidget {
             }
 
             //kluge: microsoft maps has a bug / optimization that refuses to render coordinates that are very close, even if the altitude is different, so trick it
-            if lastPosition.coordinate.distance(to: position.coordinate) < 0.01 {
-                position = positionAboveDroneTakeoffLocation(coordinate: coordinate.coordinate(bearing: 0, distance: 0.01), altitude: altitude)
+            if lastPosition.coordinate.distance(to: position.coordinate) <= 0.01 {
+                position = positionAboveDroneTakeoffLocation(coordinate: coordinate.coordinate(bearing: 0, distance: 0.011), altitude: altitude)
             }
         }
 

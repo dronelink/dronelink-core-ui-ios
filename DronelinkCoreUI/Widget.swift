@@ -120,12 +120,17 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
 }
 
 extension UIView {
-    public func createWidget() -> Widget {
+    public func createWidget(shadow: Bool = false) -> Widget {
         let widget = Widget()
         widget.view.addSubview(self)
         snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        if shadow {
+            widget.view.addShadow()
+        }
+        
         return widget
     }
 }

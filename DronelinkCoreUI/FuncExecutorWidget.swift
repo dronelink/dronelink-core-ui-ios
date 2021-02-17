@@ -216,10 +216,9 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
                 }
             }
             
-            if c2PressedPrevious, !remoteControllerState.c2Button.pressed, !variableDroneMarkButton.isHidden {
+            if c2PressedPrevious, !remoteControllerState.c2Button.pressed {
                 DispatchQueue.main.async {
-                    self.funcExecutor?.clearValue(index: self.inputIndex)
-                    self.readValue()
+                    self.onPrimary(sender: self)
                 }
             }
         }
@@ -712,6 +711,8 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
                 variableDescriptionTextView.text = funcExecutor.descriptors.description
             }
             
+            layout = funcExecutor.introImageUrl?.isEmpty ?? true ? .small : .large
+            view.superview?.setNeedsUpdateConstraints()
             return
         }
 
