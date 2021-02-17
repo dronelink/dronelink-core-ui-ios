@@ -21,7 +21,6 @@ open class CameraIndicatorWidget: UpdatableWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         titleLabel.textColor = .white
         titleLabel.alpha = 0.6
         titleLabel.textAlignment = .left
@@ -38,6 +37,7 @@ open class CameraIndicatorWidget: UpdatableWidget {
             make.left.equalToSuperview()
             make.top.equalToSuperview()
             make.right.equalToSuperview()
+            make.height.equalToSuperview().multipliedBy(0.4)
         }
         
         view.addSubview(valueLabel)
