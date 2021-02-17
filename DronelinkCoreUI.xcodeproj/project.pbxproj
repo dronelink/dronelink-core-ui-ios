@@ -26,6 +26,8 @@
 		24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */; };
 		24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
+		DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */; };
+		DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */; };
 		E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */; };
 		E4AD4F6725800F9700404783 /* FlightModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F6625800F9700404783 /* FlightModeWidget.swift */; };
 		E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F81258105A600404783 /* GPSWidget.swift */; };
@@ -61,6 +63,8 @@
 		24C355C2F269DEDDB27438E6 /* Pods-DronelinkCoreUI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.release.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.release.xcconfig"; sourceTree = "<group>"; };
 		63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.debug.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.debug.xcconfig"; sourceTree = "<group>"; };
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraExposureWidget.swift; sourceTree = "<group>"; };
+		DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraIndicatorWidget.swift; sourceTree = "<group>"; };
 		E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeWidget.swift; sourceTree = "<group>"; };
 		E4AD4F6625800F9700404783 /* FlightModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightModeWidget.swift; sourceTree = "<group>"; };
 		E4AD4F81258105A600404783 /* GPSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSWidget.swift; sourceTree = "<group>"; };
@@ -115,6 +119,8 @@
 			children = (
 				E4AD50032581547100404783 /* BatteryWidget.swift */,
 				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
+				DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */,
+				DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */,
 				E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */,
 				2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */,
 				249F377F2577D01800472A7D /* DashboardWidget.swift */,
@@ -280,6 +286,7 @@
 				247E09EA244F407500D002A2 /* MicrosoftMapWidget.swift in Sources */,
 				E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */,
 				249F37182576ECF500472A7D /* StatusWidget.swift in Sources */,
+				DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapboxMapWidget.swift in Sources */,
 				2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
@@ -290,6 +297,7 @@
 				24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */,
 				2459751623679D1F008CAB6B /* Extensions.swift in Sources */,
 				249F37802577D01800472A7D /* DashboardWidget.swift in Sources */,
+				DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */,
 				E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */,
 				249F37342576EF2900472A7D /* Widget.swift in Sources */,
 			);

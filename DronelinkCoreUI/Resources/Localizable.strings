@@ -16,6 +16,13 @@
 "learnMore" = "Learn More";
 "na" = "N/A";
 
+"CameraExposureWidget.iso.title" = "ISO";
+"CameraExposureWidget.autoiso.title" = "Auto ISO";
+"CameraExposureWidget.shutter.title" = "Shutter";
+"CameraExposureWidget.fstop.title" = "F";
+"CameraExposureWidget.ev.title" = "EV";
+"CameraExposureWidget.wb.title" = "WB";
+
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
 
 "ModeDisengageReason.user.disengaged" = "Mode Paused";
