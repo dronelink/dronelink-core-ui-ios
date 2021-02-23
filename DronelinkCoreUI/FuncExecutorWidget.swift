@@ -218,7 +218,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             
             if c2PressedPrevious, !remoteControllerState.c2Button.pressed {
                 DispatchQueue.main.async {
-                    self.onPrimary(sender: self)
+                    self.onNext(sender: self)
                 }
             }
         }

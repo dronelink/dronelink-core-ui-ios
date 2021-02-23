@@ -21,11 +21,13 @@ public class MapboxMapWidget: UpdatableWidget {
     private var droneAnnotationView: MGLAnnotationView?
     private var userDroneAnnotation: MGLAnnotation?
     private var missionRequiredTakeoffAreaAnnotation: MGLAnnotation?
-    private var missionRestrictionZoneAnnotations: [MGLAnnotation] = []
+    private var missionRestrictionZoneAnnotations: [(annotation: MGLPolygon, color: UIColor?)] = []
     private var missionEstimateBackgroundAnnotation: MGLAnnotation?
     private var missionEstimateForegroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateBackgroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateForegroundAnnotation: MGLAnnotation?
+    private var funcDroneAnnotations: [MGLPointAnnotation] = []
+    private var funcMapOverlayAnnotations: [(annotation: MGLPolygon, color: UIColor?)] = []
     private var modeTargetAnnotation = MGLPointAnnotation()
     private var modeTargetAnnotationView: MGLAnnotationView?
     private var missionCentered = false
@@ -96,7 +98,7 @@ public class MapboxMapWidget: UpdatableWidget {
     
     private func updateMissionRestrictionZones() {
         missionRestrictionZoneAnnotations.forEach {
-            mapView.removeAnnotation($0)
+            mapView.removeAnnotation($0.annotation)
         }
         missionRestrictionZoneAnnotations.removeAll()
 
@@ -107,6 +109,7 @@ public class MapboxMapWidget: UpdatableWidget {
                 }
 
                 let restrictionZone = $0.element
+                let color = UIColor(hex: restrictionZone.zone.color, defaultAlpha: 0.5)
                 switch restrictionZone.zone.shape {
                 case .circle:
                     let center = coordinates[0].coordinate
@@ -117,13 +120,13 @@ public class MapboxMapWidget: UpdatableWidget {
                         return center.coordinate(bearing: percent * Double.pi * 2, distance: radius)
                     }
                     let missionRestrictionZoneAnnotation = MGLPolygon(coordinates: points, count: UInt(points.count))
-                    missionRestrictionZoneAnnotations.append(missionRestrictionZoneAnnotation)
+                    missionRestrictionZoneAnnotations.append((annotation: missionRestrictionZoneAnnotation, color: color))
                     mapView.addAnnotation(missionRestrictionZoneAnnotation)
                     break
 
                 case .polygon:
                     let missionRestrictionZoneAnnotation = MGLPolygon(coordinates: coordinates.map { $0.coordinate }, count: UInt(coordinates.count))
-                    missionRestrictionZoneAnnotations.append(missionRestrictionZoneAnnotation)
+                    missionRestrictionZoneAnnotations.append((annotation: missionRestrictionZoneAnnotation, color: color))
                     mapView.addAnnotation(missionRestrictionZoneAnnotation)
                     break
                 }
@@ -182,6 +185,71 @@ public class MapboxMapWidget: UpdatableWidget {
         }
     }
     
+    private func updateFuncElements() {
+        var inputIndex = 0
+        var spatials: [Kernel.GeoSpatial] = []
+        var mapCenterSpatial: Kernel.GeoSpatial?
+        while let input = funcExecutor?.input(index: inputIndex) {
+            if input.variable.valueType == .drone {
+                if let value = funcExecutor?.readValue(inputIndex: inputIndex) {
+                    if let array = value as? [Kernel.GeoSpatial?] {
+                        array.forEach { spatial in
+                            if let spatial = spatial {
+                                spatials.append(spatial)
+                                mapCenterSpatial = spatial
+                            }
+                        }
+                    }
+                    else if let spatial = value as? Kernel.GeoSpatial {
+                        spatials.append(spatial)
+                        mapCenterSpatial = spatial
+                    }
+                }
+            }
+            else {
+                mapCenterSpatial = nil
+            }
+            inputIndex += 1
+        }
+
+        while funcDroneAnnotations.count > spatials.count {
+            mapView.removeAnnotation(funcDroneAnnotations.removeLast())
+        }
+
+        while funcDroneAnnotations.count < spatials.count {
+            let funcDroneAnnotation = MGLPointAnnotation()
+            funcDroneAnnotations.append(funcDroneAnnotation)
+            mapView.addAnnotation(funcDroneAnnotation)
+        }
+        
+        spatials.enumerated().forEach {
+            funcDroneAnnotations[$0.offset].coordinate = $0.element.coordinate.coordinate
+        }
+        
+        if let mapCenterSpatial = mapCenterSpatial {
+            mapView.setCenter(mapCenterSpatial.coordinate.coordinate, zoomLevel: 18.25, animated: true)
+        }
+        
+        funcMapOverlayAnnotations.forEach {
+            mapView.removeAnnotation($0.annotation)
+        }
+        funcMapOverlayAnnotations.removeAll()
+
+        if let mapOverlays = funcExecutor?.mapOverlays(droneSession: session, error: { error in
+            DispatchQueue.main.async {
+               DronelinkUI.shared.showSnackbar(text: error)
+           }
+        }) {
+            mapOverlays.enumerated().forEach {
+                let mapOverlay = $0.element
+                let color = UIColor(hex: mapOverlay.color, defaultAlpha: 0.5)
+                let funcMapOverlayAnnotation = MGLPolygon(coordinates: mapOverlay.coordinates.map { $0.coordinate }, count: UInt($0.element.coordinates.count))
+                funcMapOverlayAnnotations.append((annotation: funcMapOverlayAnnotation, color: color))
+                mapView.addAnnotation(funcMapOverlayAnnotation)
+            }
+        }
+    }
+    
     private func updateModeElements() {
         guard modeExecutor?.engaged ?? false else {
             modeTargetAnnotationView?.isHidden = true
@@ -210,6 +278,16 @@ public class MapboxMapWidget: UpdatableWidget {
                     bottom: mapView.frame.height * (mapView.frame.height > 300 ? 0.38 : inset),
                     right: mapView.frame.width * inset),
                 animated: true)
+        }
+    }
+    
+    public override func onLocated(session: DroneSession) {
+        super.onLocated(session: session)
+        
+        if let location = session.state?.value.location {
+            DispatchQueue.main.async {
+                self.mapView.setCenter(location.coordinate, zoomLevel: 17.5, animated: true)
+            }
         }
     }
 
@@ -242,6 +320,30 @@ public class MapboxMapWidget: UpdatableWidget {
         
         DispatchQueue.main.async {
             self.updateMissionEstimate()
+        }
+    }
+    
+    public override func onFuncLoaded(executor: FuncExecutor) {
+        super.onFuncLoaded(executor: executor)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
+    }
+
+    public override func onFuncUnloaded(executor: FuncExecutor) {
+        super.onFuncUnloaded(executor: executor)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
+        }
+    }
+    
+    public override func onFuncInputsChanged(executor: FuncExecutor) {
+        super.onFuncInputsChanged(executor: executor)
+        
+        DispatchQueue.main.async {
+            self.updateFuncElements()
         }
     }
 
@@ -300,6 +402,18 @@ extension MapboxMapWidget: MGLMapViewDelegate {
 
             return modeTarget
         }
+        
+        for funcDroneAnnotation in funcDroneAnnotations {
+            if funcDroneAnnotation === annotation {
+                var funcDrone = mapView.dequeueReusableAnnotationView(withIdentifier: "func-drone")
+                if funcDrone == nil {
+                    funcDrone = MGLAnnotationView(reuseIdentifier: "func-drone")
+                    funcDrone?.addSubview(UIImageView(image: DronelinkUI.loadImage(named: "func-input-drone", renderingMode: .alwaysOriginal)))
+                    funcDrone?.frame = CGRect(x: 0, y: 0, width: 15, height: 15)
+                }
+                return funcDrone
+            }
+        }
 
         return nil
     }
@@ -338,8 +452,14 @@ extension MapboxMapWidget: MGLMapViewDelegate {
         }
         
         for missionRestrictionZoneAnnotation in missionRestrictionZoneAnnotations {
-            if (annotation === missionRestrictionZoneAnnotation) {
-                return MDCPalette.pink.accent400!
+            if (annotation === missionRestrictionZoneAnnotation.annotation) {
+                return missionRestrictionZoneAnnotation.color ?? MDCPalette.pink.accent400!
+            }
+        }
+        
+        for funcMapOverlayAnnotation in funcMapOverlayAnnotations {
+            if (annotation === funcMapOverlayAnnotation.annotation) {
+                return funcMapOverlayAnnotation.color ?? MDCPalette.pink.accent400!
             }
         }
 
@@ -352,8 +472,14 @@ extension MapboxMapWidget: MGLMapViewDelegate {
         }
         
         for missionRestrictionZoneAnnotation in missionRestrictionZoneAnnotations {
-            if (annotation === missionRestrictionZoneAnnotation) {
-                return MDCPalette.pink.accent400!
+            if (annotation === missionRestrictionZoneAnnotation.annotation) {
+                return missionRestrictionZoneAnnotation.color ?? MDCPalette.pink.accent400!
+            }
+        }
+        
+        for funcMapOverlayAnnotation in funcMapOverlayAnnotations {
+            if (annotation === funcMapOverlayAnnotation.annotation) {
+                return funcMapOverlayAnnotation.color ?? MDCPalette.pink.accent400!
             }
         }
 
@@ -366,8 +492,14 @@ extension MapboxMapWidget: MGLMapViewDelegate {
         }
         
         for missionRestrictionZoneAnnotation in missionRestrictionZoneAnnotations {
-            if (annotation === missionRestrictionZoneAnnotation) {
-                return 0.5
+            if (annotation === missionRestrictionZoneAnnotation.annotation) {
+                return missionRestrictionZoneAnnotation.color?.rgba.alpha ?? 0.5
+            }
+        }
+        
+        for funcMapOverlayAnnotation in funcMapOverlayAnnotations {
+            if (annotation === funcMapOverlayAnnotation.annotation) {
+                return funcMapOverlayAnnotation.color?.rgba.alpha ?? 0.5
             }
         }
 

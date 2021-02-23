@@ -31,6 +31,8 @@ extension DronelinkUI {
 }
 
 public class DronelinkUI: NSObject {
+    public var missionDetailsURL: String?
+    
     private var background = false
     
     public override init() {

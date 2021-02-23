@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SafariServices
 import DronelinkCore
 import Foundation
 import CoreLocation
@@ -44,6 +45,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
     private let executionDurationLabel = UILabel()
     private let timeRemainingLabel = UILabel()
     private let progressView = MDCProgressView()
+    private let detailsButton = MDCButton()
     private let messagesTextView = UITextView()
     private let dismissButton = UIButton(type: .custom)
     
@@ -67,6 +69,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         view.addShadow()
         view.layer.cornerRadius = DronelinkUI.Constants.cornerRadius
         view.backgroundColor = DronelinkUI.Constants.overlayColor
+        view.clipsToBounds = true
         
         countdownProgressView.trackTintColor = UIColor.white.withAlphaComponent(0.75)
         countdownProgressView.isHidden = true
@@ -116,6 +119,16 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         messagesTextView.isScrollEnabled = true
         messagesTextView.isEditable = false
         view.addSubview(messagesTextView)
+        
+        let scheme = MDCContainerScheme()
+        scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
+        scheme.colorScheme.primaryColor = UIColor.darkGray
+        detailsButton.applyContainedTheme(withScheme: scheme)
+        detailsButton.translatesAutoresizingMaskIntoConstraints = false
+        detailsButton.setTitle("MissionExecutorWidget.details".localized, for: .normal)
+        detailsButton.setTitleColor(UIColor.white, for: .normal)
+        detailsButton.addTarget(self, action: #selector(onDetails(sender:)), for: .touchUpInside)
+        view.addSubview(detailsButton)
         
         layoutToggleButton.addTarget(self, action: #selector(onLayoutToggle), for: .touchUpInside)
         view.addSubview(layoutToggleButton)
@@ -191,6 +204,13 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             make.centerY.equalTo(executionDurationLabel.snp.centerY)
         }
         
+        detailsButton.snp.remakeConstraints { make in
+            make.top.equalTo(95)
+            make.height.equalTo(35)
+            make.left.equalToSuperview().offset(defaultPadding * 2)
+            make.right.equalToSuperview().offset(-defaultPadding * 2)
+        }
+        
         messagesTextView.snp.remakeConstraints { make in
             make.top.equalTo(90)
             make.left.equalToSuperview().offset(defaultPadding * 3)
@@ -230,6 +250,23 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         }
         
         promptConfirmation()
+    }
+    
+    @objc func onDetails(sender: Any) {
+        guard
+            let missionDetailsURL = DronelinkUI.shared.missionDetailsURL,
+            let missionID = missionExecutor?.id,
+            let url = URL(string: "\(missionDetailsURL)\(missionID)?unitSystem=\(Dronelink.shared.unitSystem.rawValue)") else {
+            return
+        }
+        
+        let embed = EmbedViewController()
+        embed.networkError = "MissionExecutorWidget.details.network.error".localized
+        embed.title = missionExecutor?.descriptors.name
+        embed.webView.load(URLRequest(url: url))
+        let nav = UINavigationController(rootViewController: embed)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
     
     private func promptConfirmation() {
@@ -395,6 +432,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             countdownProgressView.isHidden = true
             dismissButton.isHidden = false
             messagesTextView.isHidden = true
+            detailsButton.isHidden = missionExecutor.engaged || DronelinkUI.shared.missionDetailsURL == nil
 
             activityIndicator.startAnimating()
             subtitleLabel.text = "MissionExecutorWidget.estimating".localized
@@ -411,6 +449,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             countdownProgressView.isHidden = false
             dismissButton.isHidden = false
             messagesTextView.isHidden = true
+            detailsButton.isHidden = true
 
             activityIndicator.stopAnimating()
             let progress = Float(countdownMax - countdownRemaining) / Float(countdownMax)
@@ -434,6 +473,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             countdownProgressView.isHidden = true
             dismissButton.isHidden = true
             messagesTextView.isHidden = true
+            detailsButton.isHidden = true
 
             subtitleLabel.text = "ExecutableWidget.start.engaging".localized
             return
@@ -448,6 +488,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         countdownProgressView.isHidden = true
         dismissButton.isHidden = missionExecutor.engaged
         messagesTextView.isHidden = false
+        detailsButton.isHidden = missionExecutor.engaged || DronelinkUI.shared.missionDetailsURL == nil
 
         activityIndicator.stopAnimating()
         primaryButton.isEnabled = session != nil

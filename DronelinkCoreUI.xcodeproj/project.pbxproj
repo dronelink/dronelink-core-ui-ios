@@ -23,6 +23,7 @@
 		249F37182576ECF500472A7D /* StatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F37172576ECF500472A7D /* StatusWidget.swift */; };
 		249F37342576EF2900472A7D /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F37332576EF2900472A7D /* Widget.swift */; };
 		249F37802577D01800472A7D /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F377F2577D01800472A7D /* DashboardWidget.swift */; };
+		24B72FC325E05E890025A0D3 /* EmbedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B72FC225E05E890025A0D3 /* EmbedViewController.swift */; };
 		24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */; };
 		24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
@@ -58,6 +59,7 @@
 		249F37172576ECF500472A7D /* StatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusWidget.swift; sourceTree = "<group>"; };
 		249F37332576EF2900472A7D /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		249F377F2577D01800472A7D /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
+		24B72FC225E05E890025A0D3 /* EmbedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbedViewController.swift; sourceTree = "<group>"; };
 		24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuncExecutorWidget.swift; sourceTree = "<group>"; };
 		24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModeExecutorWidget.swift; sourceTree = "<group>"; };
 		24C355C2F269DEDDB27438E6 /* Pods-DronelinkCoreUI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.release.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.release.xcconfig"; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				E4AD4F9F258115E000404783 /* DownlinkWidget.swift */,
 				2459750A23679B8C008CAB6B /* DronelinkUI.swift */,
 				2418ACA223ECC18A0099D44C /* DroneOffsetsWidget.swift */,
+				24B72FC225E05E890025A0D3 /* EmbedViewController.swift */,
 				2459751523679D1F008CAB6B /* Extensions.swift */,
 				E4AD4F6625800F9700404783 /* FlightModeWidget.swift */,
 				24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */,
@@ -291,6 +294,7 @@
 				2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
 				E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */,
+				24B72FC325E05E890025A0D3 /* EmbedViewController.swift in Sources */,
 				2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */,
 				242AC08623870D4C00438D26 /* TelemetryWidget.swift in Sources */,
 				E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */,
@@ -456,7 +460,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dronelink.DronelinkCoreUI;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -492,7 +496,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.2.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dronelink.DronelinkCoreUI;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";

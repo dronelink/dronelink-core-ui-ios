@@ -27,6 +27,8 @@
 
 "ModeDisengageReason.user.disengaged" = "Mode Paused";
 
+"MissionExecutorWidget.details" = "3D Preview";
+"MissionExecutorWidget.details.network.error" = "You need a network connection for 3D previews.";
 "MissionExecutorWidget.estimating" = "Estimating flight path and time...";
 "MissionExecutorWidget.start.takeoffLocationWarning.title" = "Confirm Takeoff Location";
 "MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available" = "The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.";
