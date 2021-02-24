@@ -45,7 +45,7 @@ public class MapboxMapWidget: UpdatableWidget {
         mapView.clipsToBounds = true
         mapView.attributionButton.tintColor = UIColor.white
         if let location = Dronelink.shared.location?.value {
-            mapView.setCenter(location.coordinate, zoomLevel: 15, animated: false)
+            mapView.setCenter(location.coordinate, zoomLevel: 17, animated: false)
         }
         mapView.addAnnotation(droneHomeAnnotation)
         mapView.addAnnotation(droneAnnotation)
@@ -227,7 +227,7 @@ public class MapboxMapWidget: UpdatableWidget {
         }
         
         if let mapCenterSpatial = mapCenterSpatial {
-            mapView.setCenter(mapCenterSpatial.coordinate.coordinate, zoomLevel: 18.25, animated: true)
+            mapView.setCenter(mapCenterSpatial.coordinate.coordinate, zoomLevel: 19.5, animated: true)
         }
         
         funcMapOverlayAnnotations.forEach {
@@ -286,7 +286,7 @@ public class MapboxMapWidget: UpdatableWidget {
         
         if let location = session.state?.value.location {
             DispatchQueue.main.async {
-                self.mapView.setCenter(location.coordinate, zoomLevel: 17.5, animated: true)
+                self.mapView.setCenter(location.coordinate, zoomLevel: 18.5, animated: true)
             }
         }
     }
