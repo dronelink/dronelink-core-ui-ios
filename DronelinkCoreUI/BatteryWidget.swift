@@ -23,7 +23,7 @@ public class BatteryWidget: UpdatableWidget {
         imageView.addShadow()
         imageView.image = DronelinkUI.loadImage(named: "batteryIcon")?.withRenderingMode(.alwaysTemplate)
         view.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
+        imageView.snp.makeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
             make.width.equalTo(view.snp.height)
@@ -37,7 +37,7 @@ public class BatteryWidget: UpdatableWidget {
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
-        label.snp.makeConstraints { make in
+        label.snp.makeConstraints { [weak self] make in
             make.left.equalTo(imageView.snp.right)
             make.top.equalToSuperview()
             make.right.equalToSuperview()

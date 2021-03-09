@@ -33,41 +33,39 @@ public class CameraExposureWidget: Widget {
         }
         view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         view.addSubview(cameraIsoWidget.view)
-        cameraIsoWidget.view.snp.makeConstraints { make in
+        cameraIsoWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(itemPadding)
             make.bottom.equalToSuperview().offset(-itemPadding)
             make.left.equalToSuperview().offset(itemPadding)
         }
         
         view.addSubview(cameraShutterWidget.view)
-        cameraShutterWidget.view.snp.makeConstraints { make in
+        cameraShutterWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(itemPadding)
             make.bottom.equalToSuperview().offset(-itemPadding)
             make.left.equalTo(cameraIsoWidget.view.snp.right).offset(itemSpacing)
         }
         
         view.addSubview(cameraApertureWidget.view)
-        cameraApertureWidget.view.snp.makeConstraints { make in
+        cameraApertureWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(itemPadding)
             make.bottom.equalToSuperview().offset(-itemPadding)
             make.left.equalTo(cameraShutterWidget.view.snp.right).offset(itemSpacing)
         }
         
         view.addSubview(cameraExposureCompensationWidget.view)
-        cameraExposureCompensationWidget.view.snp.makeConstraints { make in
+        cameraExposureCompensationWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(itemPadding)
             make.bottom.equalToSuperview().offset(-itemPadding)
             make.left.equalTo(cameraApertureWidget.view.snp.right).offset(itemSpacing)
         }
         
         view.addSubview(cameraWhiteBalanceWidget.view)
-        cameraWhiteBalanceWidget.view.snp.makeConstraints { make in
+        cameraWhiteBalanceWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(itemPadding)
             make.bottom.equalToSuperview().offset(-itemPadding)
             make.left.equalTo(cameraExposureCompensationWidget.view.snp.right).offset(itemSpacing)
             make.right.equalToSuperview().offset(-itemPadding)
         }
-       
     }
-
 }

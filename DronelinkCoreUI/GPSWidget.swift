@@ -11,7 +11,6 @@ import UIKit
 import DronelinkCore
 
 public class GPSWidget: UpdatableWidget {
-    
     public let iconImageView = UIImageView(image: DronelinkUI.loadImage(named: "signalIcon")?.withRenderingMode(.alwaysOriginal))
     public let signalLevelLabel = UILabel()
     public let signalLevelImageView = UIImageView(image: DronelinkUI.loadImage(named: "signal0")?.withRenderingMode(.alwaysOriginal))
@@ -28,10 +27,10 @@ public class GPSWidget: UpdatableWidget {
         
         iconImageView.addShadow()
         view.addSubview(iconImageView)
-        iconImageView.snp.makeConstraints { make in
+        iconImageView.snp.makeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
-            make.width.equalTo(self.view.snp.height)
+            make.width.equalTo(view.snp.height)
             make.bottom.equalToSuperview()
         }
         
@@ -40,7 +39,7 @@ public class GPSWidget: UpdatableWidget {
         signalLevelLabel.textAlignment = .left
         signalLevelLabel.font = UIFont.systemFont(ofSize: 10)
         view.addSubview(signalLevelLabel)
-        signalLevelLabel.snp.makeConstraints { make in
+        signalLevelLabel.snp.makeConstraints { [weak self] make in
             make.left.equalTo(iconImageView.snp.right).offset(1)
             make.top.equalTo(0)
             make.bottom.equalToSuperview().offset(-10)
@@ -48,10 +47,10 @@ public class GPSWidget: UpdatableWidget {
         
         signalLevelImageView.addShadow()
         view.addSubview(signalLevelImageView)
-        signalLevelImageView.snp.makeConstraints { make in
+        signalLevelImageView.snp.makeConstraints { [weak self] make in
             make.left.equalTo(iconImageView.snp.right).offset(5)
             make.top.equalToSuperview()
-            make.width.equalTo(self.view.snp.height)
+            make.width.equalTo(view.snp.height)
             make.bottom.equalToSuperview()
         }
     }

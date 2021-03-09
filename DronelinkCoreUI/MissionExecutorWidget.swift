@@ -122,11 +122,13 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         
         let scheme = MDCContainerScheme()
         scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
-        scheme.colorScheme.primaryColor = UIColor.darkGray
-        detailsButton.applyContainedTheme(withScheme: scheme)
+        scheme.colorScheme.primaryColor = UIColor.white
+        detailsButton.applyOutlinedTheme(withScheme: scheme)
         detailsButton.translatesAutoresizingMaskIntoConstraints = false
         detailsButton.setTitle("MissionExecutorWidget.details".localized, for: .normal)
         detailsButton.setTitleColor(UIColor.white, for: .normal)
+        detailsButton.setBorderColor(UIColor.white.withAlphaComponent(0.75), for: .normal)
+        detailsButton.setBorderColor(UIColor.white.withAlphaComponent(0.25), for: .disabled)
         detailsButton.addTarget(self, action: #selector(onDetails(sender:)), for: .touchUpInside)
         view.addSubview(detailsButton)
         
@@ -144,81 +146,81 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         
         let labelHeight = 30
         
-        primaryButton.snp.remakeConstraints { make in
+        primaryButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(60)
             make.width.equalTo(primaryButton.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
             make.left.equalToSuperview().offset(15)
         }
         
-        activityIndicator.snp.remakeConstraints { make in
+        activityIndicator.snp.remakeConstraints { [weak self] make in
             make.edges.equalTo(primaryButton)
         }
         
-        countdownProgressView.snp.remakeConstraints { make in
+        countdownProgressView.snp.remakeConstraints { [weak self] make in
             make.left.equalTo(primaryButton.snp.right).offset(defaultPadding)
             make.right.equalToSuperview().offset(-15)
             make.height.equalTo(4)
             make.centerY.equalTo(progressView.snp.centerY)
         }
         
-        layoutToggleButton.snp.remakeConstraints { make in
+        layoutToggleButton.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview()
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
             make.bottom.equalTo(executionDurationLabel.snp.bottom)
         }
         
-        titleLabel.snp.remakeConstraints { make in
+        titleLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(labelHeight)
             make.left.equalTo(primaryButton.snp.right).offset(defaultPadding)
             make.right.equalTo(dismissButton.snp.left).offset(-defaultPadding)
             make.top.equalTo(primaryButton.snp.top)
         }
         
-        subtitleLabel.snp.remakeConstraints { make in
+        subtitleLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(labelHeight)
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
             make.top.equalTo(titleLabel.snp.bottom)
         }
         
-        executionDurationLabel.snp.remakeConstraints { make in
+        executionDurationLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(labelHeight)
             make.width.equalTo(executionDurationLabel.snp.height).multipliedBy(1.75)
             make.left.equalTo(titleLabel.snp.left)
             make.top.equalTo(titleLabel.snp.bottom)
         }
         
-        timeRemainingLabel.snp.remakeConstraints { make in
+        timeRemainingLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(executionDurationLabel.snp.height)
             make.width.equalTo(executionDurationLabel.snp.width)
             make.right.equalToSuperview().offset(-15)
             make.top.equalTo(executionDurationLabel.snp.top)
         }
         
-        progressView.snp.remakeConstraints { make in
+        progressView.snp.remakeConstraints { [weak self] make in
             make.left.equalTo(executionDurationLabel.snp.right)
             make.right.equalTo(timeRemainingLabel.snp.left)
             make.height.equalTo(4)
             make.centerY.equalTo(executionDurationLabel.snp.centerY)
         }
         
-        detailsButton.snp.remakeConstraints { make in
+        detailsButton.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(95)
             make.height.equalTo(35)
             make.left.equalToSuperview().offset(defaultPadding * 2)
             make.right.equalToSuperview().offset(-defaultPadding * 2)
         }
         
-        messagesTextView.snp.remakeConstraints { make in
+        messagesTextView.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(90)
             make.left.equalToSuperview().offset(defaultPadding * 3)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
         }
         
-        dismissButton.snp.remakeConstraints { make in
+        dismissButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(24)
             make.width.equalTo(dismissButton.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
@@ -263,10 +265,11 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         let embed = EmbedViewController()
         embed.networkError = "MissionExecutorWidget.details.network.error".localized
         embed.title = missionExecutor?.descriptors.name
-        embed.webView.load(URLRequest(url: url))
         let nav = UINavigationController(rootViewController: embed)
         nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true)
+        present(nav, animated: true) {
+            embed.load(URLRequest(url: url))
+        }
     }
     
     private func promptConfirmation() {
@@ -275,8 +278,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         if missionExecutor.engagementCount > 0,
             let confirmationMessage = missionExecutor.reengagementRules.confirmationMessage {
             var actions = [
-                MDCAlertAction(title: "resume".localized, emphasis: .high, handler: { action in
-                    self.promptTakeoffLocationWarning()
+                MDCAlertAction(title: "resume".localized, emphasis: .high, handler: { [weak self] action in
+                    self?.promptTakeoffLocationWarning()
                 }),
                 MDCAlertAction(title: "cancel".localized, emphasis: .medium, handler: { action in
                 })
@@ -340,27 +343,28 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
     private func startCountdown() {
         countdownRemaining = countdownMax
         Dronelink.shared.announce(message: "\(countdownRemaining / 20)")
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             guard
-                let _ = self.missionExecutor,
-                let _ = self.session
+                let missionExecutorWidget = self,
+                let _ = missionExecutorWidget.missionExecutor,
+                let _ = missionExecutorWidget.session
             else {
-                self.stopCountdown()
+                self?.stopCountdown()
                 return
             }
             
-            self.countdownRemaining -= 1
-            if (self.countdownRemaining == 0) {
-                self.stopCountdown(aborted: false)
-                self.engageOnMissionEstimated = true
-                if !self.estimateMission() {
-                    self.engage()
+            missionExecutorWidget.countdownRemaining -= 1
+            if (missionExecutorWidget.countdownRemaining == 0) {
+                missionExecutorWidget.stopCountdown(aborted: false)
+                missionExecutorWidget.engageOnMissionEstimated = true
+                if !missionExecutorWidget.estimateMission() {
+                    missionExecutorWidget.engage()
                 }
             }
             else {
-                self.update()
-                if (self.countdownRemaining % 20 == 0) {
-                    Dronelink.shared.announce(message: "\(self.countdownRemaining / 20)")
+                missionExecutorWidget.update()
+                if (missionExecutorWidget.countdownRemaining % 20 == 0) {
+                    Dronelink.shared.announce(message: "\(missionExecutorWidget.countdownRemaining / 20)")
                 }
             }
         }
@@ -378,10 +382,10 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
     
     private func engage() {
         engageOnMissionEstimated = false
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             guard
-                let missionExecutor = self.missionExecutor,
-                let session = self.session
+                let missionExecutor = self?.missionExecutor,
+                let session = self?.session
             else {
                 return
             }
@@ -390,16 +394,16 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
                 try missionExecutor.engage(droneSession: session) { disallowed in
                     DronelinkUI.shared.showDialog(title: disallowed.title, details: disallowed.details)
                     DispatchQueue.main.async {
-                        self.update()
+                        self?.update()
                     }
                 }
             }
             catch DronelinkError.droneSerialNumberUnavailable {
                 DronelinkUI.shared.showDialog(title: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.message".localized)
-                self.update()
+                self?.update()
             }
             catch {
-                self.update()
+                self?.update()
             }
         }
     }
@@ -422,6 +426,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
 
         titleLabel.text = missionExecutor.descriptors.display
 
+        let detailsPossible = DronelinkUI.shared.missionDetailsURL != nil
+        
         if missionExecutor.estimating {
             activityIndicator.isHidden = false
             primaryButton.isHidden = true
@@ -432,7 +438,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             countdownProgressView.isHidden = true
             dismissButton.isHidden = false
             messagesTextView.isHidden = true
-            detailsButton.isHidden = missionExecutor.engaged || DronelinkUI.shared.missionDetailsURL == nil
+            detailsButton.isHidden = !detailsPossible
+            detailsButton.isEnabled = false
 
             activityIndicator.startAnimating()
             subtitleLabel.text = "MissionExecutorWidget.estimating".localized
@@ -449,7 +456,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             countdownProgressView.isHidden = false
             dismissButton.isHidden = false
             messagesTextView.isHidden = true
-            detailsButton.isHidden = true
+            detailsButton.isHidden = !detailsPossible
+            detailsButton.isEnabled = false
 
             activityIndicator.stopAnimating()
             let progress = Float(countdownMax - countdownRemaining) / Float(countdownMax)
@@ -473,7 +481,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             countdownProgressView.isHidden = true
             dismissButton.isHidden = true
             messagesTextView.isHidden = true
-            detailsButton.isHidden = true
+            detailsButton.isHidden = !detailsPossible
+            detailsButton.isEnabled = false
 
             subtitleLabel.text = "ExecutableWidget.start.engaging".localized
             return
@@ -488,7 +497,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         countdownProgressView.isHidden = true
         dismissButton.isHidden = missionExecutor.engaged
         messagesTextView.isHidden = false
-        detailsButton.isHidden = missionExecutor.engaged || DronelinkUI.shared.missionDetailsURL == nil
+        detailsButton.isHidden = missionExecutor.engaged || !detailsPossible
+        detailsButton.isEnabled = !missionExecutor.engaged
 
         activityIndicator.stopAnimating()
         primaryButton.isEnabled = session != nil

@@ -67,12 +67,12 @@ public class MicrosoftMapWidget: UpdatableWidget {
     public override func viewDidLoad() {
         mapView.addShadow()
         mapView.clipsToBounds = true
-        mapView.addCameraDidChangeHandler { (reason, camera) -> Bool in
+        mapView.addCameraDidChangeHandler {  [weak self] (reason, camera) -> Bool in
             if reason == .userInteraction {
-                switch self.tracking {
+                switch self?.tracking ?? .none {
                 case .thirdPersonNadir:
-                    self.tracking = .none
-                    self.trackingPrevious = .none
+                    self?.tracking = .none
+                    self?.trackingPrevious = .none
                     break
 
                 case .none, .thirdPersonOblique, .firstPerson:
@@ -92,7 +92,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
         mapView.userInterfaceOptions.zoomButtonsVisible = false
         mapView.backgroundColor = UIColor.black
         view.addSubview(mapView)
-        mapView.snp.makeConstraints { make in
+        mapView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
 
@@ -582,11 +582,11 @@ public class MicrosoftMapWidget: UpdatableWidget {
     public override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateScene()
-            self.updateDroneTakeoffAltitude()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
+            self?.updateDroneTakeoffAltitude()
             if executor.estimated {
-                self.updateMissionElements()
+                self?.updateMissionElements()
             }
         }
     }
@@ -595,24 +595,24 @@ public class MicrosoftMapWidget: UpdatableWidget {
         super.onMissionUnloaded(executor: executor)
         
         droneMissionExecutedPositions.removeAll()
-        DispatchQueue.main.async {
-            self.updateMissionElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionElements()
         }
     }
 
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
     public override func onFuncUnloaded(executor: FuncExecutor) {
         super.onFuncUnloaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
@@ -631,12 +631,12 @@ public class MicrosoftMapWidget: UpdatableWidget {
             return
         }
 
-        DispatchQueue.main.async {
-            self.updateScene()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
             //wait 2 seconds to give the map time to load the elevation data
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.updateDroneTakeoffAltitude()
-                self.updateMissionElements()
+                self?.updateDroneTakeoffAltitude()
+                self?.updateMissionElements()
             }
         }
     }
@@ -645,9 +645,9 @@ public class MicrosoftMapWidget: UpdatableWidget {
     public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
         super.onMissionEstimated(executor: executor, estimate: estimate)
         
-        DispatchQueue.main.async {
-            self.updateScene()
-            self.updateMissionElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
+            self?.updateMissionElements()
         }
     }
 
@@ -663,32 +663,32 @@ public class MicrosoftMapWidget: UpdatableWidget {
         super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
         
         droneMissionExecutedPositions.removeAll()
-        DispatchQueue.main.async {
-            self.updateMissionElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionElements()
         }
     }
 
     public override func onFuncInputsChanged(executor: FuncExecutor) {
         super.onFuncInputsChanged(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
     public override func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
         super.onModeExecuted(executor: executor, engagement: engagement)
         
-        DispatchQueue.main.async {
-            self.updateModeElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateModeElements()
         }
     }
 
     public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
         super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
         
-        DispatchQueue.main.async {
-            self.updateModeElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateModeElements()
         }
     }
 }
@@ -697,33 +697,33 @@ extension MicrosoftMapWidget: ConfigurableWidget {
     public var configurationActions: [UIAlertAction] {
         var actions: [UIAlertAction] = []
         
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.reset".localized, style: .default, handler: { _ in
-            self.tracking = .none
-            self.trackingPrevious = .none
-            self.updateScene()
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.reset".localized, style: .default, handler: {  [weak self] _ in
+            self?.tracking = .none
+            self?.trackingPrevious = .none
+            self?.updateScene()
         }))
 
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { _ in
-            self.tracking = .thirdPersonNadir
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .thirdPersonNadir
         }))
 
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { _ in
-            self.tracking = .thirdPersonOblique
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .thirdPersonOblique
         }))
 
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { _ in
-            self.tracking = .firstPerson
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .firstPerson
         }))
 
 //        if tracking == .none {
 //            if style == .streets {
-//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { _ in
-//                    self.update(style: .satellite)
+//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { [weak self] _ in
+//                    self?.update(style: .satellite)
 //                }))
 //            }
 //            else {
-//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { _ in
-//                    self.update(style: .streets)
+//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { [weak self] _ in
+//                    self?.update(style: .streets)
 //                }))
 //            }
 //        }

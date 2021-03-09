@@ -152,18 +152,21 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         variableDroneMarkButton.setTitle("FuncExecutorWidget.input.drone".localized, for: .normal)
         variableDroneMarkButton.addTarget(self, action: #selector(onDroneMark(sender:)), for: .touchUpInside)
         view.addSubview(variableDroneMarkButton)
-        
-        variableDroneViewController.funcExecutor = { self.funcExecutor }
-        variableDroneViewController.onClear = { index in
-            self.funcExecutor?.clearValue(index: self.inputIndex, arrayIndex: index)
-            self.readValue()
+
+        variableDroneViewController.funcExecutor = { [weak self] in self?.funcExecutor }
+        variableDroneViewController.onClear = { [weak self] index in
+            guard let funcExecutorWidget = self else {
+                return
+            }
+            funcExecutorWidget.funcExecutor?.clearValue(index: funcExecutorWidget.inputIndex, arrayIndex: index)
+            funcExecutorWidget.readValue()
         }
         addChild(variableDroneViewController)
         view.addSubview(variableDroneViewController.view)
         variableDroneViewController.didMove(toParent: self)
-        
-        variableSummaryViewController.funcExecutor = { self.funcExecutor }
-        variableSummaryViewController.onSelect = backTo
+
+        variableSummaryViewController.funcExecutor = { [weak self] in self?.funcExecutor }
+        variableSummaryViewController.onSelect = { [weak self] index in self?.backTo(index: index) }
         addChild(variableSummaryViewController)
         view.addSubview(variableSummaryViewController.view)
         variableSummaryViewController.didMove(toParent: self)
@@ -211,14 +214,14 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     @objc func listenRCButtons() {
         if let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
             if c1PressedPrevious, !remoteControllerState.c1Button.pressed, !variableDroneMarkButton.isHidden {
-                DispatchQueue.main.async {
-                    self.onDroneMark(sender: self)
+                DispatchQueue.main.async { [weak self] in
+                    self?.onDroneMark(sender: self)
                 }
             }
             
             if c2PressedPrevious, !remoteControllerState.c2Button.pressed {
-                DispatchQueue.main.async {
-                    self.onNext(sender: self)
+                DispatchQueue.main.async { [weak self] in
+                    self?.onNext(sender: self)
                 }
             }
         }
@@ -233,56 +236,56 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         
         let defaultPadding = 10
         
-        headerBackgroundView.snp.remakeConstraints { make in
+        headerBackgroundView.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview()
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.height.equalTo(43)
         }
-        
-        footerBackgroundView.snp.remakeConstraints { make in
+
+        footerBackgroundView.snp.remakeConstraints { [weak self] make in
             make.bottom.equalToSuperview()
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.height.equalTo(52)
         }
-        
-        titleImageView.snp.remakeConstraints { make in
+
+        titleImageView.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(24)
             make.width.equalTo(titleImageView.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
             make.left.equalToSuperview().offset(defaultPadding)
         }
-        
-        titleLabel.snp.remakeConstraints { make in
+
+        titleLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(25)
             make.left.equalTo(titleImageView.snp.right).offset(defaultPadding)
             make.right.equalTo(dismissButton.snp.left).offset(-defaultPadding)
             make.top.equalTo(titleImageView.snp.top)
         }
         
-        dismissButton.snp.remakeConstraints { make in
+        dismissButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(24)
             make.width.equalTo(dismissButton.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
         }
         
-        variableNameLabel.snp.remakeConstraints { make in
+        variableNameLabel.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalTo(dismissButton.snp.left).offset(-defaultPadding)
             make.top.equalToSuperview().offset(defaultPadding)
             make.height.equalTo(25)
         }
-        
-        variableDescriptionTextView.snp.remakeConstraints { make in
+
+        variableDescriptionTextView.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(52)
             make.left.equalTo(variableNameLabel.snp.left)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(28)
         }
-        
-        variableImageView.snp.remakeConstraints { make in
+
+        variableImageView.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(45)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
@@ -320,36 +323,36 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         
         let variableBottomControl = backButton
         let buttonHeight = 32
-        
-        backButton.snp.remakeConstraints { make in
+
+        backButton.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(buttonHeight)
             make.width.equalTo(85)
         }
 
-        progressLabel.snp.remakeConstraints { make in
+        progressLabel.snp.remakeConstraints { [weak self] make in
             make.left.equalTo(backButton.snp.right).offset(defaultPadding)
             make.right.equalTo(nextButton.snp.left).offset(-defaultPadding)
             make.top.equalTo(variableBottomControl)
             make.bottom.equalTo(variableBottomControl)
         }
 
-        nextButton.snp.remakeConstraints { make in
+        nextButton.snp.remakeConstraints { [weak self] make in
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(buttonHeight)
             make.width.equalTo(last ? 200 : 85)
             make.bottom.equalTo(variableBottomControl)
         }
-        
-        primaryButton.snp.remakeConstraints { make in
+
+        primaryButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonHeight)
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
         }
-        
-        variableSummaryViewController.view.snp.remakeConstraints { make in
+
+        variableSummaryViewController.view.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(50)
             make.left.equalToSuperview().offset(5)
             make.right.equalToSuperview().offset(-defaultPadding)
@@ -358,28 +361,28 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
 
         let additionalBottomOffset: CGFloat = variableTopControl == variableNameLabel ? -20 : 0
 
-        variableSegmentedControl.snp.remakeConstraints { make in
+        variableSegmentedControl.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalTo(variableBottomControl.snp.top).offset(-26 + additionalBottomOffset)
             make.height.equalTo(tablet ? 30 : 28)
         }
-        
-        variableTextField.snp.remakeConstraints { make in
+
+        variableTextField.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(15)
             make.right.equalToSuperview().offset(-15)
             make.bottom.equalTo(variableBottomControl.snp.top).offset(-28 + additionalBottomOffset)
             make.height.equalTo(40)
         }
 
-        variablePickerView.snp.remakeConstraints { make in
+        variablePickerView.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalTo(variableBottomControl.snp.top).offset(15 + (variableTopControl == variableNameLabel ? -35 : 0))
             make.height.equalTo(80)
         }
 
-        variableDroneMarkButton.snp.remakeConstraints { make in
+        variableDroneMarkButton.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding * 2)
             if expanded {
                 make.right.equalToSuperview().offset(-defaultPadding * 2)
@@ -392,7 +395,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             make.height.equalTo(buttonHeight)
         }
 
-        variableDroneViewController.view.snp.remakeConstraints { make in
+        variableDroneViewController.view.snp.remakeConstraints { [weak self] make in
             if expanded {
                 make.left.equalToSuperview().offset(defaultPadding)
                 make.right.equalToSuperview().offset(-defaultPadding * 2)
@@ -421,13 +424,17 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         }
         
         if (intro && hasInputs) {
-            let finish = {
-                self.intro = false
-                if funcExecutor.inputCount == 0 {
-                    self.addNextDynamicInput()
+            let finish = { [weak self] in
+                guard let funcExecutorWidget = self else {
+                    return
                 }
-                self.readValue()
-                self.view.setNeedsUpdateConstraints()
+                
+                funcExecutorWidget.intro = false
+                if funcExecutor.inputCount == 0 {
+                    funcExecutorWidget.addNextDynamicInput()
+                }
+                funcExecutorWidget.readValue()
+                funcExecutorWidget.view.setNeedsUpdateConstraints()
             }
             
             if let mostRecentExecuted = FuncExecutorWidget.mostRecentExecuted,
@@ -436,10 +443,10 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
                     title: "FuncExecutorWidget.cachedInputs.title".localized,
                     details: "FuncExecutorWidget.cachedInputs.message".localized,
                     actions: [
-                        MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.new".localized, emphasis: .high, handler: { action in
+                        MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.new".localized, emphasis: .high, handler: { [weak self] action in
                             finish()
                         }),
-                        MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.previous".localized, handler: { action in
+                        MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.previous".localized, handler: { [weak self] action in
                             funcExecutor.addCachedInputs(funcExecutor: mostRecentExecuted)
                             finish()
                         })
@@ -454,11 +461,11 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         if (!executing) {
             executing = true
             view.setNeedsUpdateConstraints()
-            funcExecutor.execute(droneSession: session) { error in
+            funcExecutor.execute(droneSession: session) { [weak self] error in
                 DispatchQueue.main.async {
                     DronelinkUI.shared.showSnackbar(text: error)
-                    self.executing = false
-                    self.view.setNeedsUpdateConstraints()
+                    self?.executing = false
+                    self?.view.setNeedsUpdateConstraints()
                 }
             }
         }
@@ -533,18 +540,23 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     }
     
     func addNextDynamicInput() {
-        funcExecutor?.addNextDynamicInput(droneSession: session) { error in
+        funcExecutor?.addNextDynamicInput(droneSession: session) { [weak self] error in
              DispatchQueue.main.async {
                 DronelinkUI.shared.showSnackbar(text: error)
-                self.inputIndex -= 1
-                if self.inputIndex < 0 {
-                    self.inputIndex = 0
-                    self.intro = true
+                
+                guard let funcExecutorWidget = self else {
+                    return
+                }
+                
+                funcExecutorWidget.inputIndex -= 1
+                if funcExecutorWidget.inputIndex < 0 {
+                    funcExecutorWidget.inputIndex = 0
+                    funcExecutorWidget.intro = true
                 }
                 else {
-                    self.readValue()
+                    funcExecutorWidget.readValue()
                 }
-                self.view.setNeedsUpdateConstraints()
+                funcExecutorWidget.view.setNeedsUpdateConstraints()
             }
         }
     }
@@ -634,8 +646,8 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             
         }
         else if let enumValues = input.enumValues {
-            enumValues.enumerated().forEach { (index, enumValue) in
-                variableSegmentedControl.insertSegment(withTitle: enumValue, at: index, animated: false)
+            enumValues.enumerated().forEach { [weak self] (index, enumValue) in
+                self?.variableSegmentedControl.insertSegment(withTitle: enumValue, at: index, animated: false)
             }
         }
         
@@ -663,10 +675,10 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         
         if let valueString = value as? String {
             variableTextField.text = valueString
-            input.enumValues?.enumerated().forEach { (index, enumValue) in
+            input.enumValues?.enumerated().forEach { [weak self] (index, enumValue) in
                 if enumValue == valueString {
-                    self.variableSegmentedControl.selectedSegmentIndex = index
-                    self.variablePickerView.selectRow(index + 1, inComponent: 0, animated: false)
+                    self?.variableSegmentedControl.selectedSegmentIndex = index
+                    self?.variablePickerView.selectRow(index + 1, inComponent: 0, animated: false)
                 }
             }
         }
@@ -859,14 +871,14 @@ class FuncDroneTableViewController: UIViewController, UITableViewDelegate, UITab
         tableView.allowsSelection = false
         tableView.setEditing(true, animated: false)
         view.addSubview(tableView)
-        tableView.snp.makeConstraints { make in
+        tableView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
     }
     
     func refresh() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
         }
     }
     
@@ -943,14 +955,14 @@ class FuncSummaryTableViewController: UIViewController, UITableViewDelegate, UIT
         tableView.delegate = self
         tableView.backgroundColor = UIColor.clear
         view.addSubview(tableView)
-        tableView.snp.makeConstraints { make in
+        tableView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
     }
     
     func refresh() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
         }
     }
     

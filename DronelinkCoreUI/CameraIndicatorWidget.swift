@@ -33,7 +33,7 @@ open class CameraIndicatorWidget: UpdatableWidget {
         valueLabel.adjustsFontSizeToFitWidth = true
         
         view.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { make in
+        titleLabel.snp.makeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
             make.right.equalToSuperview()
@@ -41,7 +41,7 @@ open class CameraIndicatorWidget: UpdatableWidget {
         }
         
         view.addSubview(valueLabel)
-        valueLabel.snp.makeConstraints { make in
+        valueLabel.snp.makeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
@@ -59,13 +59,13 @@ open class CameraISOWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.iso.title".localized
-        valueGenerator = {
-            guard let iso = self.cameraState?.iso else {
+        valueGenerator = { [weak self] in
+            guard let iso = self?.cameraState?.iso else {
                 return "na".localized
             }
             
-            if iso == .auto, let isoSensitivity = self.cameraState?.isoSensitivity {
-                return Dronelink.shared.format(formatter: "integer", value: isoSensitivity)
+            if iso == .auto, let isoSensitivity = self?.cameraState?.isoSensitivity {
+                return "\(isoSensitivity)"
             }
             return Dronelink.shared.formatEnum(name: "CameraISO",
                                                value: iso.rawValue,
@@ -75,7 +75,7 @@ open class CameraISOWidget: CameraIndicatorWidget {
     
     open override func update() {
         super.update()
-        guard let iso = self.cameraState?.iso else { return }
+        guard let iso = cameraState?.iso else { return }
         if iso == .auto {
             titleLabel.text = "CameraExposureWidget.autoiso.title".localized
         } else {
@@ -88,8 +88,8 @@ open class CameraShutterWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.shutter.title".localized
-        valueGenerator = {
-            guard let shutter = self.cameraState?.shutterSpeed else {
+        valueGenerator = { [weak self] in
+            guard let shutter = self?.cameraState?.shutterSpeed else {
                 return "na".localized
             }
             
@@ -104,8 +104,8 @@ open class CameraApertureWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.fstop.title".localized
-        valueGenerator = {
-            guard let aperture = self.cameraState?.aperture else {
+        valueGenerator = { [weak self] in
+            guard let aperture = self?.cameraState?.aperture else {
                 return "na".localized
             }
             
@@ -120,8 +120,8 @@ open class CameraExposureCompensationWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.ev.title".localized
-        valueGenerator = {
-            guard let ev = self.cameraState?.exposureCompensation else {
+        valueGenerator = { [weak self] in
+            guard let ev = self?.cameraState?.exposureCompensation else {
                 return "na".localized
             }
             
@@ -136,12 +136,12 @@ open class CameraWhiteBalanceWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         titleLabel.text = "CameraExposureWidget.wb.title".localized
-        valueGenerator = {
-            guard let wb = self.cameraState?.whiteBalancePreset else {
+        valueGenerator = { [weak self] in
+            guard let wb = self?.cameraState?.whiteBalancePreset else {
                 return "na".localized
             }
             
-            if wb == .custom, let whiteBalanceColorTemperature = self.cameraState?.whiteBalanceColorTemperature {
+            if wb == .custom, let whiteBalanceColorTemperature = self?.cameraState?.whiteBalanceColorTemperature {
                 return Dronelink.shared.format(formatter: "absoluteTemperature",
                                                value: whiteBalanceColorTemperature,
                                                defaultValue: "na".localized)

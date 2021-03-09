@@ -168,7 +168,7 @@ public class DashboardWidget: DelegateWidget {
         
         hideOverlayButton.addTarget(self, action: #selector(onHideOverlay(sender:)), for: .touchUpInside)
         view.addSubview(hideOverlayButton)
-        hideOverlayButton.snp.makeConstraints { make in
+        hideOverlayButton.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
 
@@ -177,7 +177,7 @@ public class DashboardWidget: DelegateWidget {
         reticleImageView.isUserInteractionEnabled = false
         reticleImageView.contentMode = .scaleAspectFit
         view.addSubview(reticleImageView)
-        reticleImageView.snp.makeConstraints { make in
+        reticleImageView.snp.makeConstraints { [weak self] make in
             make.center.equalTo(primaryContentView)
             make.height.equalTo(primaryContentView)
         }
@@ -190,7 +190,7 @@ public class DashboardWidget: DelegateWidget {
         disconnectedImageView.alpha = 0.5
         disconnectedImageView.contentMode = .center
         primaryContentView.addSubview(disconnectedImageView)
-        disconnectedImageView.snp.makeConstraints { make in
+        disconnectedImageView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
         
@@ -199,7 +199,7 @@ public class DashboardWidget: DelegateWidget {
         contentSettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_settings_white_36pt"), for: .normal)
         contentSettingsButton.addTarget(self, action: #selector(onContentSettings(sender:)), for: .touchUpInside)
         view.addSubview(contentSettingsButton)
-        contentSettingsButton.snp.remakeConstraints { make in
+        contentSettingsButton.snp.remakeConstraints { [weak self] make in
             make.left.equalTo(secondaryContentView.snp.left).offset(8)
             make.top.equalTo(secondaryContentView.snp.top).offset(8)
             make.width.equalTo(30)
@@ -211,7 +211,7 @@ public class DashboardWidget: DelegateWidget {
         contentLayoutVisibilityButton.setImage(contentLayoutMapShowImage, for: .normal)
         contentLayoutVisibilityButton.addTarget(self, action: #selector(onContentLayoutVisibility(sender:)), for: .touchUpInside)
         view.addSubview(contentLayoutVisibilityButton)
-        contentLayoutVisibilityButton.snp.remakeConstraints { make in
+        contentLayoutVisibilityButton.snp.remakeConstraints { [weak self] make in
             make.left.equalTo(secondaryContentView.snp.left).offset(8)
             make.bottom.equalTo(secondaryContentView.snp.bottom).offset(-8)
             make.width.equalTo(30)
@@ -223,7 +223,7 @@ public class DashboardWidget: DelegateWidget {
         contentLayoutExpandButton.setImage(DronelinkUI.loadImage(named: "vector-arrange-below"), for: .normal)
         contentLayoutExpandButton.addTarget(self, action: #selector(onContentLayoutExpand(sender:)), for: .touchUpInside)
         view.addSubview(contentLayoutExpandButton)
-        contentLayoutExpandButton.snp.remakeConstraints { make in
+        contentLayoutExpandButton.snp.remakeConstraints { [weak self] make in
             make.right.equalTo(secondaryContentView.snp.right).offset(-8)
             make.top.equalTo(secondaryContentView.snp.top).offset(8)
             make.width.equalTo(30)
@@ -237,7 +237,7 @@ public class DashboardWidget: DelegateWidget {
         cameraMenuButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 13)
         cameraMenuButton.addTarget(self, action: #selector(onCameraMenu(sender:)), for: .touchUpInside)
         cameraControlsView.addSubview(cameraMenuButton)
-        cameraMenuButton.snp.makeConstraints { make in
+        cameraMenuButton.snp.makeConstraints { [weak self] make in
             make.top.equalTo(0)
             make.centerX.equalToSuperview()
             make.height.equalTo(48)
@@ -249,7 +249,7 @@ public class DashboardWidget: DelegateWidget {
         cameraExposureMenuButton.setImage(DronelinkUI.loadImage(named: "baseline_tune_white_36pt"), for: .normal)
         cameraExposureMenuButton.addTarget(self, action: #selector(onCameraExposureMenu(sender:)), for: .touchUpInside)
         cameraControlsView.addSubview(cameraExposureMenuButton)
-        cameraExposureMenuButton.snp.makeConstraints { make in
+        cameraExposureMenuButton.snp.makeConstraints { [weak self] make in
             make.bottom.equalToSuperview().offset(-12)
             make.centerX.equalToSuperview()
             make.height.equalTo(28)
@@ -260,7 +260,7 @@ public class DashboardWidget: DelegateWidget {
         offsetsButton.setImage(DronelinkUI.loadImage(named: "baseline_control_camera_white_36pt"), for: .normal)
         offsetsButton.addTarget(self, action: #selector(onOffsets(sender:)), for: .touchUpInside)
         view.addSubview(offsetsButton)
-        offsetsButton.snp.makeConstraints { make in
+        offsetsButton.snp.makeConstraints { [weak self] make in
             make.top.equalTo(cameraControlsView.snp.bottom).offset(15)
             make.centerX.equalTo(cameraControlsView.snp.centerX)
             make.height.equalTo(28)
@@ -268,7 +268,7 @@ public class DashboardWidget: DelegateWidget {
         }
 
         view.addSubview(topBarView)
-        topBarView.snp.makeConstraints { make in
+        topBarView.snp.makeConstraints { [weak self] make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
@@ -282,7 +282,7 @@ public class DashboardWidget: DelegateWidget {
         dismissButton.imageEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         dismissButton.addTarget(self, action: #selector(onDismiss(sender:)), for: .touchUpInside)
         view.addSubview(dismissButton)
-        dismissButton.snp.makeConstraints { make in
+        dismissButton.snp.makeConstraints { [weak self] make in
             make.left.equalTo(view.safeAreaLayoutGuide.snp.left)
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.width.equalTo(statusWidgetHeight * 1.25)
@@ -303,8 +303,8 @@ public class DashboardWidget: DelegateWidget {
                         actions: [
                             MDCAlertAction(title: "DashboardWidget.device.legacy.confirm".localized, emphasis: .high, handler: { action in
                             }),
-                            MDCAlertAction(title: "DashboardWidget.device.legacy.confirm.dismiss".localized, emphasis: .low, handler: { action in
-                                self.legacyDeviceWarningDismissed = true
+                            MDCAlertAction(title: "DashboardWidget.device.legacy.confirm.dismiss".localized, emphasis: .low, handler: { [weak self] action in
+                                self?.legacyDeviceWarningDismissed = true
                             })
                         ])
                 }
@@ -401,7 +401,7 @@ public class DashboardWidget: DelegateWidget {
         view.bringSubviewToFront(hideOverlayButton)
         if let overlayView = overlayViewController?.view {
             view.bringSubviewToFront(overlayView)
-            overlayView.snp.remakeConstraints { make in
+            overlayView.snp.remakeConstraints { [weak self] make in
                 let bounds = UIScreen.main.bounds
                 let width = min(bounds.width - 30, max(bounds.width / 2, 400))
                 make.centerX.equalToSuperview()
@@ -426,15 +426,15 @@ public class DashboardWidget: DelegateWidget {
         alert.popoverPresentationController?.sourceView = sender as? UIView
         
         if mapWidget is MicrosoftMapWidget {
-            alert.addAction(UIAlertAction(title: "DashboardWidget.map.mapbox".localized, style: .default, handler: { _ in
-                self.mapStyle = .mapbox
-                self.view.setNeedsUpdateConstraints()
+            alert.addAction(UIAlertAction(title: "DashboardWidget.map.mapbox".localized, style: .default, handler: { [weak self] _ in
+                self?.mapStyle = .mapbox
+                self?.view.setNeedsUpdateConstraints()
             }))
         }
         else if mapWidget is MapboxMapWidget {
-            alert.addAction(UIAlertAction(title: "DashboardWidget.map.microsoft".localized, style: .default, handler: { _ in
-                self.mapStyle = .microsoft
-                self.view.setNeedsUpdateConstraints()
+            alert.addAction(UIAlertAction(title: "DashboardWidget.map.microsoft".localized, style: .default, handler: { [weak self] _ in
+                self?.mapStyle = .microsoft
+                self?.view.setNeedsUpdateConstraints()
             }))
         }
 
@@ -464,12 +464,12 @@ public class DashboardWidget: DelegateWidget {
     
     open override func onOpened(session: DroneSession) {
         super.onOpened(session: session)
-        DispatchQueue.main.async { self.view.setNeedsUpdateConstraints() }
+        DispatchQueue.main.async { [weak self] in self?.view.setNeedsUpdateConstraints() }
     }
     
     open override func onClosed(session: DroneSession) {
         super.onClosed(session: session)
-        DispatchQueue.main.async { self.view.setNeedsUpdateConstraints() }
+        DispatchQueue.main.async { [weak self] in self?.view.setNeedsUpdateConstraints() }
     }
     
     open override func onInitialized(session: DroneSession) {
@@ -482,59 +482,63 @@ public class DashboardWidget: DelegateWidget {
     
     open override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
-        DispatchQueue.main.async { self.apply(userInterfaceSettings: executor.userInterfaceSettings) }
+        DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: executor.userInterfaceSettings) }
     }
     
     open override func onMissionUnloaded(executor: MissionExecutor) {
         super.onMissionUnloaded(executor: executor)
-        DispatchQueue.main.async { self.apply(userInterfaceSettings: nil) }
+        DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: nil) }
     }
     
     open override func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {
         super.onMissionEngaged(executor: executor, engagement: engagement)
-        DispatchQueue.main.async { self.view.setNeedsUpdateConstraints() }
+        DispatchQueue.main.async { [weak self] in
+            self?.updateDismissButton()
+            self?.view.setNeedsUpdateConstraints()
+        }
     }
     
     open override func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
         super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
-        DispatchQueue.main.async { self.view.setNeedsUpdateConstraints() }
+        DispatchQueue.main.async { [weak self] in
+            self?.updateDismissButton()
+            self?.view.setNeedsUpdateConstraints()
+        }
     }
     
     open override func onModeLoaded(executor: ModeExecutor) {
         super.onModeLoaded(executor: executor)
-        DispatchQueue.main.async { self.apply(userInterfaceSettings: executor.userInterfaceSettings) }
+        DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: executor.userInterfaceSettings) }
     }
     
     open override func onModeUnloaded(executor: ModeExecutor) {
         super.onModeUnloaded(executor: executor)
-        DispatchQueue.main.async { self.apply(userInterfaceSettings: nil) }
+        DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: nil) }
     }
     
     open override func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {
         super.onModeEngaged(executor: executor, engagement: engagement)
-        DispatchQueue.main.async { self.updateDismissButton() }
+        DispatchQueue.main.async { [weak self] in self?.updateDismissButton() }
     }
     
     open override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
         super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
-        DispatchQueue.main.async { self.updateDismissButton() }
+        DispatchQueue.main.async { [weak self] in self?.updateDismissButton() }
     }
     
     open override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
-        DispatchQueue.main.async {
-            self.apply(userInterfaceSettings: executor.userInterfaceSettings)
-        }
+        DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: executor.userInterfaceSettings) }
     }
     
     open override func onFuncUnloaded(executor: FuncExecutor) {
         super.onFuncUnloaded(executor: executor)
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             if Dronelink.shared.executor == nil {
-                self.apply(userInterfaceSettings: nil)
+                self?.apply(userInterfaceSettings: nil)
             }
             else {
-                self.view.setNeedsUpdateConstraints()
+                self?.view.setNeedsUpdateConstraints()
             }
         }
     }
@@ -576,7 +580,7 @@ public class DashboardWidget: DelegateWidget {
     
     private func refreshWidgets() {
         cameraFeedWidget = refreshWidget(current: cameraFeedWidget, next: widgetFactory.createCameraFeedWidget(current: cameraFeedWidget, primary: contentLayout.cameraFeedPrimary), subview: cameraFeedContentView)
-        cameraFeedWidget?.view.snp.remakeConstraints { make in
+        cameraFeedWidget?.view.snp.remakeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
 
@@ -598,12 +602,12 @@ public class DashboardWidget: DelegateWidget {
         else {
             mapWidget = refreshWidget(current: mapWidget, next: nil)
         }
-        mapWidget?.view.snp.remakeConstraints { make in
+        mapWidget?.view.snp.remakeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
 
         remainingFlightTimeWidget = refreshWidget(current: remainingFlightTimeWidget, next: widgetFactory.createRemainingFlightTimeWidget(current: remainingFlightTimeWidget))
-        remainingFlightTimeWidget?.view.snp.remakeConstraints { make in
+        remainingFlightTimeWidget?.view.snp.remakeConstraints { [weak self] make in
             let topOffset = -9
             if portrait, !tablet, let cameraFeedView = cameraFeedWidget?.view {
                 make.top.equalTo(cameraFeedView.snp.top).offset(topOffset)
@@ -624,7 +628,7 @@ public class DashboardWidget: DelegateWidget {
         
         var primaryIndicatorWidgetPrevious: Widget?
         primaryIndicatorWidgets.reversed().forEach { item in
-            item.widget.view.snp.remakeConstraints { make in
+            item.widget.view.snp.remakeConstraints { [weak self] make in
                 let paddingRight: CGFloat = tablet ? 9 : 7
                 if let widgetPrevious = primaryIndicatorWidgetPrevious {
                     make.right.equalTo(widgetPrevious.view.snp.left).offset(-paddingRight)
@@ -643,12 +647,12 @@ public class DashboardWidget: DelegateWidget {
         }
         
         statusBackgroundWidget = refreshWidget(current: statusBackgroundWidget, next: widgetFactory.createStatusBackgroundWidget(current: statusBackgroundWidget), subview: topBarView)
-        statusBackgroundWidget?.view.snp.remakeConstraints { make in
+        statusBackgroundWidget?.view.snp.remakeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
 
         statusForegroundWidget = refreshWidget(current: statusForegroundWidget, next: widgetFactory.createStatusForegroundWidget(current: statusForegroundWidget), subview: topBarView)
-        statusForegroundWidget?.view.snp.remakeConstraints { make in
+        statusForegroundWidget?.view.snp.remakeConstraints {  [weak self] make in
             let constrainTo: UIView = statusBackgroundWidget?.view ?? view
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.equalTo(dismissButton.snp.right).offset(5)
@@ -660,8 +664,8 @@ public class DashboardWidget: DelegateWidget {
             }
             make.height.equalTo(statusWidgetHeight)
         }
-        (statusForegroundWidget as? StatusLabelWidget)?.onTapped = onMainMenu
-        
+        (statusForegroundWidget as? StatusLabelWidget)?.onTapped = { [weak self] in self?.onMainMenu() }
+
         cameraExposureWidget = refreshWidget(current: cameraExposureWidget, next: widgetFactory.createCameraExposureWidget(current: cameraExposureWidget))
         
         cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
@@ -675,7 +679,7 @@ public class DashboardWidget: DelegateWidget {
         let cameraWidgetSize = statusWidgetHeight * 0.65
         var cameraIndicatorWidgetPrevious: Widget?
         cameraIndicatorWidgets.reversed().forEach { item in
-            item.widget.view.snp.remakeConstraints { make in
+            item.widget.view.snp.remakeConstraints {  [weak self] make in
                 if let previousWidget = cameraIndicatorWidgetPrevious {
                     make.top.equalTo(previousWidget.view.snp.top)
                     make.right.equalTo(previousWidget.view.snp.left).offset(-defaultPadding / 2)
@@ -694,7 +698,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
-        cameraModeWidget?.view.snp.remakeConstraints { make in
+        cameraModeWidget?.view.snp.remakeConstraints {  [weak self] make in
             make.top.equalTo(cameraMenuButton.snp.bottom).offset(-13)
             make.left.equalToSuperview().offset(3)
             make.height.equalTo(cameraModeWidget!.view.snp.width)
@@ -702,7 +706,7 @@ public class DashboardWidget: DelegateWidget {
         }
 
         cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
-        cameraCaptureWidget?.view.snp.remakeConstraints { make in
+        cameraCaptureWidget?.view.snp.remakeConstraints {  [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(cameraCaptureWidget!.view.snp.width).offset(20)
@@ -716,7 +720,7 @@ public class DashboardWidget: DelegateWidget {
         executorWidget = refreshWidget(current: executorWidget, next: widgetFactory.createExecutorWidget(current: executorWidget)) as? ExecutorWidget
         
         rtkStatusWidget = refreshWidget(current: rtkStatusWidget, next: widgetFactory.createRTKStatusWidget(current: rtkStatusWidget))
-        rtkStatusWidget?.view.snp.remakeConstraints { make in
+        rtkStatusWidget?.view.snp.remakeConstraints { [weak self] make in
             make.bottom.equalTo(cameraControlsView.snp.top).offset(-defaultPadding)
             make.right.equalTo(cameraControlsView.snp.right)
             make.height.equalTo(cameraWidgetSize)
@@ -742,7 +746,7 @@ public class DashboardWidget: DelegateWidget {
         let darkBackground = UIColor(red: 20, green: 20, blue: 20)
         let darkerBackground = UIColor(red: 10, green: 10, blue: 10)
         primaryContentView.backgroundColor = contentLayout.cameraFeedPrimary ? darkerBackground : darkBackground
-        primaryContentView.snp.remakeConstraints { make in
+        primaryContentView.snp.remakeConstraints { [weak self] make in
             if (portrait && !tablet) {
                 make.top.equalTo(topBarView.safeAreaLayoutGuide.snp.bottom).offset(statusWidgetHeight * 2)
             }
@@ -764,7 +768,7 @@ public class DashboardWidget: DelegateWidget {
 
         secondaryContentView.isHidden = contentLayout == .cameraFeed
         secondaryContentView.backgroundColor = contentLayout.cameraFeedPrimary ? darkBackground : darkerBackground
-        secondaryContentView.snp.remakeConstraints { make in
+        secondaryContentView.snp.remakeConstraints { [weak self] make in
             if (portrait) {
                 make.top.equalTo(primaryContentView.snp.bottom).offset(tablet ? 0 : statusWidgetHeight * 2)
                 make.right.equalToSuperview()
@@ -793,7 +797,7 @@ public class DashboardWidget: DelegateWidget {
         cameraMenuButton.isHidden = !widgetFactory.cameraMenuWidgetEnabled
         cameraExposureMenuButton.isHidden = !widgetFactory.cameraExposureMenuWidgetEnabled
 
-        cameraControlsView.snp.remakeConstraints { make in
+        cameraControlsView.snp.remakeConstraints { [weak self] make in
             make.centerY.equalTo(primaryContentView.snp.centerY)
             if (portrait || tablet) {
                 make.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-defaultPadding)
@@ -805,7 +809,7 @@ public class DashboardWidget: DelegateWidget {
             make.width.equalTo(70)
         }
 
-        compassWidget?.view.snp.remakeConstraints { make in
+        compassWidget?.view.snp.remakeConstraints { [weak self] make in
             if (portrait && tablet) {
                 make.bottom.equalTo(secondaryContentView.snp.top).offset(-defaultPadding)
                 make.height.equalTo(primaryContentView.snp.width).multipliedBy(0.15)
@@ -831,7 +835,7 @@ public class DashboardWidget: DelegateWidget {
         offsetsButton.isHidden = !offsetsButtonEnabled
         offsetsButton.tintColor = droneOffsetsWidget1 == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
         
-        telemetryWidget?.view.snp.remakeConstraints { make in
+        telemetryWidget?.view.snp.remakeConstraints { [weak self] make in
             if (portrait) {
                 make.bottom.equalTo(secondaryContentView.snp.top).offset(tablet ? -defaultPadding : -2)
                 make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(defaultPadding)
@@ -845,7 +849,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         if let droneOffsetsWidget1 = droneOffsetsWidget1 {
-            droneOffsetsWidget1.view.snp.remakeConstraints { make in
+            droneOffsetsWidget1.view.snp.remakeConstraints { [weak self] make in
                 make.height.equalTo(240)
                 make.width.equalTo(200)
                 if portrait {
@@ -859,7 +863,7 @@ public class DashboardWidget: DelegateWidget {
             }
             
             if let droneOffsetsWidget2 = droneOffsetsWidget2 {
-                droneOffsetsWidget2.view.snp.remakeConstraints { make in
+                droneOffsetsWidget2.view.snp.remakeConstraints { [weak self] make in
                     make.height.equalTo(droneOffsetsWidget1.view)
                     make.width.equalTo(droneOffsetsWidget1.view)
                     make.right.equalTo(droneOffsetsWidget1.view)
@@ -868,7 +872,7 @@ public class DashboardWidget: DelegateWidget {
             }
             
             if let cameraOffsetsWidget = cameraOffsetsWidget {
-                cameraOffsetsWidget.view.snp.remakeConstraints { make in
+                cameraOffsetsWidget.view.snp.remakeConstraints { [weak self] make in
                     make.height.equalTo(65)
                     make.width.equalTo(droneOffsetsWidget1.view)
                     make.right.equalTo(droneOffsetsWidget1.view)
@@ -877,7 +881,7 @@ public class DashboardWidget: DelegateWidget {
             }
         }
         
-        executorWidget?.view.snp.remakeConstraints { make in
+        executorWidget?.view.snp.remakeConstraints { [weak self] make in
             let preferredSize = executorWidget?.preferredSize ?? CGSize(width: 0, height: 0)
             if executorWidget is FuncExecutorWidget {
                 let large = tablet || portrait

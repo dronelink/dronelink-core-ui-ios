@@ -123,7 +123,7 @@ extension UIView {
     public func createWidget(shadow: Bool = false) -> Widget {
         let widget = Widget()
         widget.view.addSubview(self)
-        snp.makeConstraints { make in
+        snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
         
@@ -143,7 +143,7 @@ open class WrapperWidget: Widget {
         set {
             if let viewController = newValue {
                 viewController.install(inParent: self)
-                viewController.view.snp.makeConstraints { make in
+                viewController.view.snp.makeConstraints { [weak self] make in
                     make.edges.equalToSuperview()
                 }
                 _viewController = viewController

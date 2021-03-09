@@ -50,7 +50,7 @@ public class MapboxMapWidget: UpdatableWidget {
         mapView.addAnnotation(droneHomeAnnotation)
         mapView.addAnnotation(droneAnnotation)
         view.addSubview(mapView)
-        mapView.snp.makeConstraints { make in
+        mapView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
         mapView.addAnnotation(modeTargetAnnotation)
@@ -227,7 +227,7 @@ public class MapboxMapWidget: UpdatableWidget {
         }
         
         if let mapCenterSpatial = mapCenterSpatial {
-            mapView.setCenter(mapCenterSpatial.coordinate.coordinate, zoomLevel: 19.5, animated: true)
+            mapView.setCenter(mapCenterSpatial.coordinate.coordinate, zoomLevel: 19.25, animated: true)
         }
         
         funcMapOverlayAnnotations.forEach {
@@ -285,8 +285,8 @@ public class MapboxMapWidget: UpdatableWidget {
         super.onLocated(session: session)
         
         if let location = session.state?.value.location {
-            DispatchQueue.main.async {
-                self.mapView.setCenter(location.coordinate, zoomLevel: 18.5, animated: true)
+            DispatchQueue.main.async { [weak self] in
+                self?.mapView.setCenter(location.coordinate, zoomLevel: 18.5, animated: true)
             }
         }
     }
@@ -294,12 +294,12 @@ public class MapboxMapWidget: UpdatableWidget {
     public override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.missionCentered = false
-            self.updateMissionRequiredTakeoffArea()
-            self.updateMissionRestrictionZones()
+        DispatchQueue.main.async { [weak self] in
+            self?.missionCentered = false
+            self?.updateMissionRequiredTakeoffArea()
+            self?.updateMissionRestrictionZones()
             if executor.estimated {
-                self.updateMissionEstimate()
+                self?.updateMissionEstimate()
             }
         }
     }
@@ -307,59 +307,59 @@ public class MapboxMapWidget: UpdatableWidget {
     public override func onMissionUnloaded(executor: MissionExecutor) {
         super.onMissionUnloaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.missionCentered = false
-            self.updateMissionRequiredTakeoffArea()
-            self.updateMissionRestrictionZones()
-            self.updateMissionEstimate()
+        DispatchQueue.main.async { [weak self] in
+            self?.missionCentered = false
+            self?.updateMissionRequiredTakeoffArea()
+            self?.updateMissionRestrictionZones()
+            self?.updateMissionEstimate()
         }
     }
 
     public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
         super.onMissionEstimated(executor: executor, estimate: estimate)
         
-        DispatchQueue.main.async {
-            self.updateMissionEstimate()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionEstimate()
         }
     }
     
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
     public override func onFuncUnloaded(executor: FuncExecutor) {
         super.onFuncUnloaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
     
     public override func onFuncInputsChanged(executor: FuncExecutor) {
         super.onFuncInputsChanged(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
     public override func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
         super.onModeExecuted(executor: executor, engagement: engagement)
         
-        DispatchQueue.main.async {
-            self.updateModeElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateModeElements()
         }
     }
     
     public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
         super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
         
-        DispatchQueue.main.async {
-            self.updateModeElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateModeElements()
         }
     }
 }

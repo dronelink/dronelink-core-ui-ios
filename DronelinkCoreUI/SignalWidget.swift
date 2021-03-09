@@ -27,20 +27,20 @@ public class SignalWidget: UpdatableWidget {
         iconImageView.addShadow()
         iconImageView.image = DronelinkUI.loadImage(named: "upLinkIcon")?.withRenderingMode(.alwaysOriginal)
         view.addSubview(iconImageView)
-        iconImageView.snp.makeConstraints { make in
+        iconImageView.snp.makeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
-            make.width.equalTo(self.view.snp.height)
+            make.width.equalTo(view.snp.height)
             make.bottom.equalToSuperview()
         }
         
         levelImageView.addShadow()
         levelImageView.image = level0Image
         view.addSubview(levelImageView)
-        levelImageView.snp.makeConstraints { make in
+        levelImageView.snp.makeConstraints { [weak self] make in
             make.left.equalTo(iconImageView.snp.right).offset(5)
             make.top.equalToSuperview()
-            make.width.equalTo(self.view.snp.height)
+            make.width.equalTo(view.snp.height)
             make.bottom.equalToSuperview()
         }
     }

@@ -47,8 +47,8 @@ public extension UIView {
     }
     
     func animateLayout(duration: TimeInterval = 0.2) {
-        UIView.animate(withDuration: duration, delay: 0.0, options: .curveEaseInOut, animations: {
-            self.layoutIfNeeded()
+        UIView.animate(withDuration: duration, delay: 0.0, options: .curveEaseInOut, animations: { [weak self] in
+            self?.layoutIfNeeded()
         })
     }
 }

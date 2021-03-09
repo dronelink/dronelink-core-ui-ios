@@ -29,7 +29,7 @@ public class TelemetryWidget: Widget {
         }
         
         view.addSubview(distanceWidget.view)
-        distanceWidget.view.snp.makeConstraints { make in
+        distanceWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(defaultPadding)
             make.left.equalToSuperview().offset(defaultPadding)
             make.width.equalToSuperview().multipliedBy(0.45)
@@ -37,7 +37,7 @@ public class TelemetryWidget: Widget {
         }
 
         view.addSubview(altitudeWidget.view)
-        altitudeWidget.view.snp.makeConstraints { make in
+        altitudeWidget.view.snp.makeConstraints { [weak self] make in
             make.top.equalTo(distanceWidget.view.snp.top)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.width.equalTo(distanceWidget.view.snp.width)
@@ -45,7 +45,7 @@ public class TelemetryWidget: Widget {
         }
         
         view.addSubview(horizontalSpeedWidget.view)
-        horizontalSpeedWidget.view.snp.makeConstraints { make in
+        horizontalSpeedWidget.view.snp.makeConstraints { [weak self] make in
             make.bottom.equalToSuperview().offset(-defaultPadding)
             make.left.equalTo(distanceWidget.view.snp.left)
             make.width.equalTo(distanceWidget.view.snp.width)
@@ -53,7 +53,7 @@ public class TelemetryWidget: Widget {
         }
             
         view.addSubview(verticalSpeedWidget.view)
-        verticalSpeedWidget.view.snp.makeConstraints { make in
+        verticalSpeedWidget.view.snp.makeConstraints { [weak self] make in
             make.bottom.equalTo(horizontalSpeedWidget.view.snp.bottom)
             make.right.equalTo(altitudeWidget.view.snp.right)
             make.width.equalTo(horizontalSpeedWidget.view.snp.width)

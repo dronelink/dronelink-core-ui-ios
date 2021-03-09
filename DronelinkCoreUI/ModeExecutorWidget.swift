@@ -114,60 +114,60 @@ public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
         
         let labelHeight = 30
         
-        primaryButton.snp.remakeConstraints { make in
+        primaryButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(60)
             make.width.equalTo(primaryButton.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
             make.left.equalToSuperview().offset(15)
         }
         
-        activityIndicator.snp.remakeConstraints { make in
+        activityIndicator.snp.remakeConstraints { [weak self] make in
             make.edges.equalTo(primaryButton)
         }
         
-        layoutToggleButton.snp.remakeConstraints { make in
+        layoutToggleButton.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview()
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
             make.bottom.equalTo(executionDurationLabel.snp.bottom)
         }
         
-        executionDurationLabel.snp.remakeConstraints { make in
+        executionDurationLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(labelHeight)
             make.width.equalTo(executionDurationLabel.snp.height).multipliedBy(1.75)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalTo(primaryButton.snp.top)
         }
         
-        titleLabel.snp.remakeConstraints { make in
+        titleLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(labelHeight)
             make.left.equalTo(primaryButton.snp.right).offset(defaultPadding)
             make.right.equalTo(executionDurationLabel.snp.left).offset(-defaultPadding / 2)
             make.top.equalTo(primaryButton.snp.top)
         }
         
-        subtitleLabel.snp.remakeConstraints { make in
+        subtitleLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(labelHeight)
             make.left.equalTo(titleLabel.snp.left)
             make.right.equalTo(titleLabel.snp.right)
             make.top.equalTo(titleLabel.snp.bottom)
         }
         
-        countdownProgressView.snp.remakeConstraints { make in
+        countdownProgressView.snp.remakeConstraints { [weak self] make in
             make.left.equalTo(primaryButton.snp.right).offset(defaultPadding)
             make.right.equalToSuperview().offset(-15)
             make.height.equalTo(4)
             make.centerY.equalTo(subtitleLabel.snp.centerY)
         }
         
-        messagesTextView.snp.remakeConstraints { make in
+        messagesTextView.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(90)
             make.left.equalToSuperview().offset(defaultPadding * 3)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)
         }
         
-        dismissButton.snp.remakeConstraints { make in
+        dismissButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(24)
             make.width.equalTo(dismissButton.snp.height)
             make.top.equalToSuperview().offset(defaultPadding)
@@ -194,24 +194,25 @@ public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
     private func startCountdown() {
         countdownRemaining = countdownMax
         Dronelink.shared.announce(message: "\(countdownRemaining / 20)")
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { _ in
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             guard
-                let _ = self.modeExecutor,
-                let _ = self.session
+                let modeExecutorWidget = self,
+                let _ = modeExecutorWidget.modeExecutor,
+                let _ = modeExecutorWidget.session
             else {
-                self.stopCountdown()
+                self?.stopCountdown()
                 return
             }
             
-            self.countdownRemaining -= 1
-            if (self.countdownRemaining == 0) {
-                self.stopCountdown(aborted: false)
-                self.engage()
+            modeExecutorWidget.countdownRemaining -= 1
+            if (modeExecutorWidget.countdownRemaining == 0) {
+                modeExecutorWidget.stopCountdown(aborted: false)
+                modeExecutorWidget.engage()
             }
             else {
-                self.update()
-                if (self.countdownRemaining % 20 == 0) {
-                    Dronelink.shared.announce(message: "\(self.countdownRemaining / 20)")
+                modeExecutorWidget.update()
+                if (modeExecutorWidget.countdownRemaining % 20 == 0) {
+                    Dronelink.shared.announce(message: "\(modeExecutorWidget.countdownRemaining / 20)")
                 }
             }
         }
@@ -228,10 +229,10 @@ public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
     }
     
     private func engage() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             guard
-                let modeExecutor = self.modeExecutor,
-                let session = self.session
+                let modeExecutor = self?.modeExecutor,
+                let session = self?.session
             else {
                 return
             }
@@ -240,16 +241,16 @@ public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
                 try modeExecutor.engage(droneSession: session) { disallowed in
                     DronelinkUI.shared.showDialog(title: disallowed.title, details: disallowed.details)
                     DispatchQueue.main.async {
-                        self.update()
+                        self?.update()
                     }
                 }
             }
             catch DronelinkError.droneSerialNumberUnavailable {
                 DronelinkUI.shared.showDialog(title: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.title".localized, details: "ExecutableWidget.start.engage.droneSerialNumberUnavailable.message".localized)
-                self.update()
+                self?.update()
             }
             catch {
-                self.update()
+                self?.update()
             }
         }
     }

@@ -22,10 +22,10 @@ public class FlightModeWidget: UpdatableWidget {
         imgageView.addShadow()
         imgageView.image = DronelinkUI.loadImage(named: "flightModeIcon")?.withRenderingMode(.alwaysOriginal)
         view.addSubview(imgageView)
-        imgageView.snp.makeConstraints { make in
+        imgageView.snp.makeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.top.equalToSuperview()
-            make.width.equalTo(self.view.snp.height)
+            make.width.equalTo(view.snp.height)
             make.bottom.equalToSuperview()
         }
         
@@ -37,7 +37,7 @@ public class FlightModeWidget: UpdatableWidget {
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
-        label.snp.makeConstraints { make in
+        label.snp.makeConstraints { [weak self] make in
             make.left.equalTo(imgageView.snp.right).offset(7)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
