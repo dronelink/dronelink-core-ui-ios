@@ -424,7 +424,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         }
         
         if (intro && hasInputs) {
-            let finish = { [weak self] in
+            let finish = { [weak self] (previous: Bool) in
                 guard let funcExecutorWidget = self else {
                     return
                 }
@@ -432,8 +432,11 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
                 funcExecutorWidget.intro = false
                 if funcExecutor.inputCount == 0 {
                     funcExecutorWidget.addNextDynamicInput()
+                    funcExecutorWidget.readValue()
                 }
-                funcExecutorWidget.readValue()
+                else if previous {
+                    funcExecutorWidget.inputIndex = funcExecutor.inputCount
+                }
                 funcExecutorWidget.view.setNeedsUpdateConstraints()
             }
             
@@ -444,16 +447,16 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
                     details: "FuncExecutorWidget.cachedInputs.message".localized,
                     actions: [
                         MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.new".localized, emphasis: .high, handler: { [weak self] action in
-                            finish()
+                            finish(false)
                         }),
                         MDCAlertAction(title: "FuncExecutorWidget.cachedInputs.action.previous".localized, handler: { [weak self] action in
                             funcExecutor.addCachedInputs(funcExecutor: mostRecentExecuted)
-                            finish()
+                            finish(true)
                         })
                     ])
             }
             else {
-                finish()
+                finish(false)
             }
             return
         }

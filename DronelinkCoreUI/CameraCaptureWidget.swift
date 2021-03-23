@@ -40,6 +40,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     public var hyperModeImage = DronelinkUI.loadImage(named: "hyperMode")?.withRenderingMode(.alwaysTemplate)
     public var timerModeImage = DronelinkUI.loadImage(named: "timerMode")?.withRenderingMode(.alwaysTemplate)
     public var panoModeImage = DronelinkUI.loadImage(named: "panoMode")?.withRenderingMode(.alwaysTemplate)
+    public var highResolutionModeImage = DronelinkUI.loadImage(named: "highResolutionMode")?.withRenderingMode(.alwaysTemplate)
     
     private var pendingCommand: KernelCommand?
     private var previousCapturing = false
@@ -221,6 +222,10 @@ public class CameraCaptureWidget: UpdatableWidget {
                 
             case .panorama:
                 extraImage = panoModeImage
+                break
+                
+            case .highResolution:
+                extraImage = highResolutionModeImage
                 break
                 
             default:
