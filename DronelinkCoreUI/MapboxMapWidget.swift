@@ -14,7 +14,7 @@ import MaterialComponents.MaterialPalettes
 public class MapboxMapWidget: UpdatableWidget {
     public override var updateInterval: TimeInterval { 0.1 }
     
-    private let mapView = MGLMapView()
+    public let mapView = MGLMapView()
     private let droneHomeAnnotation = MGLPointAnnotation()
     private var droneHomeAnnotationView: MGLAnnotationView?
     private let droneAnnotation = MGLPointAnnotation()
