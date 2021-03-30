@@ -171,4 +171,16 @@ open class VerticalSpeedWidget: NumericInstrumentWidget {
     }
 }
 
-
+open class AbsoluteSpeedWidget: NumericInstrumentWidget {
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        prefixIcon.image = DronelinkUI.loadImage(named: "speed_icon")
+        prefixIcon.tintColor = .white
+        prefixText = nil
+        valueLabel.font = UIFont.systemFont(ofSize: tablet ? 22 : 16, weight: .semibold)
+        valueGenerator = { [weak self] in
+            Dronelink.shared.format(formatter: "velocityVertical", value: self?.session?.state?.value.absoluteSpeed, defaultValue: "NumericInstrumentWidget.empty".localized)
+        }
+    }
+}

@@ -248,6 +248,7 @@ open class WidgetFactory {
     open func createAltitudeWidget(current: Widget? = nil) -> Widget? { (current as? AltitudeWidget) ?? AltitudeWidget() }
     open func createHorizontalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? HorizontalSpeedWidget) ?? HorizontalSpeedWidget() }
     open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? VerticalSpeedWidget) ?? VerticalSpeedWidget() }
+    open func createAbsoluteSpeedWidget(current: Widget? = nil) -> Widget? { (current as? AbsoluteSpeedWidget) ?? AbsoluteSpeedWidget() }
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open var cameraMenuWidgetEnabled: Bool { false }
     open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
