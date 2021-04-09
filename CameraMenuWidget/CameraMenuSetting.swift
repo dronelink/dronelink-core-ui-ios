@@ -15,13 +15,19 @@ public enum CameraMenuSettingStyle {
 }
 
 public enum CameraMenuSetting {
+    // Photo
     case photoMode
     case imageSize
     case imageFormat
     case whiteBalance
+    // Video
     case videoSize
     case videoFormat
     case ntscPal
+    // General
+    case videoCaption
+    case storage
+    case fileIndexMode
     
     public var settingStyle: CameraMenuSettingStyle {
         switch self {
@@ -31,8 +37,12 @@ public enum CameraMenuSetting {
              .whiteBalance,
              .videoSize,
              .videoFormat,
-             .ntscPal:
+             .ntscPal,
+             .storage,
+             .fileIndexMode:
             return .options
+        case .videoCaption:
+            return .toggle
         default: return .action
         }
     }
@@ -46,6 +56,8 @@ public enum CameraMenuSetting {
         case .videoSize: return Kernel.CameraVideoResolution.allCases
         case .videoFormat: return Kernel.CameraVideoFileFormat.allCases
         case .ntscPal: return Kernel.CameraVideoStandard.allCases
+        case .storage: return Kernel.CameraStorageLocation.allCases
+        case .fileIndexMode: return Kernel.CameraFileIndexMode.allCases
         default: return []
         }
     }
@@ -59,6 +71,9 @@ public enum CameraMenuSetting {
         case .videoSize: return "CameraMenuSetting.videoSize".localized
         case .videoFormat: return "CameraMenuSetting.videoFormat".localized
         case .ntscPal: return "CameraMenuSetting.ntscPal".localized
+        case .videoCaption: return "CameraMenuSetting.videoCaption".localized
+        case .storage: return "CameraMenuSetting.storage".localized
+        case .fileIndexMode: return "CameraMenuSetting.fileIndexMode".localized
         }
     }
 }
@@ -180,6 +195,26 @@ extension Kernel.CameraVideoStandard: CameraMenuOption {
         case .pal: return "CameraVideoStandard.pal".localized
         case .ntsc: return "CameraVideoStandard.ntsc".localized
         case .unknown: return "CameraVideoStandard.unknown".localized
+        }
+    }
+}
+
+extension Kernel.CameraStorageLocation: CameraMenuOption {
+    public var displayName: String {
+        switch self {
+        case ._internal: return "CameraStorageLocation._internal".localized
+        case .sdCard: return "CameraStorageLocation.sdCard".localized
+        case .unknown: return "CameraStorageLocation.unknown".localized
+        }
+    }
+}
+
+extension Kernel.CameraFileIndexMode: CameraMenuOption {
+    public var displayName: String {
+        switch self {
+        case .reset: return "CameraFileIndexMode.reset".localized
+        case .sequence: return "CameraFileIndexMode.sequence".localized
+        case .unknown: return "CameraFileIndexMode.unknown".localized
         }
     }
 }

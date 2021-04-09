@@ -84,7 +84,7 @@ class CameraMenuWidget: UpdatableWidget, SettingsTableDelegate, SettingsOptionsD
         videoSettingsViewController.settingsDelegate = self
         videoSettingsViewController.settings = [.videoSize, .videoFormat, .ntscPal]
         generalSettingsViewController.settingsDelegate = self
-        generalSettingsViewController.settings = []
+        generalSettingsViewController.settings = [.videoCaption, .storage, .fileIndexMode]
         updateSelectedView(selectedButton: photoSettingsButton)
         
         view.addSubview(settingOptionsViewController.view)
@@ -185,10 +185,24 @@ class CameraMenuWidget: UpdatableWidget, SettingsTableDelegate, SettingsOptionsD
             do {
                 try? session?.add(command: command)
             }
-        }  else if setting == .ntscPal {
+        } else if setting == .ntscPal {
             guard let option = option as? Kernel.CameraVideoStandard else { return }
             var command = Kernel.VideoStandardCameraCommand()
             command.videoStandard = option
+            do {
+                try? session?.add(command: command)
+            }
+        } else if setting == .storage {
+            guard let option = option as? Kernel.CameraStorageLocation else { return }
+            var command = Kernel.StorageLocationCameraCommand()
+            command.storageLocation = option
+            do {
+                try? session?.add(command: command)
+            }
+        } else if setting == .fileIndexMode {
+            guard let option = option as? Kernel.CameraFileIndexMode else { return }
+            var command = Kernel.FileIndexModeCameraCommand()
+            command.fileIndexMode = option
             do {
                 try? session?.add(command: command)
             }

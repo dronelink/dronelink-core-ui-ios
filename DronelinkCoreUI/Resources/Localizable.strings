@@ -131,6 +131,9 @@
 "CameraMenuSetting.videoFormat" = "Video Format";
 "CameraMenuSetting.ntscPal" = "NTSC/PAL";
 "CameraMenuSetting.videoWhiteBalance" = "White Balance";
+"CameraMenuSetting.videoCaption" = "Video Caption";
+"CameraMenuSetting.storage" = "Storage";
+"CameraMenuSetting.fileIndexMode" = "File Index Mode";
 
 "CameraPhotoMode.single" = "Single";
 "CameraPhotoMode.hdr" = "HDR";
@@ -206,3 +209,12 @@
 "CameraVideoStandard.pal" = "PAL";
 "CameraVideoStandard.ntsc" = "NTSC";
 "CameraVideoStandard.unknown" = "Unknown";
+
+"CameraStorageLocation._internal" = "Internal";
+"CameraStorageLocation.sdCard" = "SD Card";
+"CameraStorageLocation.unknown" = "Unknown";
+
+"CameraFileIndexMode.reset" = "Reset";
+"CameraFileIndexMode.sequence" = "Sequence";
+"CameraFileIndexMode.unknown" = "Unknown";
+
