@@ -250,7 +250,7 @@ open class WidgetFactory {
     open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? VerticalSpeedWidget) ?? VerticalSpeedWidget() }
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open var cameraMenuWidgetEnabled: Bool { false }
-    open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { (current as? CameraMenuWidget) ?? CameraMenuWidget() }
     open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureWidget) ?? CameraExposureWidget() }
     open func createCameraISOWidget(current: Widget? = nil) -> Widget? { (current as? CameraISOWidget) ?? CameraISOWidget()}
     open func createCameraShutterWidget(current: Widget? = nil) -> Widget? { (current as? CameraShutterWidget) ?? CameraShutterWidget()}
