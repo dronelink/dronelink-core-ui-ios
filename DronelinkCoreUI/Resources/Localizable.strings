@@ -218,3 +218,7 @@
 "CameraFileIndexMode.sequence" = "Sequence";
 "CameraFileIndexMode.unknown" = "Unknown";
 
+"CameraExposureMenu.iso" = "ISO";
+"CameraExposureMenu.autoIso" = "AUTO";
+"CameraExposureMenu.shutter" = "Shutter";
+

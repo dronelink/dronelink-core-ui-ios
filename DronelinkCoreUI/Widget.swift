@@ -264,7 +264,7 @@ open class WidgetFactory {
     open func createCameraModeWidget(current: Widget? = nil) -> Widget? { (current as? CameraModeWidget) ?? CameraModeWidget() }
     open func createCameraCaptureWidget(current: Widget? = nil) -> Widget?  { (current as? CameraCaptureWidget) ?? CameraCaptureWidget() }
     open var cameraExposureMenuWidgetEnabled: Bool { false }
-    open func createCameraExposureMenuWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createCameraExposureMenuWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureMenuWidget) ?? CameraExposureMenuWidget() }
     open func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKMenuWidget(current: Widget? = nil) -> Widget? { nil }
