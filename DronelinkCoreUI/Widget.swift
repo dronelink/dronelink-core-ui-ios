@@ -73,7 +73,7 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     open func onModeUnloaded(executor: ModeExecutor) {
         executor.remove(delegate: self)
     }
-
+    
     open func onOpened(session: DroneSession) {
         session.add(delegate: self)
     }
@@ -98,6 +98,8 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     
     open func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {}
     
+    open func missionEngageDisallowedReasons(executor: MissionExecutor) -> [Kernel.Message]? { nil }
+    
     open func onMissionEngaging(executor: MissionExecutor) {}
     
     open func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {}
@@ -105,6 +107,8 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     open func onMissionExecuted(executor: MissionExecutor, engagement: Executor.Engagement) {}
     
     open func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {}
+    
+    open func modeEngageDisallowedReasons(executor: ModeExecutor) -> [Kernel.Message]? { nil }
     
     open func onModeEngaging(executor: ModeExecutor) {}
     

@@ -187,6 +187,16 @@ public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
             modeExecutor.disengage(reason: Kernel.Message(title: "ModeDisengageReason.user.disengaged".localized))
             return
         }
+        
+        guard let session = session else {
+            return
+        }
+        
+        if let engageDisallowedReasons = modeExecutor.engageDisallowedReasons(droneSession: session), engageDisallowedReasons.count > 0 {
+            let reason = engageDisallowedReasons.first!
+            DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
+            return
+        }
 
         startCountdown()
     }
