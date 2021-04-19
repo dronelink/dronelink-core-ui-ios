@@ -103,8 +103,8 @@
 
 "NetworkRTKStatus.value.0" = "N/A";
 "NetworkRTKStatus.value.1" = "Disabled";
-"NetworkRTKStatus.value.2" = "Connected";
-"NetworkRTKStatus.value.3" = "Connecting";
+"NetworkRTKStatus.value.2" = "Connecting";
+"NetworkRTKStatus.value.3" = "Connected";
 "NetworkRTKStatus.value.4" = "Error";
 "NetworkRTKStatus.value.5" = "Timeout";
 
