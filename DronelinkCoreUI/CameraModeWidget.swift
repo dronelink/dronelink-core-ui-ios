@@ -11,8 +11,9 @@ import UIKit
 import DronelinkCore
 
 public class CameraModeWidget: UpdatableWidget {
+    
     public var channel: UInt = 0
-    private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
+    private var cameraState: CameraStateAdapter?
     
     public let button = UIButton()
     
@@ -23,6 +24,8 @@ public class CameraModeWidget: UpdatableWidget {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        cameraState =  session?.cameraState(channel: channel)?.value
         
         button.addShadow()
         button.setImage(cameraState?.mode == .video ? videoImage : photoImage, for: .normal)
@@ -42,6 +45,7 @@ public class CameraModeWidget: UpdatableWidget {
         button.isEnabled = false
         var command = Kernel.ModeCameraCommand()
         command.mode = cameraState?.mode == .photo ? .video : .photo
+        command.channel = self.channel
         do {
             try? session?.add(command: command)
             pendingCommand = command
@@ -75,5 +79,10 @@ public class CameraModeWidget: UpdatableWidget {
                 self?.update()
             }
         }
+    }
+    
+    public override func onCameraChanged(session: DroneSession, channel: UInt) {
+        self.channel = channel
+        self.cameraState =  self.session?.cameraState(channel: channel)?.value
     }
 }

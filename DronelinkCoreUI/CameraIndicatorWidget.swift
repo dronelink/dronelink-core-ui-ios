@@ -16,10 +16,12 @@ open class CameraIndicatorWidget: UpdatableWidget {
     public let valueLabel = UILabel()
     public var valueGenerator: (() -> String?)?
     public var channel: UInt = 0
-    public var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
+    public var cameraState: CameraStateAdapter?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.cameraState = self.session?.cameraState(channel: channel)?.value
         
         titleLabel.textColor = .white
         titleLabel.alpha = 0.6
@@ -52,6 +54,11 @@ open class CameraIndicatorWidget: UpdatableWidget {
     @objc open override func update() {
         super.update()
         valueLabel.text = valueGenerator?() ?? ""
+    }
+    
+    open override func onCameraChanged(session: DroneSession, channel: UInt) {
+        self.channel = channel
+        self.cameraState = self.session?.cameraState(channel: channel)?.value
     }
 }
 

@@ -15,7 +15,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     public override var updateInterval: TimeInterval { 0.1 }
     
     public var channel: UInt = 0
-    private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
+    private var cameraState: CameraStateAdapter?
     
     public let button = UIButton()
     public let activityBackgroundImageView = UIImageView()
@@ -46,6 +46,8 @@ public class CameraCaptureWidget: UpdatableWidget {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
+        
+        cameraState = session?.cameraState(channel: channel)?.value
         
         button.addShadow()
         button.setImage(startImage, for: .normal)
@@ -123,7 +125,8 @@ public class CameraCaptureWidget: UpdatableWidget {
     
     @objc func onTapped(_ sender: UIButton) {
         button.isEnabled = false
-        let command: KernelCommand = (cameraState?.isCapturingContinuous ?? false) ? Kernel.StopCaptureCameraCommand() : Kernel.StartCaptureCameraCommand()
+        var command: KernelCameraCommand = (cameraState?.isCapturingContinuous ?? false) ? Kernel.StopCaptureCameraCommand() : Kernel.StartCaptureCameraCommand()
+        command.channel = self.channel
         do {
             try? session?.add(command: command)
             pendingCommand = command
@@ -274,5 +277,10 @@ public class CameraCaptureWidget: UpdatableWidget {
                 AudioServicesPlaySystemSound(photoSystemSound)
             }
         }
+    }
+    
+    public override func onCameraChanged(session: DroneSession, channel: UInt) {
+        self.channel = channel
+        self.cameraState = self.session?.cameraState(channel: channel)?.value
     }
 }
