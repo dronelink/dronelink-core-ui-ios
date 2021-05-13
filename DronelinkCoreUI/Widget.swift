@@ -261,6 +261,7 @@ open class WidgetFactory {
     open func createCameraApertureWidget(current: Widget? = nil) -> Widget? { (current as? CameraApertureWidget) ?? CameraApertureWidget()}
     open func createCameraExposureCompensationWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureCompensationWidget) ?? CameraExposureCompensationWidget()}
     open func createCameraWhiteBalanceWidget(current: Widget? = nil) -> Widget? { (current as? CameraWhiteBalanceWidget) ?? CameraWhiteBalanceWidget()}
+    open func createCameraFocusRingWidget(current: Widget? = nil) -> Widget? { (current as? CameraFocusRingWidget) ?? CameraFocusRingWidget()}
     open func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureFocusWidget(current: Widget? = nil) -> Widget? { nil }

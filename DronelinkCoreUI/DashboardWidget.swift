@@ -135,10 +135,12 @@ public class DashboardWidget: DelegateWidget {
     private var cameraAutoExposureWidget: Widget?
     private var cameraExposureFocusWidget: Widget?
     private var cameraFocusModeWidget: Widget?
+    private var cameraFocusRingWidget: Widget?
     private var cameraStorageWidget: Widget?
     private var cameraExposureWidget: Widget?
     private var cameraIndicatorWidgets: [(widget: Widget, width: Bool)] {
         var widgets: [(widget: Widget, width: Bool)] = []
+        if let widget = cameraFocusRingWidget { widgets.append((widget: widget, width: false)) }
         if let widget = cameraExposureWidget { widgets.append((widget: widget, width: false)) }
         if let widget = cameraStorageWidget { widgets.append((widget: widget, width: false)) }
         if let widget = cameraAutoExposureWidget { widgets.append((widget: widget, width: true)) }
@@ -490,6 +492,14 @@ public class DashboardWidget: DelegateWidget {
         DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: nil) }
     }
     
+    open override func onMissionEngaging(executor: MissionExecutor) {
+        super.onMissionEngaging(executor: executor)
+        DispatchQueue.main.async { [weak self] in
+            self?.updateDismissButton()
+            self?.view.setNeedsUpdateConstraints()
+        }
+    }
+    
     open override func onMissionEngaged(executor: MissionExecutor, engagement: Executor.Engagement) {
         super.onMissionEngaged(executor: executor, engagement: engagement)
         DispatchQueue.main.async { [weak self] in
@@ -514,6 +524,11 @@ public class DashboardWidget: DelegateWidget {
     open override func onModeUnloaded(executor: ModeExecutor) {
         super.onModeUnloaded(executor: executor)
         DispatchQueue.main.async { [weak self] in self?.apply(userInterfaceSettings: nil) }
+    }
+    
+    open override func onModeEngaging(executor: ModeExecutor) {
+        super.onModeEngaging(executor: executor)
+        DispatchQueue.main.async { [weak self] in self?.updateDismissButton() }
     }
     
     open override func onModeEngaged(executor: ModeExecutor, engagement: Executor.Engagement) {
@@ -665,7 +680,9 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(statusWidgetHeight)
         }
         (statusForegroundWidget as? StatusLabelWidget)?.onTapped = { [weak self] in self?.onMainMenu() }
-
+        
+        //cameraFocusRingWidget = refreshWidget(current: cameraFocusRingWidget, next: widgetFactory.createCameraFocusRingWidget(current: cameraFocusRingWidget))
+        
         cameraExposureWidget = refreshWidget(current: cameraExposureWidget, next: widgetFactory.createCameraExposureWidget(current: cameraExposureWidget))
         
         cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
@@ -729,7 +746,7 @@ public class DashboardWidget: DelegateWidget {
     }
     
     func updateDismissButton() {
-        dismissButton.isEnabled = !Dronelink.shared.engaged
+        dismissButton.isEnabled = !(Dronelink.shared.engaged || Dronelink.shared.missionExecutor?.engaging ?? false || Dronelink.shared.modeExecutor?.engaging ?? false)
     }
     
     public override func updateViewConstraints() {

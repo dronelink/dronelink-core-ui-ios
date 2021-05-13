@@ -16,6 +16,8 @@
 "learnMore" = "Learn More";
 "na" = "N/A";
 
+"CameraIndicatorWidget.focusring.title" = "Focus";
+
 "CameraExposureWidget.iso.title" = "ISO";
 "CameraExposureWidget.autoiso.title" = "Auto ISO";
 "CameraExposureWidget.shutter.title" = "Shutter";

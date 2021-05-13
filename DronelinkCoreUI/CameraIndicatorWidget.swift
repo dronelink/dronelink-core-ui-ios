@@ -55,6 +55,25 @@ open class CameraIndicatorWidget: UpdatableWidget {
     }
 }
 
+open class CameraFocusRingWidget: CameraIndicatorWidget {
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        
+        titleLabel.text = "CameraIndicatorWidget.focusring.title".localized
+        valueGenerator = { [weak self] in
+            guard
+                let focusRingValue = self?.cameraState?.focusRingValue,
+                let focusRingMax = self?.cameraState?.focusRingMax
+            else {
+                return "na".localized
+            }
+            
+            return "\(Int(focusRingValue))/\(Int(focusRingMax))"
+        }
+    }
+}
+
 open class CameraISOWidget: CameraIndicatorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
