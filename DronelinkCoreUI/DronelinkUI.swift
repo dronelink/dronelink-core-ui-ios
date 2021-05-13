@@ -31,6 +31,8 @@ extension DronelinkUI {
 }
 
 public class DronelinkUI: NSObject {
+    public var missionDetailsURL: String?
+    
     private var background = false
     
     public override init() {
@@ -47,8 +49,8 @@ public class DronelinkUI: NSObject {
 
         super.init()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         
         AgrumeServiceLocator.shared.setDownloadHandler { url, completion in
             KingfisherManager.shared.retrieveImage(with: url) {

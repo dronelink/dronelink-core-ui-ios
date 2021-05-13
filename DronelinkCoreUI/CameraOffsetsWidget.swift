@@ -86,21 +86,21 @@ public class CameraOffsetsWidget: UpdatableWidget {
         let defaultPadding = 10
         let buttonSize = 42
         
-        c1Button.snp.remakeConstraints { make in
+        c1Button.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.top.equalToSuperview().offset(defaultPadding)
             make.left.equalToSuperview().offset(defaultPadding)
         }
         
-        c2Button.snp.remakeConstraints { make in
+        c2Button.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.top.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
         }
         
-        cLabel.snp.remakeConstraints { make in
+        cLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.left.equalTo(c1Button.snp.right).offset(defaultPadding)
             make.right.equalTo(c2Button.snp.left).offset(-defaultPadding)
@@ -136,12 +136,12 @@ public class CameraOffsetsWidget: UpdatableWidget {
             evStepsPending = steps
         }
         
-        evStepsTimer = Timer.scheduledTimer(withTimeInterval: 0.75, repeats: false) { timer in
-            guard let session = self.session, let steps = self.evStepsPending else {
+        evStepsTimer = Timer.scheduledTimer(withTimeInterval: 0.75, repeats: false) { [weak self] timer in
+            guard let session = self?.session, let steps = self?.evStepsPending else {
                 return
             }
             
-            self.evStepsPending = nil
+            self?.evStepsPending = nil
             if steps == 0 {
                 return
             }
@@ -149,9 +149,9 @@ public class CameraOffsetsWidget: UpdatableWidget {
             do {
                 let exposureCommand = Kernel.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
                 try? session.add(command: exposureCommand)
-                self.offsets.cameraExposureCompensationSteps += steps
-                self.exposureCommand = exposureCommand
-                self.update()
+                self?.offsets.cameraExposureCompensationSteps += steps
+                self?.exposureCommand = exposureCommand
+                self?.update()
             }
         }
     }
@@ -218,8 +218,8 @@ public class CameraOffsetsWidget: UpdatableWidget {
         
         if command.id == exposureCommand.id {
             self.exposureCommand = nil
-            DispatchQueue.main.async {
-                self.view.setNeedsUpdateConstraints()
+            DispatchQueue.main.async { [weak self] in
+                self?.view.setNeedsUpdateConstraints()
             }
         }
     }

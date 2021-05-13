@@ -30,7 +30,7 @@ public class CameraModeWidget: UpdatableWidget {
         button.addTarget(self, action: #selector(onTapped(_:)), for: .touchUpInside)
         view.addSubview(button)
         button.isEnabled = false
-        button.snp.makeConstraints { make in
+        button.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview().offset(5)
             make.right.equalToSuperview().offset(-5)
@@ -68,11 +68,11 @@ public class CameraModeWidget: UpdatableWidget {
         if pendingCommand?.id == command.id {
             pendingCommand = nil
             if let error = error {
-                DronelinkUI.shared.showSnackbar(text: error.localizedDescription)
+                DronelinkUI.shared.showSnackbar(text: error as? String ?? error.localizedDescription)
             }
             
-            DispatchQueue.main.async {
-                self.update()
+            DispatchQueue.main.async { [weak self] in
+                self?.update()
             }
         }
     }

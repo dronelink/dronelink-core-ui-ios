@@ -120,12 +120,17 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
 }
 
 extension UIView {
-    public func createWidget() -> Widget {
+    public func createWidget(shadow: Bool = false) -> Widget {
         let widget = Widget()
         widget.view.addSubview(self)
-        snp.makeConstraints { make in
+        snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
+        
+        if shadow {
+            widget.view.addShadow()
+        }
+        
         return widget
     }
 }
@@ -138,7 +143,7 @@ open class WrapperWidget: Widget {
         set {
             if let viewController = newValue {
                 viewController.install(inParent: self)
-                viewController.view.snp.makeConstraints { make in
+                viewController.view.snp.makeConstraints { [weak self] make in
                     make.edges.equalToSuperview()
                 }
                 _viewController = viewController
@@ -246,7 +251,12 @@ open class WidgetFactory {
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open var cameraMenuWidgetEnabled: Bool { false }
     open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureWidget) ?? CameraExposureWidget() }
+    open func createCameraISOWidget(current: Widget? = nil) -> Widget? { (current as? CameraISOWidget) ?? CameraISOWidget()}
+    open func createCameraShutterWidget(current: Widget? = nil) -> Widget? { (current as? CameraShutterWidget) ?? CameraShutterWidget()}
+    open func createCameraApertureWidget(current: Widget? = nil) -> Widget? { (current as? CameraApertureWidget) ?? CameraApertureWidget()}
+    open func createCameraExposureCompensationWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureCompensationWidget) ?? CameraExposureCompensationWidget()}
+    open func createCameraWhiteBalanceWidget(current: Widget? = nil) -> Widget? { (current as? CameraWhiteBalanceWidget) ?? CameraWhiteBalanceWidget()}
     open func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureFocusWidget(current: Widget? = nil) -> Widget? { nil }

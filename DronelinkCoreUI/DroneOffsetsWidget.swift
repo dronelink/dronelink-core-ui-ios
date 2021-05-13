@@ -132,84 +132,84 @@ public class DroneOffsetsWidget: UpdatableWidget {
         let defaultPadding = 10
         let buttonSize = 42
         
-        styleSegmentedControl.snp.remakeConstraints { make in
+        styleSegmentedControl.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(25)
             make.left.equalToSuperview().offset(8)
             make.right.equalToSuperview().offset(-8)
             make.top.equalToSuperview().offset(8)
         }
         
-        rcInputsToggleButton.snp.remakeConstraints { make in
+        rcInputsToggleButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(styleSegmentedControl)
             make.width.equalTo(moreButton.snp.height)
             make.left.equalTo(styleSegmentedControl)
             make.top.equalTo(styleSegmentedControl.snp.bottom).offset(defaultPadding)
         }
         
-        moreButton.snp.remakeConstraints { make in
+        moreButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(styleSegmentedControl)
             make.width.equalTo(moreButton.snp.height)
             make.left.equalTo(rcInputsToggleButton)
             make.top.equalTo(rcInputsToggleButton.snp.bottom).offset(defaultPadding)
         }
         
-        clearButton.snp.remakeConstraints { make in
+        clearButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(styleSegmentedControl)
             make.width.equalTo(clearButton.snp.height)
             make.right.equalTo(styleSegmentedControl)
             make.top.equalTo(styleSegmentedControl.snp.bottom).offset(defaultPadding)
         }
         
-        detailsLabel.snp.remakeConstraints { make in
+        detailsLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(styleSegmentedControl)
             make.left.equalTo(moreButton.snp.right).offset(5)
             make.right.equalTo(clearButton.snp.left).offset(-5)
             make.top.equalTo(styleSegmentedControl.snp.bottom).offset(defaultPadding)
         }
         
-        upButton.snp.remakeConstraints { make in
+        upButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.top.equalTo(detailsLabel.snp.bottom).offset(defaultPadding)
             make.centerX.equalToSuperview()
         }
         
-        downButton.snp.remakeConstraints { make in
+        downButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.top.equalTo(upButton.snp.bottom).offset(20)
             make.centerX.equalTo(upButton)
         }
         
-        leftButton.snp.remakeConstraints { make in
+        leftButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.top.equalTo(upButton).offset(33)
             make.right.equalTo(upButton.snp.left).offset(-defaultPadding)
         }
         
-        rightButton.snp.remakeConstraints { make in
+        rightButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.centerY.equalTo(leftButton)
             make.left.equalTo(upButton.snp.right).offset(defaultPadding)
         }
 
-        c1Button.snp.remakeConstraints { make in
+        c1Button.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.bottom.equalToSuperview().offset(-defaultPadding)
             make.left.equalToSuperview().offset(defaultPadding)
         }
         
-        c2Button.snp.remakeConstraints { make in
+        c2Button.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.width.equalTo(buttonSize)
             make.bottom.equalToSuperview().offset(-defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
         }
         
-        cLabel.snp.remakeConstraints { make in
+        cLabel.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(buttonSize)
             make.left.equalTo(c1Button.snp.right).offset(defaultPadding)
             make.right.equalTo(c2Button.snp.left).offset(-defaultPadding)
@@ -264,7 +264,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         }
         
         if style == .altYaw {
-            styleSegmentedControl.setTitle(rollVisible ? "DroneOffsetsViewController.rollTrim".localized.uppercased() : style.display, forSegmentAt: style.rawValue)
+            styleSegmentedControl.setTitle(rollVisible ? "DroneOffsetsWidget.rollTrim".localized.uppercased() : style.display, forSegmentAt: style.rawValue)
         }
         
         update()
@@ -278,32 +278,32 @@ public class DroneOffsetsWidget: UpdatableWidget {
     @objc func onRCInputsToggle(sender: Any) {
         rcInputsEnabled = !rcInputsEnabled
         if rcInputsEnabled {
-            DronelinkUI.shared.showSnackbar(text: "DroneOffsetsViewController.rc.inputs".localized)
+            DronelinkUI.shared.showSnackbar(text: "DroneOffsetsWidget.rc.inputs".localized)
         }
         update()
     }
     
     @objc func onMore(sender: Any) {
-        let alert = UIAlertController(title: "DroneOffsetsViewController.more".localized, message: nil, preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "DroneOffsetsWidget.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.levelGimbal".localized, style: .default , handler:{ _ in
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.levelGimbal".localized, style: .default , handler:{ [weak self] _ in
             var command = Kernel.OrientationGimbalCommand()
             command.orientation.x = 0
-            try? self.session?.add(command: command)
+            try? self?.session?.add(command: command)
         }))
         
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.nadirGimbal".localized, style: .default , handler:{ _ in
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.nadirGimbal".localized, style: .default , handler:{ [weak self] _ in
             var command = Kernel.OrientationGimbalCommand()
             command.orientation.x = -90.convertDegreesToRadians
-            try? self.session?.add(command: command)
+            try? self?.session?.add(command: command)
         }))
         
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.resetGimbal".localized, style: .default , handler:{ _ in
-            self.session?.drone.gimbal(channel: 0)?.reset()
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.resetGimbal".localized, style: .default , handler:{ [weak self] _ in
+            self?.session?.drone.gimbal(channel: 0)?.reset()
         }))
         
-        alert.addAction(UIAlertAction(title: "DroneOffsetsViewController.rollTrim".localized, style: .default , handler:{ _ in
-            self.updateRoll(visible: true)
+        alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.rollTrim".localized, style: .default , handler:{ [weak self] _ in
+            self?.updateRoll(visible: true)
         }))
         
         alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
@@ -533,7 +533,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
                     details.append(Dronelink.shared.format(formatter: "altitude", value: offsets.droneAltitude))
                 }
 
-                rcInputsToggleButton.isHidden = session == nil
+                rcInputsToggleButton.isHidden = session?.remoteControllerState(channel: 0) == nil
                 moreButton.isHidden = session == nil
                 clearButton.isHidden = details.count == 0
                 detailsLabel.text = details.joined(separator: " / ")
@@ -558,7 +558,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
                 rightButton.isHidden = false
                 upButton.isHidden = false
                 downButton.isHidden = false
-                rcInputsToggleButton.isHidden = session == nil
+                rcInputsToggleButton.isHidden = session?.remoteControllerState(channel: 0) == nil
                 moreButton.isHidden = session == nil || UIDevice.current.userInterfaceIdiom == .pad
                 clearButton.isHidden = offsets.droneCoordinate.magnitude == 0
                 detailsLabel.text = clearButton.isHidden ? "" : display(vector: offsets.droneCoordinate)
@@ -584,27 +584,44 @@ public class DroneOffsetsWidget: UpdatableWidget {
             let remoteControllerState = session?.remoteControllerState(channel: 0)?.value {
             let deadband = 0.15
             
-            let yawPercent = remoteControllerState.leftStick.x
-            if abs(yawPercent) > deadband {
-                offsets.droneYaw += (1.0 * yawPercent).convertDegreesToRadians
-            }
+            switch style {
+            case .altYaw:
+                let yawPercent = remoteControllerState.leftStick.x
+                if abs(yawPercent) > deadband {
+                    offsets.droneYaw += (1.0 * yawPercent).convertDegreesToRadians
+                }
 
-            let altitudePercent = remoteControllerState.leftStick.y
-            if abs(altitudePercent) > deadband {
-                offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
-            }
-            
-            
-            let positionPercent = remoteControllerState.rightStick.y
-            if abs(positionPercent) > deadband {
-                guard let state = session?.state?.value else {
-                    return
+                let altitudePercent = remoteControllerState.leftStick.y
+                if abs(altitudePercent) > deadband {
+                    offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
+                }
+                break
+                    
+            case .position:
+                let positionXPercent = remoteControllerState.rightStick.x
+                if abs(positionXPercent) > deadband {
+                    guard let state = session?.state?.value else {
+                        return
+                    }
+                    
+                    offsets.droneCoordinate = offsets.droneCoordinate.add(
+                        vector: Kernel.Vector2(
+                            direction: state.orientation.yaw + (positionXPercent >= 0 ? (Double.pi / 2) : -(Double.pi / 2)),
+                            magnitude: (0.4 * abs(positionXPercent)).convertFeetToMeters))
                 }
                 
-                offsets.droneCoordinate = offsets.droneCoordinate.add(
-                    vector: Kernel.Vector2(
-                        direction: state.orientation.yaw + (positionPercent >= 0 ? 0 : Double.pi),
-                        magnitude: (0.4 * abs(positionPercent)).convertFeetToMeters))
+                let positionYPercent = remoteControllerState.rightStick.y
+                if abs(positionYPercent) > deadband {
+                    guard let state = session?.state?.value else {
+                        return
+                    }
+                    
+                    offsets.droneCoordinate = offsets.droneCoordinate.add(
+                        vector: Kernel.Vector2(
+                            direction: state.orientation.yaw + (positionYPercent >= 0 ? 0 : Double.pi),
+                            magnitude: (0.4 * abs(positionYPercent)).convertFeetToMeters))
+                }
+                break
             }
         }
     }

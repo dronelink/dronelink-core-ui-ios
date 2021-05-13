@@ -23,9 +23,12 @@
 		249F37182576ECF500472A7D /* StatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F37172576ECF500472A7D /* StatusWidget.swift */; };
 		249F37342576EF2900472A7D /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F37332576EF2900472A7D /* Widget.swift */; };
 		249F37802577D01800472A7D /* DashboardWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 249F377F2577D01800472A7D /* DashboardWidget.swift */; };
+		24B72FC325E05E890025A0D3 /* EmbedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B72FC225E05E890025A0D3 /* EmbedViewController.swift */; };
 		24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */; };
 		24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
+		DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */; };
+		DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */; };
 		E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */; };
 		E4AD4F6725800F9700404783 /* FlightModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F6625800F9700404783 /* FlightModeWidget.swift */; };
 		E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F81258105A600404783 /* GPSWidget.swift */; };
@@ -56,11 +59,14 @@
 		249F37172576ECF500472A7D /* StatusWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusWidget.swift; sourceTree = "<group>"; };
 		249F37332576EF2900472A7D /* Widget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		249F377F2577D01800472A7D /* DashboardWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardWidget.swift; sourceTree = "<group>"; };
+		24B72FC225E05E890025A0D3 /* EmbedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmbedViewController.swift; sourceTree = "<group>"; };
 		24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuncExecutorWidget.swift; sourceTree = "<group>"; };
 		24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModeExecutorWidget.swift; sourceTree = "<group>"; };
 		24C355C2F269DEDDB27438E6 /* Pods-DronelinkCoreUI.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.release.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.release.xcconfig"; sourceTree = "<group>"; };
 		63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.debug.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.debug.xcconfig"; sourceTree = "<group>"; };
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraExposureWidget.swift; sourceTree = "<group>"; };
+		DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraIndicatorWidget.swift; sourceTree = "<group>"; };
 		E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeWidget.swift; sourceTree = "<group>"; };
 		E4AD4F6625800F9700404783 /* FlightModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightModeWidget.swift; sourceTree = "<group>"; };
 		E4AD4F81258105A600404783 /* GPSWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPSWidget.swift; sourceTree = "<group>"; };
@@ -115,12 +121,15 @@
 			children = (
 				E4AD50032581547100404783 /* BatteryWidget.swift */,
 				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
+				DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */,
+				DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */,
 				E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */,
 				2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */,
 				249F377F2577D01800472A7D /* DashboardWidget.swift */,
 				E4AD4F9F258115E000404783 /* DownlinkWidget.swift */,
 				2459750A23679B8C008CAB6B /* DronelinkUI.swift */,
 				2418ACA223ECC18A0099D44C /* DroneOffsetsWidget.swift */,
+				24B72FC225E05E890025A0D3 /* EmbedViewController.swift */,
 				2459751523679D1F008CAB6B /* Extensions.swift */,
 				E4AD4F6625800F9700404783 /* FlightModeWidget.swift */,
 				24B92C7823E314A2007A42DD /* FuncExecutorWidget.swift */,
@@ -280,16 +289,19 @@
 				247E09EA244F407500D002A2 /* MicrosoftMapWidget.swift in Sources */,
 				E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */,
 				249F37182576ECF500472A7D /* StatusWidget.swift in Sources */,
+				DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapboxMapWidget.swift in Sources */,
 				2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
 				E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */,
+				24B72FC325E05E890025A0D3 /* EmbedViewController.swift in Sources */,
 				2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */,
 				242AC08623870D4C00438D26 /* TelemetryWidget.swift in Sources */,
 				E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */,
 				24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */,
 				2459751623679D1F008CAB6B /* Extensions.swift in Sources */,
 				249F37802577D01800472A7D /* DashboardWidget.swift in Sources */,
+				DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */,
 				E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */,
 				249F37342576EF2900472A7D /* Widget.swift in Sources */,
 			);
@@ -336,6 +348,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				EXCLUDED_ARCHS = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -400,6 +413,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				EXCLUDED_ARCHS = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -411,6 +425,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -424,6 +439,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -431,6 +447,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Mapbox-iOS-SDK/dynamic\"",
@@ -443,7 +460,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dronelink.DronelinkCoreUI;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -458,6 +475,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 24C355C2F269DEDDB27438E6 /* Pods-DronelinkCoreUI.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -465,6 +483,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"${PODS_ROOT}/Mapbox-iOS-SDK/dynamic\"",
@@ -477,7 +496,8 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.2.0;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dronelink.DronelinkCoreUI;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

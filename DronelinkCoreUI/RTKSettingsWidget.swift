@@ -126,8 +126,8 @@ public class RTKSettingsWidget: Widget {
         confirm.addTarget(self, action: #selector(onConfirm),for: .touchUpInside)
         scroll.addSubview(confirm)
                 
-        manager?.addUpdateListner(key: "RtkConfiguration", closure: { (state: RTKState) in
-            self.statusUpdate(state)
+        manager?.addUpdateListner(key: "RtkConfiguration", closure: { [weak self] (state: RTKState) in
+            self?.statusUpdate(state)
         })
     }
     
@@ -175,13 +175,13 @@ public class RTKSettingsWidget: Widget {
         let padding = 8
         let labelHeight = 30
         let labelWidth = 100
-        scroll.snp.remakeConstraints { make in
+        scroll.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview()
             make.right.equalToSuperview()
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
         }
-        dismissButton.snp.remakeConstraints { make in
+        dismissButton.snp.remakeConstraints { [weak self] make in
             make.height.equalTo(24)
             make.width.equalTo(dismissButton.snp.height)
             make.right.equalToSuperview().offset(-padding)
@@ -189,21 +189,21 @@ public class RTKSettingsWidget: Widget {
         }
         view.bringSubviewToFront(dismissButton)
         
-        headingStatus.snp.remakeConstraints { make in
+        headingStatus.snp.remakeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(padding)
             make.left.equalTo(scroll.safeAreaLayoutGuide.snp.left).offset(padding)
         }
         
         var previous: UIView = headingStatus
         for (label, control) in self.statusControls {
-            control.snp.remakeConstraints { make in
+            control.snp.remakeConstraints { [weak self] make in
                 make.top.equalTo(previous.snp.bottom).offset(2)
                 make.left.equalTo(label.snp.right).offset(padding)
                 make.right.equalTo(scroll.safeAreaLayoutGuide.snp.right).offset(-padding)
                 make.height.equalTo(15)
             }
             
-            label.snp.remakeConstraints { make in
+            label.snp.remakeConstraints { [weak self] make in
                 make.top.equalTo(control.snp.top)
                 make.left.equalTo(scroll.safeAreaLayoutGuide.snp.left).offset(padding)
                 make.width.equalTo(labelWidth)
@@ -213,19 +213,19 @@ public class RTKSettingsWidget: Widget {
             previous = control
         }
         
-        headingConfiguration.snp.remakeConstraints { make in
+        headingConfiguration.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(previous.snp.bottom).offset(padding + 8)
             make.left.equalTo(scroll.safeAreaLayoutGuide.snp.left).offset(padding)
         }
         previous = headingConfiguration
         for (label, control) in self.controls {
-            control.snp.remakeConstraints { make in
+            control.snp.remakeConstraints { [weak self] make in
                 make.top.equalTo(previous.snp.bottom).offset(2)
                 make.left.equalTo(label.snp.right).offset(padding)
                 make.right.equalTo(scroll.safeAreaLayoutGuide.snp.right).offset(-padding)
             }
             
-            label.snp.remakeConstraints { make in
+            label.snp.remakeConstraints { [weak self] make in
                 make.bottom.equalTo(control.snp.bottom).offset(-8)
                 make.left.equalTo(scroll.safeAreaLayoutGuide.snp.left).offset(padding)
                 make.width.equalTo(labelWidth)
@@ -235,7 +235,7 @@ public class RTKSettingsWidget: Widget {
             previous = control
         }
         
-        confirm.snp.remakeConstraints { make in
+        confirm.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(previous.snp.bottom).offset(padding)
             make.right.equalTo(scroll.safeAreaLayoutGuide.snp.right).offset(-padding)
             make.bottom.equalTo(scroll.contentLayoutGuide.snp.bottom).offset(-padding)

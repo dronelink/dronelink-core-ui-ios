@@ -40,6 +40,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     public var hyperModeImage = DronelinkUI.loadImage(named: "hyperMode")?.withRenderingMode(.alwaysTemplate)
     public var timerModeImage = DronelinkUI.loadImage(named: "timerMode")?.withRenderingMode(.alwaysTemplate)
     public var panoModeImage = DronelinkUI.loadImage(named: "panoMode")?.withRenderingMode(.alwaysTemplate)
+    public var highResolutionModeImage = DronelinkUI.loadImage(named: "highResolutionMode")?.withRenderingMode(.alwaysTemplate)
     
     private var pendingCommand: KernelCommand?
     private var previousCapturing = false
@@ -52,7 +53,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         button.addTarget(self, action: #selector(onTapped(_:)), for: .touchUpInside)
         button.isEnabled = false
         view.addSubview(button)
-        button.snp.makeConstraints { make in
+        button.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview().offset(5)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
@@ -64,7 +65,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         activityBackgroundImageView.contentMode = .scaleAspectFit
         activityBackgroundImageView.isUserInteractionEnabled = false
         view.addSubview(activityBackgroundImageView)
-        activityBackgroundImageView.snp.makeConstraints { make in
+        activityBackgroundImageView.snp.makeConstraints { [weak self] make in
             make.edges.equalTo(button)
         }
         
@@ -74,7 +75,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         activityIndicator.strokeWidth = 2.5
         activityIndicator.isUserInteractionEnabled = false
         view.addSubview(activityIndicator)
-        activityIndicator.snp.makeConstraints { make in
+        activityIndicator.snp.makeConstraints { [weak self] make in
             make.edges.equalTo(button)
         }
         
@@ -82,7 +83,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         extraImageView.contentMode = .scaleAspectFit
         extraImageView.isUserInteractionEnabled = false
         view.addSubview(extraImageView)
-        extraImageView.snp.makeConstraints { make in
+        extraImageView.snp.makeConstraints { [weak self] make in
             make.center.equalTo(button.snp.center)
             make.height.equalTo(22)
             make.width.equalTo(22)
@@ -99,7 +100,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         extraLabel.layer.cornerRadius = 6
         extraLabel.layer.masksToBounds = true
         view.addSubview(extraLabel)
-        extraLabel.snp.makeConstraints { make in
+        extraLabel.snp.makeConstraints { [weak self] make in
             make.top.equalTo(extraImageView.snp.bottom).offset(-11)
             make.left.equalTo(extraImageView.snp.left).offset(-3)
             make.height.equalTo(12)
@@ -113,7 +114,7 @@ public class CameraCaptureWidget: UpdatableWidget {
         timeLabel.font = UIFont.systemFont(ofSize: 12)
         timeLabel.isHidden = true
         view.addSubview(timeLabel)
-        timeLabel.snp.makeConstraints { make in
+        timeLabel.snp.makeConstraints { [weak self] make in
             make.top.equalTo(button.snp.bottom).offset(5)
             make.left.equalToSuperview()
             make.right.equalToSuperview()
@@ -223,6 +224,10 @@ public class CameraCaptureWidget: UpdatableWidget {
                 extraImage = panoModeImage
                 break
                 
+            case .highResolution:
+                extraImage = highResolutionModeImage
+                break
+                
             default:
                 break
             }
@@ -258,11 +263,11 @@ public class CameraCaptureWidget: UpdatableWidget {
         if pendingCommand?.id == command.id {
             pendingCommand = nil
             if let error = error {
-                DronelinkUI.shared.showSnackbar(text: error.localizedDescription)
+                DronelinkUI.shared.showSnackbar(text: error as? String ?? error.localizedDescription)
             }
             
-            DispatchQueue.main.async {
-                self.update()
+            DispatchQueue.main.async { [weak self] in
+                self?.update()
             }
         }
     }

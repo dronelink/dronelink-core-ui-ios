@@ -54,23 +54,25 @@ public class MicrosoftMapWidget: UpdatableWidget {
     private let funcLayer = MSMapElementLayer()
     private var funcInputDroneIcons: [MSMapIcon] = []
     private let funcInputDroneImage = MSMapImage(uiImage: DronelinkUI.loadImage(named: "func-input-drone", renderingMode: .alwaysOriginal)!)
+    private let funcMapOverlaysLayer = MSMapElementLayer()
     private let modeLayer = MSMapElementLayer()
     private let modeTargetIcon = MSMapIcon()
     private var droneTakeoffAltitude: Double?
     private var droneTakeoffAltitudeReferenceSystem: MSMapAltitudeReferenceSystem { droneTakeoffAltitude == nil ? .surface : .geoid }
     private var style = Style.streets
+    private var sessionLocationCentered = false
     private var tracking = Tracking.none
     private var trackingPrevious = Tracking.none
 
     public override func viewDidLoad() {
         mapView.addShadow()
         mapView.clipsToBounds = true
-        mapView.addCameraDidChangeHandler { (reason, camera) -> Bool in
+        mapView.addCameraDidChangeHandler {  [weak self] (reason, camera) -> Bool in
             if reason == .userInteraction {
-                switch self.tracking {
+                switch self?.tracking ?? .none {
                 case .thirdPersonNadir:
-                    self.tracking = .none
-                    self.trackingPrevious = .none
+                    self?.tracking = .none
+                    self?.trackingPrevious = .none
                     break
 
                 case .none, .thirdPersonOblique, .firstPerson:
@@ -90,7 +92,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
         mapView.userInterfaceOptions.zoomButtonsVisible = false
         mapView.backgroundColor = UIColor.black
         view.addSubview(mapView)
-        mapView.snp.makeConstraints { make in
+        mapView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
 
@@ -110,6 +112,9 @@ public class MicrosoftMapWidget: UpdatableWidget {
         missionLayer.zIndex = 1
         mapView.layers.add(missionLayer)
 
+        funcMapOverlaysLayer.zIndex = 1
+        mapView.layers.add(funcMapOverlaysLayer)
+        
         funcLayer.zIndex = 1
         mapView.layers.add(funcLayer)
 
@@ -202,7 +207,9 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
         if session?.located ?? false, let state = session?.state?.value, let location = state.location {
             var trackingScene: MSMapScene?
-            switch (tracking) {
+            
+            let trackingResolved = !sessionLocationCentered && tracking == .none && missionExecutor == nil ? .thirdPersonOblique : tracking
+            switch (trackingResolved) {
             case .none:
                 break
 
@@ -241,6 +248,8 @@ public class MicrosoftMapWidget: UpdatableWidget {
                 mapView.setScene(trackingScene, with: .none)
                 trackingPrevious = tracking
             }
+            
+            sessionLocationCentered = true
         }
     }
 
@@ -266,17 +275,17 @@ public class MicrosoftMapWidget: UpdatableWidget {
                 guard let coordinates = missionExecutor?.restrictionZoneBoundaryCoordinates(index: $0.offset) else {
                     return
                 }
-
+                
                 let polygon = MSMapPolygon()
-                polygon.strokeColor = MDCPalette.red.accent400!.withAlphaComponent(0.7)
+                polygon.strokeColor = UIColor(hex: $0.element.zone.color, defaultAlpha: 0.7) ?? MDCPalette.red.accent400!.withAlphaComponent(0.7)
                 polygon.strokeWidth = 2
-                polygon.fillColor = MDCPalette.red.accent400!.withAlphaComponent(0.5)
+                polygon.fillColor = UIColor(hex: $0.element.zone.color, defaultAlpha: 0.5) ?? MDCPalette.red.accent400!.withAlphaComponent(0.5)
 
                 let restrictionZone = $0.element
                 switch restrictionZone.zone.shape {
                 case .circle:
                     let center = coordinates[0].coordinate
-                    let radius = coordinates[0].coordinate.distance(to: coordinates[1].coordinate)
+                    let radius = center.distance(to: coordinates[1].coordinate)
                     polygon.shapes = [
                         MSGeocircle(
                             center: positionAboveDroneTakeoffLocation(coordinate: center, altitude: restrictionZone.zone.minAltitude.value),
@@ -348,6 +357,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
     private func updateFuncElements() {
         var iconIndex = 0
         var inputIndex = 0
+        var mapCenterSpatial: Kernel.GeoSpatial?
         while let input = funcExecutor?.input(index: inputIndex) {
             if input.variable.valueType == .drone {
                 if let value = funcExecutor?.readValue(inputIndex: inputIndex) {
@@ -356,11 +366,13 @@ public class MicrosoftMapWidget: UpdatableWidget {
                         array.forEach { spatial in
                             if let spatial = spatial {
                                 spatials.append(spatial)
+                                mapCenterSpatial = spatial
                             }
                         }
                     }
                     else if let spatial = value as? Kernel.GeoSpatial {
                         spatials.append(spatial)
+                        mapCenterSpatial = spatial
                     }
 
                     spatials.enumerated().forEach { (variableValueIndex, spatial) in
@@ -399,6 +411,36 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
         while funcLayer.elements.count < funcInputDroneIcons.count {
             funcLayer.elements.add(funcInputDroneIcons[Int(funcLayer.elements.count)])
+        }
+        
+        if let mapCenterSpatial = mapCenterSpatial, tracking == .none {
+            mapView.setScene(MSMapScene(location: MSGeopoint(latitude: mapCenterSpatial.coordinate.latitude, longitude: mapCenterSpatial.coordinate.longitude), radius: 18), with: .none)
+        }
+        
+        funcMapOverlaysLayer.elements.clear()
+        
+        if let mapOverlays = funcExecutor?.mapOverlays(droneSession: session, error: { error in
+            DispatchQueue.main.async {
+               DronelinkUI.shared.showSnackbar(text: error)
+           }
+        }) {
+            mapOverlays.enumerated().forEach {
+                let mapOverlay = $0.element
+                
+                let polygon = MSMapPolygon()
+                polygon.strokeColor = UIColor(hex: mapOverlay.color, defaultAlpha: 0.7) ?? MDCPalette.red.accent400!.withAlphaComponent(0.7)
+                polygon.strokeWidth = 2
+                polygon.fillColor = UIColor(hex: mapOverlay.color, defaultAlpha: 0.5) ?? MDCPalette.red.accent400!.withAlphaComponent(0.5)
+
+                polygon.paths = [
+                    MSGeopath(
+                        positions: mapOverlay.coordinates.map { positionAboveDroneTakeoffLocation(coordinate: $0.coordinate, altitude: 0) },
+                        altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem
+                    )
+                ]
+
+                funcMapOverlaysLayer.elements.add(polygon)
+            }
         }
     }
 
@@ -463,8 +505,8 @@ public class MicrosoftMapWidget: UpdatableWidget {
             }
 
             //kluge: microsoft maps has a bug / optimization that refuses to render coordinates that are very close, even if the altitude is different, so trick it
-            if lastPosition.coordinate.distance(to: position.coordinate) < 0.01 {
-                position = positionAboveDroneTakeoffLocation(coordinate: coordinate.coordinate(bearing: 0, distance: 0.01), altitude: altitude)
+            if lastPosition.coordinate.distance(to: position.coordinate) <= 0.01 {
+                position = positionAboveDroneTakeoffLocation(coordinate: coordinate.coordinate(bearing: 0, distance: 0.011), altitude: altitude)
             }
         }
 
@@ -540,11 +582,11 @@ public class MicrosoftMapWidget: UpdatableWidget {
     public override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateScene()
-            self.updateDroneTakeoffAltitude()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
+            self?.updateDroneTakeoffAltitude()
             if executor.estimated {
-                self.updateMissionElements()
+                self?.updateMissionElements()
             }
         }
     }
@@ -553,24 +595,24 @@ public class MicrosoftMapWidget: UpdatableWidget {
         super.onMissionUnloaded(executor: executor)
         
         droneMissionExecutedPositions.removeAll()
-        DispatchQueue.main.async {
-            self.updateMissionElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionElements()
         }
     }
 
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
     public override func onFuncUnloaded(executor: FuncExecutor) {
         super.onFuncUnloaded(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
@@ -583,16 +625,18 @@ public class MicrosoftMapWidget: UpdatableWidget {
     public override func onLocated(session: DroneSession) {
         super.onLocated(session: session)
         
+        sessionLocationCentered = false
+        
         if missionExecutor?.estimating ?? false {
             return
         }
 
-        DispatchQueue.main.async {
-            self.updateScene()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
             //wait 2 seconds to give the map time to load the elevation data
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                self.updateDroneTakeoffAltitude()
-                self.updateMissionElements()
+                self?.updateDroneTakeoffAltitude()
+                self?.updateMissionElements()
             }
         }
     }
@@ -601,9 +645,9 @@ public class MicrosoftMapWidget: UpdatableWidget {
     public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
         super.onMissionEstimated(executor: executor, estimate: estimate)
         
-        DispatchQueue.main.async {
-            self.updateScene()
-            self.updateMissionElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
+            self?.updateMissionElements()
         }
     }
 
@@ -619,32 +663,32 @@ public class MicrosoftMapWidget: UpdatableWidget {
         super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
         
         droneMissionExecutedPositions.removeAll()
-        DispatchQueue.main.async {
-            self.updateMissionElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionElements()
         }
     }
 
     public override func onFuncInputsChanged(executor: FuncExecutor) {
         super.onFuncInputsChanged(executor: executor)
         
-        DispatchQueue.main.async {
-            self.updateFuncElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateFuncElements()
         }
     }
 
     public override func onModeExecuted(executor: ModeExecutor, engagement: Executor.Engagement) {
         super.onModeExecuted(executor: executor, engagement: engagement)
         
-        DispatchQueue.main.async {
-            self.updateModeElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateModeElements()
         }
     }
 
     public override func onModeDisengaged(executor: ModeExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
         super.onModeDisengaged(executor: executor, engagement: engagement, reason: reason)
         
-        DispatchQueue.main.async {
-            self.updateModeElements()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateModeElements()
         }
     }
 }
@@ -653,33 +697,33 @@ extension MicrosoftMapWidget: ConfigurableWidget {
     public var configurationActions: [UIAlertAction] {
         var actions: [UIAlertAction] = []
         
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.reset".localized, style: .default, handler: { _ in
-            self.tracking = .none
-            self.trackingPrevious = .none
-            self.updateScene()
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.reset".localized, style: .default, handler: {  [weak self] _ in
+            self?.tracking = .none
+            self?.trackingPrevious = .none
+            self?.updateScene()
         }))
 
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { _ in
-            self.tracking = .thirdPersonNadir
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.follow".localized, style: tracking == .thirdPersonNadir ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .thirdPersonNadir
         }))
 
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { _ in
-            self.tracking = .thirdPersonOblique
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.chase.plane".localized, style: tracking == .thirdPersonOblique ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .thirdPersonOblique
         }))
 
-        actions.append(UIAlertAction(title: "MicrosoftMapWidget.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { _ in
-            self.tracking = .firstPerson
+        actions.append(UIAlertAction(title: "MicrosoftMapWidget.fpv".localized, style: tracking == .firstPerson ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .firstPerson
         }))
 
 //        if tracking == .none {
 //            if style == .streets {
-//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { _ in
-//                    self.update(style: .satellite)
+//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { [weak self] _ in
+//                    self?.update(style: .satellite)
 //                }))
 //            }
 //            else {
-//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { _ in
-//                    self.update(style: .streets)
+//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { [weak self] _ in
+//                    self?.update(style: .streets)
 //                }))
 //            }
 //        }

@@ -19,7 +19,7 @@ import SwiftyUserDefaults
 public class RTKStatusWidget: DelegateWidget {
     let statusLabel = UILabel()
     let rtkLabel = UILabel()
-    public var createManager: (() -> RTKManager?)?
+    public var createManager: ((_ session: DroneSession) -> RTKManager?)?
     private var manager: RTKManager?
     
     public override func viewDidLoad() {
@@ -46,19 +46,21 @@ public class RTKStatusWidget: DelegateWidget {
     }
     
     public override func onInitialized(session: DroneSession) {
-        manager = createManager?()
+        manager = createManager?(session)
         
-        view.isHidden = manager == nil
+        DispatchQueue.main.async { [weak self] in
+            self?.view.isHidden = self?.manager == nil
+        }
 
         manager?.addUpdateListner(key: "RtkStatus") { (state: RTKState) in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 if (state.networkRTKStatus != .notSupported)
                 {
-                    self.updateLabel(state)
-                    self.view.isHidden = false
+                    self?.updateLabel(state)
+                    self?.view.isHidden = false
                 }
                 else {
-                    self.view.isHidden = true
+                    self?.view.isHidden = true
                 }
             }
         }
@@ -89,13 +91,13 @@ public class RTKStatusWidget: DelegateWidget {
         
         let defaultPadding = 8
         
-        rtkLabel.snp.remakeConstraints { make in
+        rtkLabel.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalToSuperview().offset(2)
         }
         
-        statusLabel.snp.remakeConstraints { make in
+        statusLabel.snp.remakeConstraints { [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.top.equalTo(rtkLabel.snp.bottom)

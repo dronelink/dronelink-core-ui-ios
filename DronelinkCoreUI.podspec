@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = "DronelinkCoreUI"
-  s.version = "2.1.0"
+  s.version = "2.2.0"
   s.summary = "Dronelink core UI components"
   s.homepage = "https://dronelink.com/"
   s.license = { :type => "MIT", :file => "LICENSE" }
@@ -11,7 +11,8 @@ Pod::Spec.new do |s|
   s.source = { :git => "https://github.com/dronelink/dronelink-core-ui-ios.git", :tag => "#{s.version}" }
   s.source_files  = "DronelinkCoreUI/**/*.swift"
   s.resources = "DronelinkCoreUI/**/*.{strings,xcassets}"
-  s.dependency "DronelinkCore", "~> 2.1.0"
+  s.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
+  s.dependency "DronelinkCore", "~> 2.2.0"
   s.dependency "SnapKit", "~> 5.0.1"
   s.dependency "SwiftyUserDefaults", "~> 5.0.0"
   s.dependency "MicrosoftMapsSDK", "~> 1.1.4"

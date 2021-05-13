@@ -114,7 +114,7 @@ public class StatusLabelWidget: StatusWidget {
         label.textColor = UIColor.white
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
-        label.snp.makeConstraints { make in
+        label.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
         

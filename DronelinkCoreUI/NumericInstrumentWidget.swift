@@ -28,7 +28,7 @@ open class NumericInstrumentWidget: UpdatableWidget {
         valueLabel.adjustsFontSizeToFitWidth = true
         prefixLabel.textAlignment = .center
         view.addSubview(prefixLabel)
-        prefixLabel.snp.makeConstraints { make in
+        prefixLabel.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
             make.left.equalToSuperview()
@@ -37,7 +37,7 @@ open class NumericInstrumentWidget: UpdatableWidget {
         
         prefixIcon.addShadow()
         view.addSubview(prefixIcon)
-        prefixIcon.snp.makeConstraints { make in
+        prefixIcon.snp.makeConstraints { [weak self] make in
             make.edges.equalTo(prefixLabel)
         }
         
@@ -47,7 +47,7 @@ open class NumericInstrumentWidget: UpdatableWidget {
         valueLabel.minimumScaleFactor = 0.5
         valueLabel.adjustsFontSizeToFitWidth = true
         view.addSubview(valueLabel)
-        valueLabel.snp.makeConstraints { make in
+        valueLabel.snp.makeConstraints { [weak self] make in
             make.top.equalToSuperview()
             make.bottom.equalToSuperview()
             make.left.equalTo(prefixLabel.snp.right).offset(5)
@@ -77,8 +77,8 @@ open class AltitudeWidget: NumericInstrumentWidget {
         super.viewDidLoad()
         
         prefixText = "AltitudeWidget.prefix".localized
-        valueGenerator = {
-            Dronelink.shared.format(formatter: "altitude", value: self.session?.state?.value.altitude, defaultValue: "NumericInstrumentWidget.empty".localized)
+        valueGenerator = { [weak self] in
+            Dronelink.shared.format(formatter: "altitude", value: self?.session?.state?.value.altitude, defaultValue: "NumericInstrumentWidget.empty".localized)
         }
     }
 }
@@ -88,9 +88,9 @@ open class DistanceWidget: NumericInstrumentWidget {
         super.viewDidLoad()
         
         prefixText = "DistanceWidget.prefix".localized
-        valueGenerator = {
+        valueGenerator = { [weak self] in
             var distance: Double?
-            if let state = self.session?.state?.value {
+            if let state = self?.session?.state?.value {
                 if let droneLocation = state.location {
                     if let userLocation = Dronelink.shared.location?.value {
                         distance = userLocation.distance(from: droneLocation)
@@ -112,9 +112,9 @@ open class DistanceHomeWidget: NumericInstrumentWidget {
         super.viewDidLoad()
         
         prefixText = "DistanceWidget.prefix".localized
-        valueGenerator = {
+        valueGenerator = { [weak self] in
             var distance: Double?
-            if let state = self.session?.state?.value {
+            if let state = self?.session?.state?.value {
                 if let droneLocation = state.location {
                     distance = state.homeLocation?.distance(from: droneLocation)
                 }
@@ -131,9 +131,9 @@ open class DistanceUserWidget: NumericInstrumentWidget {
         super.viewDidLoad()
 
         prefixText = "DistanceWidget.prefix".localized
-        valueGenerator = {
+        valueGenerator = { [weak self] in
             var distance: Double?
-            if let state = self.session?.state?.value {
+            if let state = self?.session?.state?.value {
                 if let droneLocation = state.location {
                     distance = state.homeLocation?.distance(from: droneLocation)
                 }
@@ -152,8 +152,8 @@ open class HorizontalSpeedWidget: NumericInstrumentWidget {
         prefixText = "HorizontalSpeedWidget.prefix".localized
         prefixLabel.font = UIFont.systemFont(ofSize: tablet ? 22 : 16, weight: .semibold)
         valueLabel.font = UIFont.systemFont(ofSize: tablet ? 22 : 16, weight: .semibold)
-        valueGenerator = {
-            Dronelink.shared.format(formatter: "velocityHorizontal", value: self.session?.state?.value.horizontalSpeed, defaultValue: "NumericInstrumentWidget.empty".localized)
+        valueGenerator = { [weak self] in
+            Dronelink.shared.format(formatter: "velocityHorizontal", value: self?.session?.state?.value.horizontalSpeed, defaultValue: "NumericInstrumentWidget.empty".localized)
         }
     }
 }
@@ -165,8 +165,8 @@ open class VerticalSpeedWidget: NumericInstrumentWidget {
         prefixText = "VerticalSpeedWidget.prefix".localized
         prefixLabel.font = UIFont.systemFont(ofSize: tablet ? 22 : 16, weight: .semibold)
         valueLabel.font = UIFont.systemFont(ofSize: tablet ? 22 : 16, weight: .semibold)
-        valueGenerator = {
-            Dronelink.shared.format(formatter: "velocityVertical", value: self.session?.state?.value.verticalSpeed, defaultValue: "NumericInstrumentWidget.empty".localized)
+        valueGenerator = { [weak self] in
+            Dronelink.shared.format(formatter: "velocityVertical", value: self?.session?.state?.value.verticalSpeed, defaultValue: "NumericInstrumentWidget.empty".localized)
         }
     }
 }
