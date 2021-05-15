@@ -27,6 +27,7 @@ open class Widget: UIViewController {
 }
 
 open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegate, DroneSessionDelegate, MissionExecutorDelegate, ModeExecutorDelegate, FuncExecutorDelegate {
+    
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Dronelink.shared.add(delegate: self)
@@ -117,6 +118,10 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     open func onFuncInputsChanged(executor: FuncExecutor) {}
     
     open func onFuncExecuted(executor: FuncExecutor) {}
+    
+    open func missionEngageDisallowedReasons(executor: MissionExecutor) -> [Kernel.Message]? { nil }
+    
+    open func modeEngageDisallowedReasons(executor: ModeExecutor) -> [Kernel.Message]? { nil }
 }
 
 extension UIView {

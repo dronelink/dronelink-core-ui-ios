@@ -28,7 +28,7 @@ public class DownlinkWidget: SignalWidget {
             levelLabel.snp.makeConstraints { [weak self] make in
                 make.left.equalTo(iconImageView.snp.right).offset(5)
                 make.top.equalToSuperview()
-                make.width.equalTo(view.snp.height)
+                make.width.equalTo(view.snp.height).multipliedBy(2)
                 make.bottom.equalToSuperview()
             }
         }
