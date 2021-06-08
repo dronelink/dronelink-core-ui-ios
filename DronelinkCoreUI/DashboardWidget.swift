@@ -158,6 +158,7 @@ public class DashboardWidget: DelegateWidget {
     private var droneOffsetsWidget2: Widget?
     private var cameraOffsetsWidget: Widget?
     private var rtkStatusWidget: Widget?
+    private var debugWidget: Widget?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -290,7 +291,7 @@ public class DashboardWidget: DelegateWidget {
             make.width.equalTo(statusWidgetHeight * 1.25)
             make.height.equalTo(statusWidgetHeight)
         }
-
+        
         showLegacyDeviceWarning()
     }
     
@@ -312,6 +313,25 @@ public class DashboardWidget: DelegateWidget {
                 }
             }
         }
+    }
+    
+    var debug = false
+    var previousDebugTap = Date()
+    var consecutiveDebugTaps = 0
+    @objc func debugTapHandler(gesture: UITapGestureRecognizer) {
+        if -previousDebugTap.timeIntervalSinceNow < 0.5 {
+            consecutiveDebugTaps += 1
+            NSLog("Debug taps \(consecutiveDebugTaps)")
+            if consecutiveDebugTaps >= 5 {
+                debug = !debug
+                consecutiveDebugTaps = 0
+                view.setNeedsUpdateConstraints()
+            }
+        }
+        else {
+            consecutiveDebugTaps = 1
+        }
+        previousDebugTap = Date()
     }
     
     override public func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -715,7 +735,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
-        cameraModeWidget?.view.snp.remakeConstraints {  [weak self] make in
+        cameraModeWidget?.view.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(cameraMenuButton.snp.bottom).offset(-13)
             make.left.equalToSuperview().offset(3)
             make.height.equalTo(cameraModeWidget!.view.snp.width)
@@ -733,6 +753,10 @@ public class DashboardWidget: DelegateWidget {
         compassWidget = refreshWidget(current: compassWidget, next: widgetFactory.createCompassWidget(current: compassWidget))
        
         telemetryWidget = refreshWidget(current: telemetryWidget, next: widgetFactory.createTelemetryWidget(current: telemetryWidget))
+        if telemetryWidget?.view.gestureRecognizers == nil {
+            let debugGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(debugTapHandler))
+            telemetryWidget?.view.addGestureRecognizer(debugGestureRecognizer)
+        }
         
         executorWidget = refreshWidget(current: executorWidget, next: widgetFactory.createExecutorWidget(current: executorWidget)) as? ExecutorWidget
         
@@ -743,6 +767,8 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(cameraWidgetSize)
             make.width.equalTo(100)
         }
+        
+        debugWidget = refreshWidget(current: debugWidget, next: debug ? DebugWidget() : nil)
     }
     
     func updateDismissButton() {
@@ -863,6 +889,15 @@ public class DashboardWidget: DelegateWidget {
             }
             make.height.equalTo(tablet ? 85 : 75)
             make.width.equalTo(tablet ? 350 : 275)
+        }
+        
+        if let telemetryWidget = telemetryWidget {
+            debugWidget?.view.snp.remakeConstraints { [weak self] make in
+                make.width.equalTo(telemetryWidget.view.snp.width)
+                make.height.equalTo(100)
+                make.left.equalTo(telemetryWidget.view.snp.left)
+                make.bottom.equalTo(telemetryWidget.view.snp.top).offset(-8)
+            }
         }
         
         if let droneOffsetsWidget1 = droneOffsetsWidget1 {

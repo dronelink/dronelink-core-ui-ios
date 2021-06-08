@@ -256,9 +256,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
     
     @objc func onDetails(sender: Any) {
         guard
-            let missionDetailsURL = DronelinkUI.shared.missionDetailsURL,
-            let missionID = missionExecutor?.id,
-            let url = URL(string: "\(missionDetailsURL)\(missionID)?unitSystem=\(Dronelink.shared.unitSystem.rawValue)") else {
+            let detailsURL = missionExecutor?.detailsURL,
+            let url = URL(string: detailsURL) else {
             return
         }
         
@@ -426,7 +425,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
 
         titleLabel.text = missionExecutor.descriptors.display
 
-        let detailsPossible = DronelinkUI.shared.missionDetailsURL != nil
+        let detailsPossible = missionExecutor.detailsURL != nil
         
         if missionExecutor.estimating {
             activityIndicator.isHidden = false
