@@ -124,3 +124,103 @@
 "RTKSettingsWidget.popover.configuration.mountpoint" = "Mount point";
 
 "RTKStatusWidget.status.label" = "Network RTK";
+
+"CameraMenuSetting.photoMode" = "Photo";
+"CameraMenuSetting.imageSize" = "Image Size";
+"CameraMenuSetting.imageFormat" = "Image Format";
+"CameraMenuSetting.whiteBalance" = "White Balance";
+"CameraMenuSetting.videoSize" = "Video Size";
+"CameraMenuSetting.videoFormat" = "Video Format";
+"CameraMenuSetting.ntscPal" = "NTSC/PAL";
+"CameraMenuSetting.videoWhiteBalance" = "White Balance";
+"CameraMenuSetting.videoCaption" = "Video Caption";
+"CameraMenuSetting.storage" = "Storage";
+"CameraMenuSetting.fileIndexMode" = "File Index Mode";
+
+"CameraPhotoMode.single" = "Single";
+"CameraPhotoMode.hdr" = "HDR";
+"CameraPhotoMode.burst" = "Burst";
+"CameraPhotoMode.aeb" = "AEB";
+"CameraPhotoMode.interval" = "Interval";
+"CameraPhotoMode.timeLapse" = "TimeLapse";
+"CameraPhotoMode.rawBurst" = "Raw Burst";
+"CameraPhotoMode.shallowFocus" = "Shallow Focus";
+"CameraPhotoMode.panorama" = "Panorama";
+"CameraPhotoMode.ehdr" = "EHDR";
+"CameraPhotoMode.hyperLight" = "Hyper Light";
+"CameraPhotoMode.highResolution" = "High Resolution";
+"CameraPhotoMode.smart" = "Smart";
+"CameraPhotoMode.internalAISpotChecking" = "Internal AI Spot Checking";
+"CameraPhotoMode.unknown" = "Unknown";
+
+"CameraPhotoAspectRatio._4x3" = "4:3";
+"CameraPhotoAspectRatio._16x9" = "16:9";
+"CameraPhotoAspectRatio._3x2" = "3:2";
+"CameraPhotoAspectRatio.unknown" = "Unknown";
+
+"CameraPhotoFileFormat.raw" = "Raw";
+"CameraPhotoFileFormat.jpeg" = "JPEG";
+"CameraPhotoFileFormat.raw+jpeg" = "Raw+JPEG";
+"CameraPhotoFileFormat.tiff14bit" = "Tiff 14 bit";
+"CameraPhotoFileFormat.radiometricJpeg" = "Radiometric JPEG";
+"CameraPhotoFileFormat.tiff14bitLinearLowTempResolution" = "Tiff 14 bit Linear Low Temp Resolution";
+"CameraPhotoFileFormat.tiff14bitLinearHighTempResolution" = "Tiff 14 bit Linear High Temp Resolution";
+"CameraPhotoFileFormat.unknown" = "Unknown";
+
+"CameraWhiteBalancePreset.auto" = "Auto";
+"CameraWhiteBalancePreset.sunny" = "Sunny";
+"CameraWhiteBalancePreset.cloudy" = "Cloudy";
+"CameraWhiteBalancePreset.waterSurface" = "Water Surface";
+"CameraWhiteBalancePreset.indoorIncandescent" = "Indoor Incandescent";
+"CameraWhiteBalancePreset.indoorFluorescent" = "Indoor Fluorescent";
+"CameraWhiteBalancePreset.custom" = "Custom";
+"CameraWhiteBalancePreset.neutral" = "Neutral";
+"CameraWhiteBalancePreset.unknown" = "Unknown";
+
+"CameraVideoResolution.336x256" = "336x256";
+"CameraVideoResolution.640x360" = "640x360";
+"CameraVideoResolution.640x480" = "640x480";
+"CameraVideoResolution.640x512" = "640x512";
+"CameraVideoResolution.1280x720" = "1280x720";
+"CameraVideoResolution.1920x1080" = "1920x1080";
+"CameraVideoResolution.2048x1080" = "2048x1080";
+"CameraVideoResolution.2688x1512" = "2688x1512";
+"CameraVideoResolution.2704x1520" = "2704x1520";
+"CameraVideoResolution.2720x1530" = "2720x1530";
+"CameraVideoResolution.3712x2088" = "3712x2088";
+"CameraVideoResolution.3840x1572" = "3840x1572";
+"CameraVideoResolution.3840x2160" = "3840x2160";
+"CameraVideoResolution.3944x2088" = "3944x2088";
+"CameraVideoResolution.4096x2160" = "4096x2160";
+"CameraVideoResolution.4608x2160" = "4608x2160";
+"CameraVideoResolution.4608x2592" = "4608x2592";
+"CameraVideoResolution.5280x2160" = "5280x2160";
+"CameraVideoResolution.5280x2972" = "5280x2972";
+"CameraVideoResolution.5760x3240" = "5760x3240";
+"CameraVideoResolution.6016x3200" = "6016x3200";
+"CameraVideoResolution.max" = "Max";
+"CameraVideoResolution.noSSDVideo" = "No SSD Video";
+"CameraVideoResolution.unknown" = "Unknown";
+
+"CameraVideoFileFormat.mov" = "MOV";
+"CameraVideoFileFormat.mp4" = "MP4";
+"CameraVideoFileFormat.tiffSequence" = "Tiff Sequence";
+"CameraVideoFileFormat.seq" = "Seq";
+"CameraVideoFileFormat.unknown" = "Unknown";
+
+"CameraVideoStandard.pal" = "PAL";
+"CameraVideoStandard.ntsc" = "NTSC";
+"CameraVideoStandard.unknown" = "Unknown";
+
+"CameraStorageLocation._internal" = "Internal";
+"CameraStorageLocation.sdCard" = "SD Card";
+"CameraStorageLocation.unknown" = "Unknown";
+
+"CameraFileIndexMode.reset" = "Reset";
+"CameraFileIndexMode.sequence" = "Sequence";
+"CameraFileIndexMode.unknown" = "Unknown";
+
+"CameraExposureMenu.iso" = "ISO";
+"CameraExposureMenu.autoIso" = "AUTO";
+"CameraExposureMenu.shutter" = "Shutter";
+

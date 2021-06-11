@@ -28,6 +28,11 @@
 		24BEBF8325408343001AE3EF /* ModeExecutorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BEBF8225408343001AE3EF /* ModeExecutorWidget.swift */; };
 		24D3DC2B26691C650009B9FF /* DebugWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D3DC2A26691C650009B9FF /* DebugWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
+		DE4B86D6262A1B6A00806221 /* CameraMenuWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4B86D2262A1B6A00806221 /* CameraMenuWidget.swift */; };
+		DE4B86D7262A1B6A00806221 /* SettingsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4B86D3262A1B6A00806221 /* SettingsTableViewController.swift */; };
+		DE4B86D8262A1B6A00806221 /* SettingOptionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4B86D4262A1B6A00806221 /* SettingOptionsViewController.swift */; };
+		DE4B86D9262A1B6A00806221 /* CameraMenuSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4B86D5262A1B6A00806221 /* CameraMenuSetting.swift */; };
+		DE4B86DC262A1B7900806221 /* CameraExposureMenuWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4B86DB262A1B7900806221 /* CameraExposureMenuWidget.swift */; };
 		DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */; };
 		DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */; };
 		E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */; };
@@ -67,6 +72,11 @@
 		24D3DC2A26691C650009B9FF /* DebugWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugWidget.swift; sourceTree = "<group>"; };
 		63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.debug.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.debug.xcconfig"; sourceTree = "<group>"; };
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE4B86D2262A1B6A00806221 /* CameraMenuWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraMenuWidget.swift; sourceTree = "<group>"; };
+		DE4B86D3262A1B6A00806221 /* SettingsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsTableViewController.swift; sourceTree = "<group>"; };
+		DE4B86D4262A1B6A00806221 /* SettingOptionsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingOptionsViewController.swift; sourceTree = "<group>"; };
+		DE4B86D5262A1B6A00806221 /* CameraMenuSetting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraMenuSetting.swift; sourceTree = "<group>"; };
+		DE4B86DB262A1B7900806221 /* CameraExposureMenuWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraExposureMenuWidget.swift; sourceTree = "<group>"; };
 		DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraExposureWidget.swift; sourceTree = "<group>"; };
 		DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraIndicatorWidget.swift; sourceTree = "<group>"; };
 		E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeWidget.swift; sourceTree = "<group>"; };
@@ -124,7 +134,9 @@
 				E4AD50032581547100404783 /* BatteryWidget.swift */,
 				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
 				DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */,
+				DE4B86DB262A1B7900806221 /* CameraExposureMenuWidget.swift */,
 				DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */,
+				DE4B86D1262A1B6A00806221 /* CameraMenuWidget */,
 				E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */,
 				2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */,
 				249F377F2577D01800472A7D /* DashboardWidget.swift */,
@@ -171,6 +183,17 @@
 				8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DE4B86D1262A1B6A00806221 /* CameraMenuWidget */ = {
+			isa = PBXGroup;
+			children = (
+				DE4B86D2262A1B6A00806221 /* CameraMenuWidget.swift */,
+				DE4B86D3262A1B6A00806221 /* SettingsTableViewController.swift */,
+				DE4B86D4262A1B6A00806221 /* SettingOptionsViewController.swift */,
+				DE4B86D5262A1B6A00806221 /* CameraMenuSetting.swift */,
+			);
+			path = CameraMenuWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -293,13 +316,17 @@
 				E4AD4FA0258115E000404783 /* DownlinkWidget.swift in Sources */,
 				24D3DC2B26691C650009B9FF /* DebugWidget.swift in Sources */,
 				249F37182576ECF500472A7D /* StatusWidget.swift in Sources */,
+				DE4B86D7262A1B6A00806221 /* SettingsTableViewController.swift in Sources */,
 				DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */,
 				2459752F2367A22D008CAB6B /* MapboxMapWidget.swift in Sources */,
 				2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */,
 				2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */,
 				E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */,
 				24B72FC325E05E890025A0D3 /* EmbedViewController.swift in Sources */,
+				DE4B86D9262A1B6A00806221 /* CameraMenuSetting.swift in Sources */,
 				2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */,
+				DE4B86D6262A1B6A00806221 /* CameraMenuWidget.swift in Sources */,
+				DE4B86DC262A1B7900806221 /* CameraExposureMenuWidget.swift in Sources */,
 				242AC08623870D4C00438D26 /* TelemetryWidget.swift in Sources */,
 				E4AD4F82258105A600404783 /* GPSWidget.swift in Sources */,
 				24B92C7923E314A2007A42DD /* FuncExecutorWidget.swift in Sources */,
@@ -307,6 +334,7 @@
 				249F37802577D01800472A7D /* DashboardWidget.swift in Sources */,
 				DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */,
 				E4AD4F9D258115D400404783 /* UplinkWidget.swift in Sources */,
+				DE4B86D8262A1B6A00806221 /* SettingOptionsViewController.swift in Sources */,
 				249F37342576EF2900472A7D /* Widget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
