@@ -40,8 +40,7 @@ public class CameraModeWidget: UpdatableWidget {
     
     @objc func onTapped(_ sender: UIButton) {
         button.isEnabled = false
-        var command = Kernel.ModeCameraCommand()
-        command.mode = cameraState?.mode == .photo ? .video : .photo
+        let command = Kernel.ModeCameraCommand(mode: cameraState?.mode == .photo ? .video : .photo)
         do {
             try? session?.add(command: command)
             pendingCommand = command

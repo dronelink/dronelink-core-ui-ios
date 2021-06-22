@@ -6,6 +6,8 @@
 //  Copyright © 2020 Dronelink. All rights reserved.
 //
 import Foundation
+import CoreLocation
+import CoreMotion
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
@@ -50,6 +52,9 @@ public class DroneOffsetsWidget: UpdatableWidget {
         get { Dronelink.shared.droneOffsets }
         set (newOffsets) { Dronelink.shared.droneOffsets = newOffsets }
     }
+    private var altimeter = CMAltimeter()
+    private var relativeAltitudeUpdating = false
+    private var relativeAltitudeActive = false
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,7 +98,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt", action: #selector(onRight(sender:)))
         configureButton(button: upButton, image: "baseline_arrow_drop_up_white_36pt", action: #selector(onUp(sender:)))
         configureButton(button: downButton, image: "baseline_arrow_drop_down_white_36pt", action: #selector(onDown(sender:)))
-        configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
+        configureButton(button: c1Button, image: "baseline_timeline_white_24pt", action: #selector(onC1(sender:)))
         configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
         
         cLabel.textAlignment = .center
@@ -104,6 +109,42 @@ public class DroneOffsetsWidget: UpdatableWidget {
         view.addSubview(cLabel)
         
         update()
+    }
+    
+    deinit {
+        stopRelativeAltitudeUpdates()
+    }
+    
+    func stopRelativeAltitudeUpdates() {
+        if relativeAltitudeUpdating {
+            altimeter.stopRelativeAltitudeUpdates()
+            relativeAltitudeUpdating = false
+            relativeAltitudeActive = false
+        }
+    }
+    
+    open override func onClosed(session: DroneSession) {
+        super.onClosed(session: session)
+        stopRelativeAltitudeUpdates()
+    }
+    
+    open override func onMotorsChanged(session: DroneSession, value: Bool) {
+        if !CMAltimeter.isRelativeAltitudeAvailable() {
+            return
+        }
+        
+        if value {
+            //disabling this for now until we do more testing
+//            relativeAltitudeUpdating = true
+//            altimeter.startRelativeAltitudeUpdates(to: .main) { [weak self] altitude, error in
+//                if let relativeAltitude = altitude?.relativeAltitude, self?.relativeAltitudeActive ?? false {
+//                    self?.offsets.droneAltitude = -relativeAltitude.doubleValue
+//                }
+//            }
+        }
+        else {
+            stopRelativeAltitudeUpdates()
+        }
     }
     
     private func configureButton(button: MDCFloatingButton, image: String, color: UIColor? = nil, action: Selector) {
@@ -224,7 +265,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         else {
             configureButton(button: leftButton, image: "baseline_arrow_left_white_36pt", action: #selector(onLeft(sender:)))
             configureButton(button: rightButton, image: "baseline_arrow_right_white_36pt", action: #selector(onRight(sender:)))
-            configureButton(button: c1Button, image: "baseline_check_white_24pt", color: style == .altYaw ? MDCPalette.green.accent400 : MDCPalette.lightBlue.accent400, action: #selector(onC1(sender:)))
+            configureButton(button: c1Button, image: "baseline_timeline_white_24pt", action: #selector(onC1(sender:)))
             configureButton(button: c2Button, image: "baseline_arrow_upward_white_24pt", color: style == .altYaw ? MDCPalette.purple.accent400 : MDCPalette.pink.accent400, action: #selector(onC2(sender:)))
         }
         
@@ -271,6 +312,13 @@ public class DroneOffsetsWidget: UpdatableWidget {
             self?.updateRoll(visible: true)
         }))
         
+        if let serialNumber = session?.serialNumber {
+            alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.clearCameraFocusCalibrations".localized, style: .default , handler:{ [weak self] _ in
+                let cleared = Dronelink.shared.clearCameraFocusCalibrations(serialNumber: serialNumber)
+                DronelinkUI.shared.showSnackbar(text: String(format: "DroneOffsetsWidget.clearCameraFocusCalibrations.finished".localized, "\(cleared)"))
+            }))
+        }
+        
         alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
             
         }))
@@ -285,6 +333,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         else {
             switch style {
             case .altYaw:
+                relativeAltitudeActive = false
                 offsets.droneAltitude = 0
                 offsets.droneYaw = 0
                 break
@@ -357,6 +406,11 @@ public class DroneOffsetsWidget: UpdatableWidget {
         update()
     }
     
+    func incrementDroneAltitudeOffset(_ value: Double) {
+        relativeAltitudeActive = false
+        offsets.droneAltitude += value
+    }
+    
     @objc func onUp(sender: Any) {
         guard let session = session else {
             return
@@ -364,7 +418,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         
         switch style {
         case .altYaw:
-            offsets.droneAltitude += 1.0.convertFeetToMeters
+            incrementDroneAltitudeOffset(1.0.convertFeetToMeters)
             break
         
         case .position:
@@ -389,7 +443,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
         
         switch style {
         case .altYaw:
-            offsets.droneAltitude += -1.0.convertFeetToMeters
+            incrementDroneAltitudeOffset(-1.0.convertFeetToMeters)
             break
         
         case .position:
@@ -410,11 +464,13 @@ public class DroneOffsetsWidget: UpdatableWidget {
     @objc func onC1(sender: Any) {
         switch style {
         case .altYaw:
-            guard let altitude = session?.state?.value.altitude else {
-                return
+            if relativeAltitudeActive {
+                DronelinkUI.shared.showSnackbar(text: "DroneOffsetsWidget.relative.altitude.disabled".localized)
             }
-            
-            offsets.droneAltitudeReference = altitude
+            else {
+                DronelinkUI.shared.showSnackbar(text: "DroneOffsetsWidget.relative.altitude.enabled".localized)
+            }
+            relativeAltitudeActive = !relativeAltitudeActive
             break
         
         case .position:
@@ -490,7 +546,8 @@ public class DroneOffsetsWidget: UpdatableWidget {
         else {
             switch style {
             case .altYaw:
-                c1Button.isHidden = !debug
+                c1Button.setBackgroundColor(((relativeAltitudeActive ? MDCPalette.amber.accent700 : nil) ?? UIColor.darkGray).withAlphaComponent(0.85))
+                c1Button.isHidden = !relativeAltitudeUpdating
                 c2Button.isHidden = !debug
                 leftButton.isHidden = false
                 rightButton.isHidden = false
@@ -520,8 +577,8 @@ public class DroneOffsetsWidget: UpdatableWidget {
                     cLabel.text = nil
                 }
 
-                c1Button.isEnabled = session?.state?.value.altitude != nil && !(Dronelink.shared.missionExecutor?.engaged ?? false)
-                c2Button.isEnabled = c1Button.isEnabled && cLabel.text != nil
+                c1Button.isEnabled = true
+                c2Button.isEnabled = cLabel.text != nil
                 break
 
             case .position:
@@ -566,7 +623,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
 
                 let altitudePercent = remoteControllerState.leftStick.y
                 if abs(altitudePercent) > deadband {
-                    offsets.droneAltitude += (0.5 * altitudePercent).convertFeetToMeters
+                    incrementDroneAltitudeOffset((0.5 * altitudePercent).convertFeetToMeters)
                 }
                 break
                     

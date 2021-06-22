@@ -11,48 +11,9 @@ import UIKit
 import DronelinkCore
 import SnapKit
 
-open class CameraIndicatorWidget: UpdatableWidget {
-    public let titleLabel = UILabel()
-    public let valueLabel = UILabel()
-    public var valueGenerator: (() -> String?)?
+open class CameraIndicatorWidget: IndicatorWidget {
     public var channel: UInt = 0
     public var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        titleLabel.textColor = .white
-        titleLabel.alpha = 0.6
-        titleLabel.textAlignment = .left
-        titleLabel.font = UIFont.systemFont(ofSize: 7.4, weight: .regular)
-        titleLabel.adjustsFontSizeToFitWidth = true
-        
-        valueLabel.textColor = .white
-        valueLabel.textAlignment = .left
-        valueLabel.font = UIFont.systemFont(ofSize: 13.8, weight: .bold)
-        valueLabel.adjustsFontSizeToFitWidth = true
-        
-        view.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { [weak self] make in
-            make.left.equalToSuperview()
-            make.top.equalToSuperview()
-            make.right.equalToSuperview()
-            make.height.equalToSuperview().multipliedBy(0.4)
-        }
-        
-        view.addSubview(valueLabel)
-        valueLabel.snp.makeConstraints { [weak self] make in
-            make.left.equalToSuperview()
-            make.right.equalToSuperview()
-            make.bottom.equalToSuperview()
-            make.top.equalTo(titleLabel.snp.bottom)
-        }
-    }
-    
-    @objc open override func update() {
-        super.update()
-        valueLabel.text = valueGenerator?() ?? ""
-    }
 }
 
 open class CameraFocusRingWidget: CameraIndicatorWidget {
@@ -171,4 +132,3 @@ open class CameraWhiteBalanceWidget: CameraIndicatorWidget {
         }
     }
 }
-

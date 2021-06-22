@@ -18,7 +18,7 @@ import IQKeyboardManager
 public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     private static var mostRecentExecuted: FuncExecutor?
     
-    public var layout: ExecutorWidgetLayout = .small
+    public var layout: DynamicSizeWidgetLayout = .small
     
     public var preferredSize: CGSize {
         if (portrait && tablet) {

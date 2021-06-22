@@ -74,6 +74,10 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
         executor.remove(delegate: self)
     }
     
+    open func onCameraFocusCalibrationRequested(value: Kernel.CameraFocusCalibration) {}
+    
+    open func onCameraFocusCalibrationUpdated(value: Kernel.CameraFocusCalibration) {}
+    
     open func onOpened(session: DroneSession) {
         session.add(delegate: self)
     }
@@ -192,20 +196,22 @@ open class UpdatableWidget: DelegateWidget {
     @objc open func update() {}
 }
 
-public enum ExecutorWidgetLayout: String {
+public enum DynamicSizeWidgetLayout: String {
     case small = "small",
          medium = "medium",
          large = "large"
 }
 
-public protocol ExecutorWidget: Widget {
-    var layout: ExecutorWidgetLayout { get }
+public protocol DynamicSizeWidget: Widget {
+    var layout: DynamicSizeWidgetLayout { get }
     var preferredSize: CGSize { get }
 }
 
 public protocol ConfigurableWidget {
     var configurationActions: [UIAlertAction] { get }
 }
+
+public protocol ExecutorWidget: DynamicSizeWidget {}
 
 public protocol WidgetFactoryProvider {
     var widgetFactory: WidgetFactory? { get }
@@ -254,6 +260,7 @@ open class WidgetFactory {
     open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? VerticalSpeedWidget) ?? VerticalSpeedWidget() }
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
     open var cameraMenuWidgetEnabled: Bool { false }
+    open func createDefaultIndicatorsWidget(current: Widget? = nil) -> Widget? { (current as? DefaultIndicatorsWidget) ?? DefaultIndicatorsWidget() }
     open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureWidget) ?? CameraExposureWidget() }
     open func createCameraISOWidget(current: Widget? = nil) -> Widget? { (current as? CameraISOWidget) ?? CameraISOWidget()}
@@ -268,8 +275,18 @@ open class WidgetFactory {
     open func createCameraFocusModeWidget(current: Widget? = nil) -> Widget? { nil }
     open func createCameraModeWidget(current: Widget? = nil) -> Widget? { (current as? CameraModeWidget) ?? CameraModeWidget() }
     open func createCameraCaptureWidget(current: Widget? = nil) -> Widget?  { (current as? CameraCaptureWidget) ?? CameraCaptureWidget() }
+    open func createCameraFocusCalibrationWidget(current: Widget? = nil, calibration: Kernel.CameraFocusCalibration) -> DynamicSizeWidget? {
+        if let widget = current as? CameraFocusCalibrationWidget {
+            return widget
+        }
+        
+        let widget = CameraFocusCalibrationWidget()
+        widget.calibration = calibration
+        return widget
+    }
     open var cameraExposureMenuWidgetEnabled: Bool { false }
     open func createCameraExposureMenuWidget(current: Widget? = nil) -> Widget? { nil }
+    open func createGimbalOrientationWidget(current: Widget? = nil) -> Widget?  { (current as? GimbalOrientationWidget) ?? GimbalOrientationWidget() }
     open func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKMenuWidget(current: Widget? = nil) -> Widget? { nil }

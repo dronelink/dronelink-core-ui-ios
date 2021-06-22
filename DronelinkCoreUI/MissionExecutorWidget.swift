@@ -22,7 +22,7 @@ import MaterialComponents.MDCActivityIndicator
 public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
     public override var updateInterval: TimeInterval { 0.5 }
     
-    public var layout: ExecutorWidgetLayout = .small
+    public var layout: DynamicSizeWidgetLayout = .small
     
     public var preferredSize: CGSize {
         if (portrait && tablet) {
@@ -249,6 +249,23 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             let reason = engageDisallowedReasons.first!
             DronelinkUI.shared.showDialog(title: reason.title, details: reason.details)
             return
+        }
+        
+        if let cameraFocusCalibrationsRequired = missionExecutor.cameraFocusCalibrationsRequired {
+            let calibrationsPending = cameraFocusCalibrationsRequired.filter { Dronelink.shared.get(cameraFocusCalibration: $0.with(droneSerialNumber: session.serialNumber)) == nil }
+            if let calibration = calibrationsPending.first {
+                DronelinkUI.shared.showDialog(
+                    title: "MissionExecutorWidget.cameraFocusCalibrationsRequired.title".localized,
+                    details: String(format: (calibrationsPending.count > 1 ? "MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple" :  "MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single").localized, "\(calibrationsPending.count)"),
+                    actions: [
+                        MDCAlertAction(title: "continue".localized, emphasis: .high, handler: { [weak self] action in
+                            Dronelink.shared.request(cameraFocusCalibration: calibration)
+                        }),
+                        MDCAlertAction(title: "cancel".localized, handler: { [weak self] action in
+                        })
+                    ])
+                return
+            }
         }
         
         promptConfirmation()
@@ -590,8 +607,10 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         }
         
         if executor.status.completed {
-            Dronelink.shared.unloadMission()
-            Dronelink.shared.announce(message: reason.title)
+            DispatchQueue.main.async {
+                Dronelink.shared.unloadMission()
+                Dronelink.shared.announce(message: reason.title)
+            }
             return
         }
 

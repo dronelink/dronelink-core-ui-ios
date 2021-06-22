@@ -39,6 +39,10 @@ public class DebugWidget: UpdatableWidget {
         
         var values: [String] = []
         
+        if let ultrasonicAltitude = session?.state?.value.ultrasonicAltitude {
+            values.append("Ultrasonic Altitude: \(Double(round(10 * ultrasonicAltitude)/10))")
+        }
+        
         if let cameraState = session?.cameraState(channel: 0)?.value {
             if let focusRingValue = cameraState.focusRingValue {
                 values.append("Focus ring value: \(focusRingValue)")

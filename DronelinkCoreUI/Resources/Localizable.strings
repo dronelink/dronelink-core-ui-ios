@@ -16,6 +16,22 @@
 "learnMore" = "Learn More";
 "na" = "N/A";
 
+"CameraFocusCalibrationWidget.title" = "Camera Focus Calibration";
+"CameraFocusCalibrationWidget.finished" = "Calibration finished (%@)";
+"CameraFocusCalibrationWidget.type.distance" = "Distance";
+"CameraFocusCalibrationWidget.type.altitude" = "Altitude";
+"CameraFocusCalibrationWidget.mark.reference.title" = "Mark Reference";
+"CameraFocusCalibrationWidget.drone.unavailable" = "Waiting for drone...";
+"CameraFocusCalibrationWidget.serial.number.unavailable" = "Unable to read drone serial number. Please reconnect the drone.";
+"CameraFocusCalibrationWidget.camera.unavailable" = "Unable to determine camera focus state...";
+"CameraFocusCalibrationWidget.location.unavailable" = "Waiting for location...";
+"CameraFocusCalibrationWidget.details.mark.reference" = "Mark a reference object to focus on.";
+"CameraFocusCalibrationWidget.details.move.distance" = "Move %@ away while pointing at the reference object with the gimbal at 0°.";
+"CameraFocusCalibrationWidget.details.move.altitude" = "Fly %@ above your takeoff location with the gimbal at -90°.";
+"CameraFocusCalibrationWidget.details.busy" = "Calibrating...";
+"CameraFocusCalibrationWidget.details.focus.distance" = "Continue focusing the camera by tapping the reference object on the screen (%@).";
+"CameraFocusCalibrationWidget.details.focus.altitude" = "Continue focusing the camera by tapping your takeoff location on the screen (%@).";
+
 "CameraIndicatorWidget.focusring.title" = "Focus";
 
 "CameraExposureWidget.iso.title" = "ISO";
@@ -25,10 +41,15 @@
 "CameraExposureWidget.ev.title" = "EV";
 "CameraExposureWidget.wb.title" = "WB";
 
+"GimbalOrientationWidget.title" = "Gimbal";
+
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
 
 "ModeDisengageReason.user.disengaged" = "Mode Paused";
 
+"MissionExecutorWidget.cameraFocusCalibrationsRequired.title" = "Camera Focus Calibration Required";
+"MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single" = "This mission requires a camera focus calibration before running.";
+"MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple" = "This mission requires %@ camera focus calibrations before running.";
 "MissionExecutorWidget.details" = "3D Preview";
 "MissionExecutorWidget.details.network.error" = "You need a network connection for 3D previews.";
 "MissionExecutorWidget.estimating" = "Estimating flight path and time...";
@@ -94,14 +115,18 @@
 "MicrosoftMapWidget.satellite" = "Satellite";
 "MicrosoftMapWidget.streets" = "Streets & Buildings";
 
-"DroneOffsetsWidget.altitudeYaw" = "ALT/YAW";
+"DroneOffsetsWidget.altitudeYaw" = "YAW/ALT";
 "DroneOffsetsWidget.position" = "POSITION";
 "DroneOffsetsWidget.more" = "Gimbal Options";
 "DroneOffsetsWidget.resetGimbal" = "Reset";
 "DroneOffsetsWidget.levelGimbal" = "0° (Level)";
 "DroneOffsetsWidget.nadirGimbal" = "-90° (Nadir)";
 "DroneOffsetsWidget.rollTrim" = "Roll Trim";
+"DroneOffsetsWidget.clearCameraFocusCalibrations" = "Clear Focus Calibrations";
+"DroneOffsetsWidget.clearCameraFocusCalibrations.finished" = "Cleared %@ calibration(s)";
 "DroneOffsetsWidget.rc.inputs" = "Caution: RC sticks enabled";
+"DroneOffsetsWidget.relative.altitude.enabled" = "Caution: Auto altitude enabled";
+"DroneOffsetsWidget.relative.altitude.disabled" = "Auto altitude disabled";
 
 "NetworkRTKStatus.value.0" = "N/A";
 "NetworkRTKStatus.value.1" = "Disabled";

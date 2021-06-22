@@ -137,11 +137,11 @@ public class DashboardWidget: DelegateWidget {
     private var cameraFocusModeWidget: Widget?
     private var cameraFocusRingWidget: Widget?
     private var cameraStorageWidget: Widget?
-    private var cameraExposureWidget: Widget?
-    private var cameraIndicatorWidgets: [(widget: Widget, width: Bool)] {
+    private var defaultIndicatorsWidget: Widget?
+    private var indicatorWidgets: [(widget: Widget, width: Bool)] {
         var widgets: [(widget: Widget, width: Bool)] = []
         if let widget = cameraFocusRingWidget { widgets.append((widget: widget, width: false)) }
-        if let widget = cameraExposureWidget { widgets.append((widget: widget, width: false)) }
+        if let widget = defaultIndicatorsWidget { widgets.append((widget: widget, width: false)) }
         if let widget = cameraStorageWidget { widgets.append((widget: widget, width: false)) }
         if let widget = cameraAutoExposureWidget { widgets.append((widget: widget, width: true)) }
         if let widget = cameraExposureFocusWidget { widgets.append((widget: widget, width: true)) }
@@ -153,7 +153,9 @@ public class DashboardWidget: DelegateWidget {
     private var compassWidget: Widget?
     private var telemetryWidget: Widget?
     private var executorWidget: ExecutorWidget?
-    private var executorLayout: ExecutorWidgetLayout { executorWidget?.layout ?? .small }
+    private var cameraFocusCalibrationWidget: DynamicSizeWidget?
+    private var activityWidget: DynamicSizeWidget? { cameraFocusCalibrationWidget ?? executorWidget }
+    private var activityWidgetLayout: DynamicSizeWidgetLayout { activityWidget?.layout ?? .small }
     private var droneOffsetsWidget1: Widget?
     private var droneOffsetsWidget2: Widget?
     private var cameraOffsetsWidget: Widget?
@@ -269,6 +271,29 @@ public class DashboardWidget: DelegateWidget {
             make.height.equalTo(28)
             make.width.equalTo(28)
         }
+        
+        let droneOffsetsWidget = DroneOffsetsWidget()
+        droneOffsetsWidget.styles = tablet ? [.position] : [.altYaw, .position]
+        droneOffsetsWidget.install(inParent: self)
+        self.droneOffsetsWidget1 = droneOffsetsWidget
+        
+        if tablet {
+            if let droneOffsetsWidget = self.droneOffsetsWidget2 {
+                droneOffsetsWidget.uninstallFromParent()
+                self.droneOffsetsWidget2 = nil
+            }
+            else {
+                let droneOffsetsWidget = DroneOffsetsWidget()
+                droneOffsetsWidget.styles = [.altYaw]
+                droneOffsetsWidget.install(inParent: self)
+                self.droneOffsetsWidget2 = droneOffsetsWidget
+            }
+        }
+        
+        let cameraOffsetsWidget = CameraOffsetsWidget()
+        cameraOffsetsWidget.install(inParent: self)
+        self.cameraOffsetsWidget = cameraOffsetsWidget
+        
 
         view.addSubview(topBarView)
         topBarView.snp.makeConstraints { [weak self] make in
@@ -322,7 +347,7 @@ public class DashboardWidget: DelegateWidget {
         if -previousDebugTap.timeIntervalSinceNow < 0.5 {
             consecutiveDebugTaps += 1
             NSLog("Debug taps \(consecutiveDebugTaps)")
-            if consecutiveDebugTaps >= 5 {
+            if consecutiveDebugTaps >= 7 {
                 debug = !debug
                 consecutiveDebugTaps = 0
                 view.setNeedsUpdateConstraints()
@@ -366,51 +391,16 @@ public class DashboardWidget: DelegateWidget {
     }
     
     @objc func onOffsets(sender: Any) {
-        toggleOffsets()
+        toggleOffsets(visible: droneOffsetsWidget1?.view.isHidden ?? false)
     }
     
-    private func toggleOffsets(visible: Bool? = nil) {
+    private func toggleOffsets(visible: Bool?) {
         if let visible = visible {
-            if (visible && droneOffsetsWidget1 != nil) || (!visible && droneOffsetsWidget1 == nil) {
-                return
-            }
+            droneOffsetsWidget1?.view.isHidden = !visible
+            droneOffsetsWidget2?.view.isHidden = !visible
+            cameraOffsetsWidget?.view.isHidden = !visible
+            view.setNeedsUpdateConstraints()
         }
-        
-        if let droneOffsetsWidget = droneOffsetsWidget1 {
-            droneOffsetsWidget.uninstallFromParent()
-            self.droneOffsetsWidget1 = nil
-        }
-        else {
-            let droneOffsetsWidget = DroneOffsetsWidget()
-            droneOffsetsWidget.styles = tablet ? [.position] : [.altYaw, .position]
-            droneOffsetsWidget.install(inParent: self)
-            self.droneOffsetsWidget1 = droneOffsetsWidget
-        }
-        
-        if tablet {
-            if let droneOffsetsWidget = self.droneOffsetsWidget2 {
-                droneOffsetsWidget.uninstallFromParent()
-                self.droneOffsetsWidget2 = nil
-            }
-            else {
-                let droneOffsetsWidget = DroneOffsetsWidget()
-                droneOffsetsWidget.styles = [.altYaw]
-                droneOffsetsWidget.install(inParent: self)
-                self.droneOffsetsWidget2 = droneOffsetsWidget
-            }
-        }
-        
-        if let cameraOffsetsWidget = self.cameraOffsetsWidget {
-            cameraOffsetsWidget.uninstallFromParent()
-            self.cameraOffsetsWidget = nil
-        }
-        else {
-            let cameraOffsetsWidget = CameraOffsetsWidget()
-            cameraOffsetsWidget.install(inParent: self)
-            self.cameraOffsetsWidget = cameraOffsetsWidget
-        }
-        
-        view.setNeedsUpdateConstraints()
     }
     
     private func showOverlay(viewController: UIViewController) {
@@ -482,6 +472,24 @@ public class DashboardWidget: DelegateWidget {
     @objc func onDismiss(sender: Any) {
         Dronelink.shared.unload()
         dismiss(animated: true)
+    }
+    
+    open override func onCameraFocusCalibrationRequested(value: Kernel.CameraFocusCalibration) {
+        super.onCameraFocusCalibrationRequested(value: value)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.cameraFocusCalibrationWidget = self?.refreshWidget(current: self?.cameraFocusCalibrationWidget, next: self?.widgetFactory.createCameraFocusCalibrationWidget(calibration: value)) as? DynamicSizeWidget
+            self?.view.setNeedsUpdateConstraints()
+        }
+    }
+    
+    open override func onCameraFocusCalibrationUpdated(value: Kernel.CameraFocusCalibration) {
+        super.onCameraFocusCalibrationUpdated(value: value)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.cameraFocusCalibrationWidget = self?.refreshWidget(current: self?.cameraFocusCalibrationWidget, next: nil) as? DynamicSizeWidget
+            self?.view.setNeedsUpdateConstraints()
+        }
     }
     
     open override func onOpened(session: DroneSession) {
@@ -703,7 +711,7 @@ public class DashboardWidget: DelegateWidget {
         
         //cameraFocusRingWidget = refreshWidget(current: cameraFocusRingWidget, next: widgetFactory.createCameraFocusRingWidget(current: cameraFocusRingWidget))
         
-        cameraExposureWidget = refreshWidget(current: cameraExposureWidget, next: widgetFactory.createCameraExposureWidget(current: cameraExposureWidget))
+        defaultIndicatorsWidget = refreshWidget(current: defaultIndicatorsWidget, next: widgetFactory.createDefaultIndicatorsWidget(current: defaultIndicatorsWidget))
         
         cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
         
@@ -714,10 +722,10 @@ public class DashboardWidget: DelegateWidget {
         cameraFocusModeWidget = refreshWidget(current: cameraFocusModeWidget, next: widgetFactory.createCameraFocusModeWidget(current: cameraFocusModeWidget))
         
         let cameraWidgetSize = statusWidgetHeight * 0.65
-        var cameraIndicatorWidgetPrevious: Widget?
-        cameraIndicatorWidgets.reversed().forEach { item in
+        var indicatorWidgetPrevious: Widget?
+       indicatorWidgets.reversed().forEach { item in
             item.widget.view.snp.remakeConstraints {  [weak self] make in
-                if let previousWidget = cameraIndicatorWidgetPrevious {
+                if let previousWidget = indicatorWidgetPrevious {
                     make.top.equalTo(previousWidget.view.snp.top)
                     make.right.equalTo(previousWidget.view.snp.left).offset(-defaultPadding / 2)
                 }
@@ -731,7 +739,7 @@ public class DashboardWidget: DelegateWidget {
                 }
             }
             
-            cameraIndicatorWidgetPrevious = item.widget
+            indicatorWidgetPrevious = item.widget
         }
         
         cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
@@ -820,16 +828,16 @@ public class DashboardWidget: DelegateWidget {
             }
             else {
                 if tablet {
-                    make.width.equalTo(view.snp.width).multipliedBy(executorLayout == .large ? 0.30 : 0.4)
+                    make.width.equalTo(view.snp.width).multipliedBy(activityWidgetLayout == .large ? 0.30 : 0.4)
                 }
                 else {
-                    make.width.equalTo(view.snp.width).multipliedBy(executorLayout == .large ? 0.18 : 0.28)
+                    make.width.equalTo(view.snp.width).multipliedBy(activityWidgetLayout == .large ? 0.18 : 0.28)
                 }
 
                 make.height.equalTo(secondaryContentView.snp.width).multipliedBy(0.5)
                 make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-defaultPadding)
-                if !portrait, executorLayout == .large, let executorWidget = executorWidget {
-                    make.left.equalTo(executorWidget.view.snp.right).offset(defaultPadding)
+                if !portrait, activityWidgetLayout == .large, let activityWidget = activityWidget {
+                    make.left.equalTo(activityWidget.view.snp.right).offset(defaultPadding)
                 }
                 else {
                     make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(defaultPadding)
@@ -876,7 +884,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         offsetsButton.isHidden = !offsetsButtonEnabled
-        offsetsButton.tintColor = droneOffsetsWidget1 == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
+        offsetsButton.tintColor = droneOffsetsWidget1?.view.isHidden ?? false ? UIColor.white : DronelinkUI.Constants.secondaryColor
         
         telemetryWidget?.view.snp.remakeConstraints { [weak self] make in
             if (portrait) {
@@ -933,11 +941,14 @@ public class DashboardWidget: DelegateWidget {
             }
         }
         
-        executorWidget?.view.snp.remakeConstraints { [weak self] make in
-            let preferredSize = executorWidget?.preferredSize ?? CGSize(width: 0, height: 0)
-            if executorWidget is FuncExecutorWidget {
+        executorWidget?.view.isHidden = executorWidget !== activityWidget
+        cameraFocusCalibrationWidget?.view.isHidden = cameraFocusCalibrationWidget !== activityWidget
+        
+        activityWidget?.view.snp.remakeConstraints { [weak self] make in
+            let preferredSize = activityWidget?.preferredSize ?? CGSize(width: 0, height: 0)
+            if (activityWidget is FuncExecutorWidget) {
                 let large = tablet || portrait
-                if (executorLayout == .large) {
+                if (activityWidgetLayout == .large) {
                     if (portrait) {
                         make.height.equalTo(tablet ? 550 : 300)
                     }
@@ -973,7 +984,7 @@ public class DashboardWidget: DelegateWidget {
                 make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-defaultPadding)
                 make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(defaultPadding)
                 make.width.equalToSuperview().multipliedBy(0.35)
-                if (executorLayout == .small) {
+                if (activityWidgetLayout == .small) {
                     make.height.equalTo(preferredSize.height)
                 }
                 else {
@@ -986,7 +997,7 @@ public class DashboardWidget: DelegateWidget {
                 make.right.equalToSuperview()
                 make.left.equalToSuperview()
                 make.bottom.equalToSuperview()
-                if (executorLayout == .small) {
+                if (activityWidgetLayout == .small) {
                     make.height.equalTo(preferredSize.height)
                 }
                 else {
@@ -1004,7 +1015,7 @@ public class DashboardWidget: DelegateWidget {
                 make.width.equalToSuperview().multipliedBy(0.4)
             }
             
-            if (executorLayout == .small) {
+            if (activityWidgetLayout == .small) {
                 make.height.equalTo(preferredSize.height)
             }
             else {

@@ -19,7 +19,7 @@ import MaterialComponents.MDCActivityIndicator
 public class ModeExecutorWidget: UpdatableWidget, ExecutorWidget {
     public override var updateInterval: TimeInterval { 0.5 }
     
-    public var layout: ExecutorWidgetLayout = .small
+    public var layout: DynamicSizeWidgetLayout = .small
     
     public var preferredSize: CGSize {
         if (portrait && tablet) {
