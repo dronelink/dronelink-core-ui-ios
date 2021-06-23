@@ -3,7 +3,7 @@ inhibit_all_warnings!
 use_frameworks!
 
 target 'DronelinkCoreUI' do
-  pod 'DronelinkCore', '~> 2.3.0'
+  pod 'DronelinkCore', '~> 2.4.0'
   pod 'SnapKit', '~> 5.0.1'
   pod 'SwiftyUserDefaults', '~> 5.0.0'
   pod 'MicrosoftMapsSDK', '~> 1.1.4'
