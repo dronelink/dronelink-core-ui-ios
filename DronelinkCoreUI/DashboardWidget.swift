@@ -273,6 +273,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         let droneOffsetsWidget = DroneOffsetsWidget()
+        droneOffsetsWidget.view.isHidden = true
         droneOffsetsWidget.styles = tablet ? [.position] : [.altYaw, .position]
         droneOffsetsWidget.install(inParent: self)
         self.droneOffsetsWidget1 = droneOffsetsWidget
@@ -294,6 +295,9 @@ public class DashboardWidget: DelegateWidget {
         cameraOffsetsWidget.install(inParent: self)
         self.cameraOffsetsWidget = cameraOffsetsWidget
         
+        droneOffsetsWidget1?.view.isHidden = true
+        droneOffsetsWidget2?.view.isHidden = true
+        cameraOffsetsWidget.view.isHidden = true
 
         view.addSubview(topBarView)
         topBarView.snp.makeConstraints { [weak self] make in
@@ -777,6 +781,18 @@ public class DashboardWidget: DelegateWidget {
         }
         
         debugWidget = refreshWidget(current: debugWidget, next: debug ? DebugWidget() : nil)
+        
+        if let widget = droneOffsetsWidget1 {
+            view.bringSubviewToFront(widget.view)
+        }
+        
+        if let widget = droneOffsetsWidget2 {
+            view.bringSubviewToFront(widget.view)
+        }
+        
+        if let widget = cameraOffsetsWidget {
+            view.bringSubviewToFront(widget.view)
+        }
     }
     
     func updateDismissButton() {
