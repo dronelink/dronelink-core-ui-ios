@@ -10,12 +10,12 @@ import UIKit
 import WebKit
 import MaterialComponents.MaterialActivityIndicator
 
-class EmbedViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
+public class EmbedViewController: UIViewController, WKUIDelegate, WKNavigationDelegate {
     private let activityIndicator = MDCActivityIndicator()
     private let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
     public var networkError: String?
     
-    override func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.black
@@ -45,7 +45,7 @@ class EmbedViewController: UIViewController, WKUIDelegate, WKNavigationDelegate 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onDone(sender:)))
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         webView.stopLoading()
         webView.removeFromSuperview()
     }
@@ -54,20 +54,20 @@ class EmbedViewController: UIViewController, WKUIDelegate, WKNavigationDelegate 
         dismiss(animated: true, completion: nil)
     }
     
-    func load(_ request: URLRequest) {
+    public func load(_ request: URLRequest) {
         webView.load(request)
     }
     
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {}
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {}
     
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.removeFromSuperview()
             self?.webView.isHidden = false
         }
     }
     
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         DronelinkUI.shared.showSnackbar(text: networkError ?? error.localizedDescription)
     }
 }

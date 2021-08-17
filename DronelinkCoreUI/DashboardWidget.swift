@@ -273,22 +273,17 @@ public class DashboardWidget: DelegateWidget {
         }
         
         let droneOffsetsWidget = DroneOffsetsWidget()
-        droneOffsetsWidget.view.isHidden = true
         droneOffsetsWidget.styles = tablet ? [.position] : [.altYaw, .position]
+        droneOffsetsWidget.view.isHidden = true
         droneOffsetsWidget.install(inParent: self)
         self.droneOffsetsWidget1 = droneOffsetsWidget
         
         if tablet {
-            if let droneOffsetsWidget = self.droneOffsetsWidget2 {
-                droneOffsetsWidget.uninstallFromParent()
-                self.droneOffsetsWidget2 = nil
-            }
-            else {
-                let droneOffsetsWidget = DroneOffsetsWidget()
-                droneOffsetsWidget.styles = [.altYaw]
-                droneOffsetsWidget.install(inParent: self)
-                self.droneOffsetsWidget2 = droneOffsetsWidget
-            }
+            let droneOffsetsWidget = DroneOffsetsWidget()
+            droneOffsetsWidget.styles = [.altYaw]
+            droneOffsetsWidget.view.isHidden = true
+            droneOffsetsWidget.install(inParent: self)
+            self.droneOffsetsWidget2 = droneOffsetsWidget
         }
         
         let cameraOffsetsWidget = CameraOffsetsWidget()

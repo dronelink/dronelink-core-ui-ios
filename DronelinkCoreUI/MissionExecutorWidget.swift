@@ -114,7 +114,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         view.addSubview(progressView)
         
         messagesTextView.backgroundColor = UIColor.clear
-        messagesTextView.font = UIFont.systemFont(ofSize: 12)
+        messagesTextView.font = UIFont.boldSystemFont(ofSize: 14)
         messagesTextView.textColor = UIColor.white
         messagesTextView.isScrollEnabled = true
         messagesTextView.isEditable = false
@@ -214,7 +214,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         }
         
         messagesTextView.snp.remakeConstraints { [weak self] make in
-            make.top.equalTo(90)
+            make.top.equalTo(80)
             make.left.equalToSuperview().offset(defaultPadding * 3)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.bottom.equalToSuperview().offset(-defaultPadding)

@@ -29,8 +29,8 @@
 "CameraFocusCalibrationWidget.details.move.distance" = "Move %@ away while pointing at the reference object with the gimbal at 0°.";
 "CameraFocusCalibrationWidget.details.move.altitude" = "Fly %@ above your takeoff location with the gimbal at -90°.";
 "CameraFocusCalibrationWidget.details.busy" = "Calibrating...";
-"CameraFocusCalibrationWidget.details.focus.distance" = "Continue focusing the camera by tapping the reference object on the screen (%@).";
-"CameraFocusCalibrationWidget.details.focus.altitude" = "Continue focusing the camera by tapping your takeoff location on the screen (%@).";
+"CameraFocusCalibrationWidget.details.focus.distance" = "Continue focusing the camera by tapping the reference object on the screen (%@). Switch to focus from spot metering.";
+"CameraFocusCalibrationWidget.details.focus.altitude" = "Continue focusing the camera by tapping the takeoff location on the screen (%@). Switch to focus from spot metering.";
 
 "CameraIndicatorWidget.focusring.title" = "Focus";
 

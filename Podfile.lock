@@ -1,5 +1,5 @@
 PODS:
-  - Agrume (5.6.12):
+  - Agrume (5.6.13):
     - SwiftyGif
   - DronelinkCore (2.4.0)
   - IQKeyboardManager (6.5.6)
@@ -8,7 +8,7 @@ PODS:
   - Kingfisher/Core (5.15.8)
   - Mapbox-iOS-SDK (6.3.0):
     - MapboxMobileEvents (~> 0.10.4)
-  - MapboxMobileEvents (0.10.7)
+  - MapboxMobileEvents (0.10.8)
   - MarqueeLabel (4.0.5)
   - MaterialComponents/ActivityIndicator (119.0.0):
     - MaterialComponents/Palettes
@@ -151,8 +151,8 @@ PODS:
     - MaterialComponents/private/Application
     - MaterialComponents/private/Math
     - MDFTextAccessibility
-  - MDFInternationalization (2.0.0)
-  - MDFTextAccessibility (2.0.0)
+  - MDFInternationalization (3.0.0)
+  - MDFTextAccessibility (2.0.1)
   - MicrosoftMapsSDK (1.1.4)
   - MotionAnimator (2.8.1):
     - MotionInterchange (~> 1.6)
@@ -201,16 +201,16 @@ SPEC REPOS:
     - SwiftyUserDefaults
 
 SPEC CHECKSUMS:
-  Agrume: d60f7ead4aad9720564148f7e9cbe0b225b1d814
+  Agrume: 21b96a1138abc0f890211bfcb12f8b1e3464b4c1
   DronelinkCore: e852afde1f3f1fd90f75511020f9303ef5553626
   IQKeyboardManager: 2a6e97afdafc7becf0cb17a9a8d795e3a980717f
   Kingfisher: a3c03d702433fa6cfedabb2bddbe076fb8f2e902
   Mapbox-iOS-SDK: 2563ed87ead6ec08f1c2090873977b8a7be335a8
-  MapboxMobileEvents: d0a581dedd8f47411cc65ea520b965e83914316e
+  MapboxMobileEvents: 36ff53b135aac486eed94b61f813c7967a0c2c6f
   MarqueeLabel: 00cc0bcd087111dca575878b3531af980559707d
   MaterialComponents: 69a725e28406a97816441dea4ec6ec38265a08bb
-  MDFInternationalization: 010097556d6b09d2c4ea38e0820ea6d37be6a314
-  MDFTextAccessibility: 85c09a1bd9c321f494348e632a25063bcda35a53
+  MDFInternationalization: d697c55307816222a55685c4ccb1044ffb030c12
+  MDFTextAccessibility: f4bb4cc2194286651b59a215fdeaa0e05dc90ba5
   MicrosoftMapsSDK: 64317bb343e3ef26507f61617889a6918a1b59d4
   MotionAnimator: ee16aa30567c5bae0fb2750c132915829cfaaf8a
   MotionInterchange: ead0e3ae1f3a5fb539e289debbc7ae036160a10d
@@ -220,4 +220,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 3158c79350dcc44a9122073e1dabf629463d2dd5
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.10.2

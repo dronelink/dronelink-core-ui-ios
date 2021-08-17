@@ -173,22 +173,22 @@ extension UIViewController {
 }
 
 open class UpdatableWidget: DelegateWidget {
-    public var updateInterval: TimeInterval { 1.0 }
+    open var updateInterval: TimeInterval { 1.0 }
     public var updateTimer: Timer?
     
-    public override func viewWillAppear(_ animated: Bool) {
+    override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         update()
         updateTimer = Timer.scheduledTimer(timeInterval: updateInterval, target: self, selector: #selector(update), userInfo: nil, repeats: true)
     }
     
-    override public func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         updateTimer?.invalidate()
         updateTimer = nil
     }
     
-    public override func updateViewConstraints() {
+    override open func updateViewConstraints() {
         super.updateViewConstraints()
         update()
     }
