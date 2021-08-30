@@ -51,6 +51,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
     private var droneMissionExecutedPolyline: MSMapPolyline?
     private var droneMissionExecutedPositions: [MSGeoposition] = []
     private let missionLayer = MSMapElementLayer()
+    private let missionReengagementLayer = MSMapElementLayer()
     private let funcLayer = MSMapElementLayer()
     private var funcInputDroneIcons: [MSMapIcon] = []
     private let funcInputDroneImage = MSMapImage(uiImage: DronelinkUI.loadImage(named: "func-input-drone", renderingMode: .alwaysOriginal)!)
@@ -111,6 +112,9 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
         missionLayer.zIndex = 1
         mapView.layers.add(missionLayer)
+        
+        missionReengagementLayer.zIndex = 1
+        mapView.layers.add(missionReengagementLayer)
 
         funcMapOverlaysLayer.zIndex = 1
         mapView.layers.add(funcMapOverlaysLayer)
@@ -133,11 +137,11 @@ public class MicrosoftMapWidget: UpdatableWidget {
         self.style = style
         switch (style) {
         case .streets:
-            mapView.setStyleSheet(MSMapStyleSheets.roadDark())
+            mapView.styleSheet = MSMapStyleSheets.roadDark()
             break
 
         case .satellite:
-            mapView.setStyleSheet(MSMapStyleSheets.aerialWithOverlay())
+            mapView.styleSheet = MSMapStyleSheets.aerialWithOverlay()
             break
         }
     }
@@ -153,16 +157,17 @@ public class MicrosoftMapWidget: UpdatableWidget {
             droneHomeIcon.rotation = Float(rotation)
             droneHomeIcon.location = MSGeopoint(latitude: droneHomeLocation.coordinate.latitude, longitude: droneHomeLocation.coordinate.longitude)
         }
-
+        
+        let offset = Dronelink.shared.droneOffsets.droneCoordinate
         let engaged = missionExecutor?.engaged ?? false
-        if droneTakeoffAltitude != nil, session?.located ?? false, let state = session?.state?.value, let location = state.location {
+        if droneTakeoffAltitude != nil, session?.located ?? false, let state = session?.state?.value, let location = state.location?.coordinate.coordinate(bearing: offset.direction + Double.pi, distance: offset.magnitude) {
             var rotation = Int(-state.orientation.yaw.convertRadiansToDegrees) % 360
             if (rotation < 0) {
                 rotation += 360;
             }
             droneIcon.rotation = Float(rotation)
-            droneIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
-            addPositionAboveDroneTakeoffLocation(positions: &droneSessionPositions, coordinate: location.coordinate, altitude: state.altitude)
+            droneIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: location, altitude: state.altitude), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
+            addPositionAboveDroneTakeoffLocation(positions: &droneSessionPositions, coordinate: location, altitude: state.altitude)
         }
 
         if engaged || droneSessionPositions.count == 0 {
@@ -205,7 +210,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
             }
         }
 
-        if session?.located ?? false, let state = session?.state?.value, let location = state.location {
+        if session?.located ?? false, let state = session?.state?.value, let location = state.location?.coordinate.coordinate(bearing: offset.direction + Double.pi, distance: offset.magnitude) {
             var trackingScene: MSMapScene?
             
             let trackingResolved = !sessionLocationCentered && tracking == .none && missionExecutor == nil ? .thirdPersonOblique : tracking
@@ -215,7 +220,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
             case .thirdPersonNadir:
                 trackingScene = MSMapScene(
-                    location: MSGeopoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude),
+                    location: MSGeopoint(latitude: location.latitude, longitude: location.longitude),
                     radius: max(20, state.altitude / 1.5))
                 break
 
@@ -223,7 +228,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
                 trackingScene = MSMapScene(camera: MSMapCamera(
                     location: MSGeopoint(
                         position: positionAboveDroneTakeoffLocation(
-                            coordinate: location.coordinate.coordinate(bearing: state.orientation.yaw + Double.pi, distance: 15),
+                            coordinate: location.coordinate(bearing: state.orientation.yaw + Double.pi, distance: 15),
                             altitude: state.altitude + 14),
                         altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
                     heading: state.orientation.yaw.convertRadiansToDegrees,
@@ -234,7 +239,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
                 trackingScene = MSMapScene(
                     camera: MSMapCamera(
                         location: MSGeopoint(
-                            position: positionAboveDroneTakeoffLocation(coordinate: location.coordinate, altitude: state.altitude),
+                            position: positionAboveDroneTakeoffLocation(coordinate: location, altitude: state.altitude),
                             altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem),
                         heading: state.orientation.yaw.convertRadiansToDegrees,
                         pitch: min((session?.gimbalState(channel: 0)?.value.orientation.pitch.convertRadiansToDegrees ?? 0) + 90, 90)))
@@ -330,27 +335,37 @@ public class MicrosoftMapWidget: UpdatableWidget {
             missionLayer.elements.add(polyline)
         }
 
-        if missionExecutor?.engaged ?? false {
-            if let reengagementEstimateSpatials = missionExecutor?.estimate?.reengagementSpatials, reengagementEstimateSpatials.count > 0 {
-                if let reengagementEstimateSpatial = reengagementEstimateSpatials.last {
-                    let reengagementIcon = MSMapIcon()
-                    reengagementIcon.image = MSMapImage(uiImage: DronelinkUI.loadImage(named: "reengagement", renderingMode: .alwaysOriginal)!)
-                    reengagementIcon.flat = true
-                    reengagementIcon.desiredCollisionBehavior = .remainVisible
-                    reengagementIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: reengagementEstimateSpatial.coordinate.coordinate, altitude: reengagementEstimateSpatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
-                    missionLayer.elements.add(reengagementIcon)
-                }
+        updateMissionReengagementElements()
+    }
+    
+    private func updateMissionReengagementElements() {
+        missionReengagementLayer.elements.clear()
+        
+        let engaged = missionExecutor?.engaged ?? false
+        let reengaging = missionExecutor?.reengaging ?? false
+        let reengagementEstimateSpatials = ((reengaging ? missionExecutor?.reengagementSpatials : nil) ?? missionExecutor?.estimate?.reengagementSpatials)
+        if reengaging,
+           let reengagementEstimateSpatials = reengagementEstimateSpatials,
+           reengagementEstimateSpatials.count > 0 {
+            var positions: [MSGeoposition] = []
+            reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
+            let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
 
-                var positions: [MSGeoposition] = []
-                reengagementEstimateSpatials.forEach { addPositionAboveDroneTakeoffLocation(positions: &positions, coordinate: $0.coordinate.coordinate, altitude: $0.altitude.value, tolerance: 0.1) }
-                let path = MSGeopath(positions: positions, altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
-
-                let polyline = MSMapPolyline()
-                polyline.strokeColor = MDCPalette.purple.accent200!
-                polyline.strokeWidth = 1
-                polyline.path = path
-                missionLayer.elements.add(polyline)
-            }
+            let polyline = MSMapPolyline()
+            polyline.strokeColor = MDCPalette.purple.accent200!
+            polyline.strokeWidth = 1
+            polyline.path = path
+            missionReengagementLayer.elements.add(polyline)
+        }
+        
+        let reengagementSpatial = reengaging ? reengagementEstimateSpatials?.last : missionExecutor?.reengagementSpatial
+        if let reengagementSpatial = reengagementSpatial, !engaged || reengaging {
+            let missionReengagementDroneIcon = MSMapIcon()
+            missionReengagementDroneIcon.image = MSMapImage(uiImage: DronelinkUI.loadImage(named: "drone-reengagement", renderingMode: .alwaysOriginal)!)
+            missionReengagementDroneIcon.flat = true
+            missionReengagementDroneIcon.desiredCollisionBehavior = .remainVisible
+            missionReengagementDroneIcon.location = MSGeopoint(position: positionAboveDroneTakeoffLocation(coordinate: reengagementSpatial.coordinate.coordinate, altitude: reengagementSpatial.altitude.value), altitudeReferenceSystem: droneTakeoffAltitudeReferenceSystem)
+            missionReengagementLayer.elements.add(missionReengagementDroneIcon)
         }
     }
 
@@ -599,6 +614,38 @@ public class MicrosoftMapWidget: UpdatableWidget {
             self?.updateMissionElements()
         }
     }
+    
+    public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
+        super.onMissionEstimated(executor: executor, estimate: estimate)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.updateScene()
+            self?.updateMissionElements()
+        }
+    }
+
+    public override func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
+        super.onMissionExecuted(executor: executor, engagement: engagement)
+        
+        if let state = engagement.droneSession.state?.value, let location = state.location {
+            addPositionAboveDroneTakeoffLocation(positions: &droneMissionExecutedPositions, coordinate: location.coordinate, altitude: state.altitude)
+        }
+        
+        if (missionReengagementLayer.elements.count == 0 && executor.reengaging) || (missionReengagementLayer.elements.count > 0 && !executor.reengaging) {
+            DispatchQueue.main.async { [weak self] in
+                self?.updateMissionReengagementElements()
+            }
+        }
+    }
+
+    public override func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
+        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        
+        droneMissionExecutedPositions.removeAll()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionElements()
+        }
+    }
 
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
@@ -638,33 +685,6 @@ public class MicrosoftMapWidget: UpdatableWidget {
                 self?.updateDroneTakeoffAltitude()
                 self?.updateMissionElements()
             }
-        }
-    }
-
-
-    public override func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {
-        super.onMissionEstimated(executor: executor, estimate: estimate)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.updateScene()
-            self?.updateMissionElements()
-        }
-    }
-
-    public override func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
-        super.onMissionExecuted(executor: executor, engagement: engagement)
-        
-        if let state = engagement.droneSession.state?.value, let location = state.location {
-            addPositionAboveDroneTakeoffLocation(positions: &droneMissionExecutedPositions, coordinate: location.coordinate, altitude: state.altitude)
-        }
-    }
-
-    public override func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
-        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
-        
-        droneMissionExecutedPositions.removeAll()
-        DispatchQueue.main.async { [weak self] in
-            self?.updateMissionElements()
         }
     }
 
@@ -715,18 +735,18 @@ extension MicrosoftMapWidget: ConfigurableWidget {
             self?.tracking = .firstPerson
         }))
 
-//        if tracking == .none {
-//            if style == .streets {
-//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { [weak self] _ in
-//                    self?.update(style: .satellite)
-//                }))
-//            }
-//            else {
-//                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { [weak self] _ in
-//                    self?.update(style: .streets)
-//                }))
-//            }
-//        }
+        if tracking == .none {
+            if style == .streets {
+                actions.append(UIAlertAction(title: "MicrosoftMapWidget.satellite".localized, style: .default, handler: { [weak self] _ in
+                    self?.update(style: .satellite)
+                }))
+            }
+            else {
+                actions.append(UIAlertAction(title: "MicrosoftMapWidget.streets".localized, style: .default, handler: { [weak self] _ in
+                    self?.update(style: .streets)
+                }))
+            }
+        }
         
         return actions
     }

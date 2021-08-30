@@ -26,6 +26,8 @@ public class MapboxMapWidget: UpdatableWidget {
     private var missionEstimateForegroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateBackgroundAnnotation: MGLAnnotation?
     private var missionReengagementEstimateForegroundAnnotation: MGLAnnotation?
+    private var missionReengagementDroneAnnotation = MGLPointAnnotation()
+    private var missionReengagementDroneAnnotationView: MGLAnnotationView?
     private var funcDroneAnnotations: [MGLPointAnnotation] = []
     private var funcMapOverlayAnnotations: [(annotation: MGLPolygon, color: UIColor?)] = []
     private var modeTargetAnnotation = MGLPointAnnotation()
@@ -39,9 +41,11 @@ public class MapboxMapWidget: UpdatableWidget {
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         mapView.attributionButtonPosition = .bottomRight
         mapView.logoViewPosition = .bottomRight
+        mapView.compassViewPosition = .bottomRight
         mapView.showsUserLocation = true
         mapView.showsScale = false
         mapView.showsHeading = false
+        mapView.allowsTilting = false
         mapView.clipsToBounds = true
         mapView.attributionButton.tintColor = UIColor.white
         if let location = Dronelink.shared.location?.value {
@@ -53,6 +57,7 @@ public class MapboxMapWidget: UpdatableWidget {
         mapView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
+        mapView.addAnnotation(missionReengagementDroneAnnotation)
         mapView.addAnnotation(modeTargetAnnotation)
         update()
     }
@@ -69,7 +74,8 @@ public class MapboxMapWidget: UpdatableWidget {
         }
         
         if let state = session?.state?.value, let droneLocation = state.location {
-            droneAnnotation.coordinate = droneLocation.coordinate
+            let offset = Dronelink.shared.droneOffsets.droneCoordinate
+            droneAnnotation.coordinate = droneLocation.coordinate.coordinate(bearing: offset.direction + Double.pi, distance: offset.magnitude)
             if let droneAnnotationView = droneAnnotationView {
                 droneAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat((state.orientation.yaw.convertRadiansToDegrees - mapView.camera.heading).convertDegreesToRadians))
             }
@@ -143,14 +149,6 @@ public class MapboxMapWidget: UpdatableWidget {
             mapView.removeAnnotation(missionEstimateForegroundAnnotation)
         }
 
-        if let missionReengagementEstimateBackgroundAnnotation = missionReengagementEstimateBackgroundAnnotation {
-            mapView.removeAnnotation(missionReengagementEstimateBackgroundAnnotation)
-        }
-
-        if let missionReengagementEstimateForegroundAnnotation = missionReengagementEstimateForegroundAnnotation {
-            mapView.removeAnnotation(missionReengagementEstimateForegroundAnnotation)
-        }
-
         var visibleCoordinates: [CLLocationCoordinate2D] = []
         if let estimateCoordinates = missionExecutor?.estimate?.spatials.map({ $0.coordinate.coordinate }), estimateCoordinates.count > 0 {
             missionEstimateBackgroundAnnotation = MGLPolyline(coordinates: estimateCoordinates, count: UInt(estimateCoordinates.count))
@@ -162,17 +160,11 @@ public class MapboxMapWidget: UpdatableWidget {
             if !missionCentered {
                 visibleCoordinates.append(contentsOf: estimateCoordinates)
             }
-
-            if let reengagementEstimateCoordinates = missionExecutor?.estimate?.reengagementSpatials?.map({ $0.coordinate.coordinate }), reengagementEstimateCoordinates.count > 0 {
-                missionReengagementEstimateBackgroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
-                mapView.addAnnotation(missionReengagementEstimateBackgroundAnnotation!)
-
-                missionReengagementEstimateForegroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
-                mapView.addAnnotation(missionReengagementEstimateForegroundAnnotation!)
-
-                if !missionCentered {
-                    visibleCoordinates.append(contentsOf: reengagementEstimateCoordinates)
-                }
+        }
+        
+        if let reengagementEstimateCoordinates = updateMissionReengagementEstimate() {
+            if !missionCentered {
+                visibleCoordinates.append(contentsOf: reengagementEstimateCoordinates)
             }
         }
 
@@ -183,6 +175,42 @@ public class MapboxMapWidget: UpdatableWidget {
                 count: UInt(visibleCoordinates.count),
                 edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
         }
+    }
+    
+    private func updateMissionReengagementEstimate() -> [CLLocationCoordinate2D]? {
+        if let missionReengagementEstimateBackgroundAnnotation = missionReengagementEstimateBackgroundAnnotation {
+            mapView.removeAnnotation(missionReengagementEstimateBackgroundAnnotation)
+        }
+        missionReengagementEstimateBackgroundAnnotation = nil
+
+        if let missionReengagementEstimateForegroundAnnotation = missionReengagementEstimateForegroundAnnotation {
+            mapView.removeAnnotation(missionReengagementEstimateForegroundAnnotation)
+        }
+        missionReengagementEstimateForegroundAnnotation = nil
+        
+        let engaged = missionExecutor?.engaged ?? false
+        let reengaging = missionExecutor?.reengaging ?? false
+        let reengagementEstimateCoordinates = ((reengaging ? missionExecutor?.reengagementSpatials : nil) ?? missionExecutor?.estimate?.reengagementSpatials)?.map({ $0.coordinate.coordinate })
+        if reengaging,
+           let reengagementEstimateCoordinates = reengagementEstimateCoordinates,
+           reengagementEstimateCoordinates.count > 0 {
+            missionReengagementEstimateBackgroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
+            mapView.addAnnotation(missionReengagementEstimateBackgroundAnnotation!)
+
+            missionReengagementEstimateForegroundAnnotation = MGLPolyline(coordinates: reengagementEstimateCoordinates, count: UInt(reengagementEstimateCoordinates.count))
+            mapView.addAnnotation(missionReengagementEstimateForegroundAnnotation!)
+        }
+        
+        let reengagementCoordinate = reengaging ? reengagementEstimateCoordinates?.last : missionExecutor?.reengagementSpatial?.coordinate.coordinate
+        if let reengagementCoordinate = reengagementCoordinate, !engaged || reengaging {
+            missionReengagementDroneAnnotationView?.isHidden = false
+            missionReengagementDroneAnnotation.coordinate = reengagementCoordinate
+        }
+        else {
+            missionReengagementDroneAnnotationView?.isHidden = true
+        }
+        
+        return reengagementEstimateCoordinates
     }
     
     private func updateFuncElements() {
@@ -323,6 +351,22 @@ public class MapboxMapWidget: UpdatableWidget {
         }
     }
     
+    public override func onMissionExecuted(executor: MissionExecutor, engagement: MissionExecutor.Engagement) {
+        super.onMissionExecuted(executor: executor, engagement: engagement)
+        if (missionReengagementEstimateBackgroundAnnotation == nil && executor.reengaging) || (missionReengagementEstimateBackgroundAnnotation != nil && !executor.reengaging) {
+            DispatchQueue.main.async { [weak self] in
+                self?.updateMissionReengagementEstimate()
+            }
+        }
+    }
+    
+    public override func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
+        super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionReengagementEstimate()
+        }
+    }
+    
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
         
@@ -388,6 +432,18 @@ extension MapboxMapWidget: MGLMapViewDelegate {
             }
 
             return drone
+        }
+        
+        if (annotation === missionReengagementDroneAnnotation) {
+            var droneReengagement = mapView.dequeueReusableAnnotationView(withIdentifier: "drone-reengagement")
+            if droneReengagement == nil {
+                droneReengagement = MGLAnnotationView(reuseIdentifier: "drone-reengagement")
+                droneReengagement?.addSubview(UIImageView(image: DronelinkUI.loadImage(named: "drone-reengagement", renderingMode: .alwaysOriginal)))
+                droneReengagement?.frame = CGRect(x: 0, y: 0, width: 15, height: 15)
+                missionReengagementDroneAnnotationView = droneReengagement
+            }
+
+            return droneReengagement
         }
         
         if (annotation === modeTargetAnnotation) {

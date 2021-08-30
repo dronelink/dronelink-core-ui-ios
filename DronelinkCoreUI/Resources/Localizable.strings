@@ -105,7 +105,7 @@
 "DashboardWidget.camera.noSDCard.details" = "Please make sure to insert an SD card before running a mission with data capture.";
 "DashboardWidget.cameraMenu" = "MENU";
 "DashboardWidget.contentSettings" = "Map Options";
-"DashboardWidget.map.mapbox" = "2D (Satellite)";
+"DashboardWidget.map.mapbox" = "2D";
 "DashboardWidget.map.microsoft" = "3D (Beta)";
 
 "MicrosoftMapWidget.reset" = "Reset";

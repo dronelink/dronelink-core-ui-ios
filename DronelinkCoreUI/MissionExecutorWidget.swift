@@ -503,13 +503,21 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             subtitleLabel.text = "ExecutableWidget.start.engaging".localized
             return
         }
+        
+        var estimateTime = 0.0
+        var executionDuration = 0.0
+        if let estimate = missionExecutor.estimate {
+            estimateTime = estimate.time
+            executionDuration = missionExecutor.executionDuration
+        }
+        let timeRemaining = max(estimateTime - executionDuration, 0)
 
         activityIndicator.isHidden = true
         primaryButton.isHidden = false
         subtitleLabel.isHidden = true
         executionDurationLabel.isHidden = false
-        timeRemainingLabel.isHidden = false
-        progressView.isHidden = false
+        timeRemainingLabel.isHidden = estimateTime == 0
+        progressView.isHidden = estimateTime == 0
         countdownProgressView.isHidden = true
         dismissButton.isHidden = missionExecutor.engaged
         messagesTextView.isHidden = false
@@ -518,13 +526,6 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
 
         activityIndicator.stopAnimating()
         primaryButton.isEnabled = session != nil
-        var estimateTime = 0.0
-        var executionDuration = 0.0
-        if let estimate = missionExecutor.estimate {
-            estimateTime = estimate.time
-            executionDuration = missionExecutor.executionDuration
-        }
-        let timeRemaining = max(estimateTime - executionDuration, 0)
         executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
         timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
         progressView.setProgress(Float(min(estimateTime == 0 ? 0 : executionDuration / estimateTime, 1)), animated: true)
