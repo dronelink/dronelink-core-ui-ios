@@ -38,7 +38,7 @@ public class BatteryWidget: UpdatableWidget {
         label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         view.addSubview(label)
         label.snp.makeConstraints { [weak self] make in
-            make.left.equalTo(imageView.snp.right)
+            make.left.equalTo(imageView.snp.right).offset(5)
             make.top.equalToSuperview()
             make.right.equalToSuperview()
             make.bottom.equalToSuperview()
