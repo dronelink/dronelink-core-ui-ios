@@ -510,14 +510,14 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
             estimateTime = estimate.time
             executionDuration = missionExecutor.executionDuration
         }
-        let timeRemaining = max(estimateTime - executionDuration, 0)
+        let timeRemaining = estimateTime - executionDuration
 
         activityIndicator.isHidden = true
         primaryButton.isHidden = false
         subtitleLabel.isHidden = true
         executionDurationLabel.isHidden = false
-        timeRemainingLabel.isHidden = estimateTime == 0
-        progressView.isHidden = estimateTime == 0
+        timeRemainingLabel.isHidden = false
+        progressView.isHidden = false
         countdownProgressView.isHidden = true
         dismissButton.isHidden = missionExecutor.engaged
         messagesTextView.isHidden = false
@@ -527,7 +527,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         activityIndicator.stopAnimating()
         primaryButton.isEnabled = session != nil
         executionDurationLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: executionDuration, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
-        timeRemainingLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: timeRemaining, defaultValue: "ExecutableWidget.executionDuration.empty".localized)
+        timeRemainingLabel.text = "\(timeRemaining < 0 ? "+" : "")\(Dronelink.shared.format(formatter: "timeElapsed", value: abs(timeRemaining), defaultValue: "ExecutableWidget.executionDuration.empty".localized))"
         progressView.setProgress(Float(min(estimateTime == 0 ? 0 : executionDuration / estimateTime, 1)), animated: true)
 
         if missionExecutor.engaged {
@@ -552,7 +552,8 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         
         let estimateContext = (coordinate: session?.state?.value.location?.coordinate ?? CLLocationCoordinate2D(), altitude: session?.state?.value.altitude ?? 0)
         if let previousEstimateContext = previousEstimateContext {
-            if previousEstimateContext.coordinate.distance(to: estimateContext.coordinate) < 1 && abs(previousEstimateContext.altitude - estimateContext.altitude) < 1 {
+            let tolerance = 4.0
+            if previousEstimateContext.coordinate.distance(to: estimateContext.coordinate) < tolerance && abs(previousEstimateContext.altitude - estimateContext.altitude) < tolerance {
                 return false
             }
         }

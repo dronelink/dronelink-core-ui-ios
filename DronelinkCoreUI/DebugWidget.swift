@@ -52,7 +52,8 @@ public class DebugWidget: UpdatableWidget {
                 values.append("Focus ring max: \(focusRingValue)")
             }
         }
-        else {
+        
+        if values.count == 0 {
             values.append("Drone disconnected...")
         }
         

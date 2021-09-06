@@ -33,6 +33,7 @@ public class MapboxMapWidget: UpdatableWidget {
     private var modeTargetAnnotation = MGLPointAnnotation()
     private var modeTargetAnnotationView: MGLAnnotationView?
     private var missionCentered = false
+    private var currentMissionEstimateID: String?
     
     public override func viewDidLoad() {
         mapView.delegate = self
@@ -141,6 +142,11 @@ public class MapboxMapWidget: UpdatableWidget {
     }
     
     private func updateMissionEstimate() {
+        if missionExecutor?.estimate?.id == currentMissionEstimateID {
+            return
+        }
+        currentMissionEstimateID = missionExecutor?.estimate?.id
+        
         if let missionEstimateBackgroundAnnotation = missionEstimateBackgroundAnnotation {
             mapView.removeAnnotation(missionEstimateBackgroundAnnotation)
         }
@@ -150,7 +156,8 @@ public class MapboxMapWidget: UpdatableWidget {
         }
 
         var visibleCoordinates: [CLLocationCoordinate2D] = []
-        if let estimateCoordinates = missionExecutor?.estimate?.spatials.map({ $0.coordinate.coordinate }), estimateCoordinates.count > 0 {
+        if let estimateCoordinates = missionExecutor?.estimate?.spatials.map({ $0.coordinate.coordinate }),
+           estimateCoordinates.count > 0 {
             missionEstimateBackgroundAnnotation = MGLPolyline(coordinates: estimateCoordinates, count: UInt(estimateCoordinates.count))
             mapView.addAnnotation(missionEstimateBackgroundAnnotation!)
 
@@ -170,6 +177,7 @@ public class MapboxMapWidget: UpdatableWidget {
 
         if (visibleCoordinates.count > 0) {
             missionCentered = true
+            
             mapView.setVisibleCoordinates(
                 visibleCoordinates,
                 count: UInt(visibleCoordinates.count),

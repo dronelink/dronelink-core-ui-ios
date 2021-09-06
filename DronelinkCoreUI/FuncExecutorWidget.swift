@@ -463,7 +463,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         
         if (!executing) {
             executing = true
-            view.setNeedsUpdateConstraints()
+            update()
             funcExecutor.execute(droneSession: session) { [weak self] error in
                 DispatchQueue.main.async {
                     DronelinkUI.shared.showSnackbar(text: error)
@@ -714,7 +714,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             primaryButton.isHidden = false
 
             titleLabel.text = funcExecutor.descriptors.name
-            primaryButton.setTitle((executing ? "FuncExecutorWidget.primary.executing" : hasInputs ? "FuncExecutorWidget.primary.intro" : "FuncExecutorWidget.primary.execute").localized, for: .normal)
+            primaryButton.setTitle((hasInputs ? "FuncExecutorWidget.primary.intro" : "FuncExecutorWidget.primary.execute").localized, for: .normal)
             
             if let introImageUrl = funcExecutor.introImageUrl, !introImageUrl.isEmpty {
                 variableImageView.isHidden = false
@@ -735,7 +735,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         backButton.isHidden = false
         backButton.isEnabled = inputIndex > 0
         nextButton.isHidden = false
-        nextButton.setTitle((last ? "FuncExecutorWidget.primary.execute" : "next").localized, for: .normal)
+        nextButton.setTitle((executing ? "FuncExecutorWidget.primary.executing" : last ? "FuncExecutorWidget.primary.execute" : "next").localized, for: .normal)
         progressLabel.isHidden = last
         progressLabel.text = inputIndex + 1 == funcExecutor.inputCount ? "\(inputIndex + 1)" : "\(inputIndex + 1) / \(funcExecutor.inputCount)"
         
