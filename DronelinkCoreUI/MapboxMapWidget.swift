@@ -111,7 +111,7 @@ public class MapboxMapWidget: UpdatableWidget {
 
         if let restrictionZones = missionExecutor?.restrictionZones {
             restrictionZones.enumerated().forEach {
-                guard let coordinates = missionExecutor?.restrictionZoneBoundaryCoordinates(index: $0.offset) else {
+                guard let coordinatesRaw = missionExecutor?.restrictionZoneBoundaryCoordinates?[safeIndex: $0.offset], let coordinates = coordinatesRaw else {
                     return
                 }
 
@@ -370,6 +370,13 @@ public class MapboxMapWidget: UpdatableWidget {
     
     public override func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {
         super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionReengagementEstimate()
+        }
+    }
+    
+    public override func onMissionUpdatedDisconnected(executor: MissionExecutor, engagement: Executor.Engagement) {
+        super.onMissionUpdatedDisconnected(executor: executor, engagement: engagement)
         DispatchQueue.main.async { [weak self] in
             self?.updateMissionReengagementEstimate()
         }

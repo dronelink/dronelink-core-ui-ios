@@ -112,6 +112,8 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     
     open func onMissionDisengaged(executor: MissionExecutor, engagement: Executor.Engagement, reason: Kernel.Message) {}
     
+    open func onMissionUpdatedDisconnected(executor: MissionExecutor, engagement: Executor.Engagement) {}
+    
     open func modeEngageDisallowedReasons(executor: ModeExecutor) -> [Kernel.Message]? { nil }
     
     open func onModeEngaging(executor: ModeExecutor) {}

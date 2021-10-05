@@ -45,7 +45,7 @@ public class StatusWidget: UpdatableWidget {
             return statuses.disconnected
         }
         
-        if let statusMessage = targetDroneSessionManager?.statusMessages?.filter({ $0.level != .info }).sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
+        if let statusMessage = targetDroneSessionManager?.statusMessages?.sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
             return statusMessage.status
         }
         

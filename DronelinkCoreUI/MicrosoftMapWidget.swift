@@ -277,7 +277,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
         if let restrictionZones = missionExecutor?.restrictionZones {
             restrictionZones.enumerated().forEach {
-                guard let coordinates = missionExecutor?.restrictionZoneBoundaryCoordinates(index: $0.offset) else {
+                guard let coordinatesRaw = missionExecutor?.restrictionZoneBoundaryCoordinates?[safeIndex: $0.offset], let coordinates = coordinatesRaw else {
                     return
                 }
                 
@@ -640,6 +640,15 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
     public override func onMissionDisengaged(executor: MissionExecutor, engagement: MissionExecutor.Engagement, reason: Kernel.Message) {
         super.onMissionDisengaged(executor: executor, engagement: engagement, reason: reason)
+        
+        droneMissionExecutedPositions.removeAll()
+        DispatchQueue.main.async { [weak self] in
+            self?.updateMissionElements()
+        }
+    }
+    
+    public override func onMissionUpdatedDisconnected(executor: MissionExecutor, engagement: Executor.Engagement) {
+        super.onMissionUpdatedDisconnected(executor: executor, engagement: engagement)
         
         droneMissionExecutedPositions.removeAll()
         DispatchQueue.main.async { [weak self] in
