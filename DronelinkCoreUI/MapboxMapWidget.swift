@@ -10,8 +10,15 @@ import Foundation
 import Mapbox
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
+import CoreLocation
 
 public class MapboxMapWidget: UpdatableWidget {
+    public enum Tracking {
+        case none
+        case droneNorthUp
+        case droneHeading
+    }
+    
     public override var updateInterval: TimeInterval { 0.1 }
     
     private let mapView = MGLMapView()
@@ -34,6 +41,7 @@ public class MapboxMapWidget: UpdatableWidget {
     private var modeTargetAnnotationView: MGLAnnotationView?
     private var missionCentered = false
     private var currentMissionEstimateID: String?
+    private var tracking = Tracking.none
     
     public override func viewDidLoad() {
         mapView.delegate = self
@@ -84,6 +92,50 @@ public class MapboxMapWidget: UpdatableWidget {
         }
         else {
             droneAnnotationView?.isHidden = true
+        }
+        
+        if tracking != .none {
+            if let state = session?.state?.value,
+               let location = state.location {
+                let distance = max(20, state.altitude / 1.5)
+                
+                set(visibleCoordinates: [
+                    location.coordinate.coordinate(bearing: 0, distance: distance),
+                    location.coordinate.coordinate(bearing: Double.pi / 2, distance: distance),
+                    location.coordinate.coordinate(bearing: Double.pi, distance: distance),
+                    location.coordinate.coordinate(bearing: 3 * Double.pi / 2, distance: distance)
+                ], direction: tracking == .droneNorthUp ? 0 : state.orientation.yaw.convertRadiansToDegrees)
+            }
+        }
+    }
+
+    private func set(visibleCoordinates: [CLLocationCoordinate2D], direction: CLLocationDirection? = nil) {
+        if visibleCoordinates.count == 0 {
+            return
+        }
+        
+        let inset: CGFloat = 0.2
+        let edgePadding = UIEdgeInsets(
+            top: mapView.frame.height * (mapView.frame.height > 300 ? 0.25 : inset),
+            left: mapView.frame.width * inset,
+            bottom: mapView.frame.height * (mapView.frame.height > 300 ? 0.38 : inset),
+            right: mapView.frame.width * inset)
+        
+        if let direction = direction {
+            mapView.setVisibleCoordinates(
+                visibleCoordinates,
+                count: UInt(visibleCoordinates.count),
+                edgePadding: edgePadding,
+                direction: direction < 0 ? direction + 360 : direction,
+                duration: 0.1,
+                animationTimingFunction: nil)
+        }
+        else {
+            mapView.setVisibleCoordinates(
+                visibleCoordinates,
+                count: UInt(visibleCoordinates.count),
+                edgePadding: edgePadding,
+                animated: true)
         }
     }
     
@@ -175,13 +227,11 @@ public class MapboxMapWidget: UpdatableWidget {
             }
         }
 
-        if (visibleCoordinates.count > 0) {
+        if visibleCoordinates.count > 0 {
             missionCentered = true
-            
-            mapView.setVisibleCoordinates(
-                visibleCoordinates,
-                count: UInt(visibleCoordinates.count),
-                edgePadding: UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), animated: false)
+            if tracking == .none || session?.state?.value.location == nil {
+                set(visibleCoordinates: visibleCoordinates)
+            }
         }
     }
     
@@ -303,17 +353,8 @@ public class MapboxMapWidget: UpdatableWidget {
             modeTargetAnnotationView?.isHidden = true
         }
         
-        if let visibleCoordinates = modeExecutor?.visibleCoordinates, visibleCoordinates.count > 0 {
-            let inset: CGFloat = 0.2
-            mapView.setVisibleCoordinates(
-                visibleCoordinates.map { $0.coordinate },
-                count: UInt(visibleCoordinates.count),
-                edgePadding: UIEdgeInsets(
-                    top: mapView.frame.height * (mapView.frame.height > 300 ? 0.25 : inset),
-                    left: mapView.frame.width * inset,
-                    bottom: mapView.frame.height * (mapView.frame.height > 300 ? 0.38 : inset),
-                    right: mapView.frame.width * inset),
-                animated: true)
+        if tracking == .none, let visibleCoordinates = modeExecutor?.visibleCoordinates {
+            set(visibleCoordinates: visibleCoordinates.map { $0.coordinate })
         }
     }
     
@@ -575,5 +616,25 @@ extension MapboxMapWidget: MGLMapViewDelegate {
         }
 
         return 1.0
+    }
+}
+
+extension MapboxMapWidget: ConfigurableWidget {
+    public var configurationActions: [UIAlertAction] {
+        var actions: [UIAlertAction] = []
+        
+        actions.append(UIAlertAction(title: "MapboxMapWidget.reset".localized, style: .default, handler: {  [weak self] _ in
+            self?.tracking = .none
+        }))
+
+        actions.append(UIAlertAction(title: "MapboxMapWidget.tracking".localized, style: tracking == .droneHeading ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .droneHeading
+        }))
+
+        actions.append(UIAlertAction(title: "MapboxMapWidget.tracking.north.up".localized, style: tracking == .droneNorthUp ? .destructive : .default, handler: { [weak self] _ in
+            self?.tracking = .droneNorthUp
+        }))
+        
+        return actions
     }
 }

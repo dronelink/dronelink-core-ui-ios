@@ -108,6 +108,10 @@
 "DashboardWidget.map.mapbox" = "2D";
 "DashboardWidget.map.microsoft" = "3D (Beta)";
 
+"MapboxMapWidget.reset" = "Reset";
+"MapboxMapWidget.tracking" = "Follow Drone";
+"MapboxMapWidget.tracking.north.up" = "Follow (North Up)";
+
 "MicrosoftMapWidget.reset" = "Reset";
 "MicrosoftMapWidget.follow" = "Follow";
 "MicrosoftMapWidget.chase.plane" = "Chase Plane (Beta)";
