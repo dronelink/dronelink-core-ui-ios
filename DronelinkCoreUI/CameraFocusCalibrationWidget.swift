@@ -23,20 +23,33 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
     private let titleLabel = UILabel()
     private let typeSegmentedControl = UISegmentedControl()
     private let markReferenceButton = MDCButton()
-    private let referenceLabel = UILabel()
+    private let primaryButtonScheme = MDCContainerScheme()
+    private let primaryButton = MDCButton()
     private let detailsLabel = UILabel()
     private let dismissButton = UIButton(type: .custom)
     private let titleImage = DronelinkUI.loadImage(named: "baseline_center_focus_strong_white_36pt")
     private let cancelImage = DronelinkUI.loadImage(named: "baseline_close_white_36pt")
     
-    private let referenceInvalidColor = MDCPalette.red.accent700
-    private let referenceValidColor = MDCPalette.green.accent700
+    private let referenceInvalidColor = MDCPalette.pink.accent400!
+    private let referenceValidColor = MDCPalette.green.accent700!
+    private let calibratingColor = MDCPalette.pink.accent400!
     
     public var calibration: Kernel.CameraFocusCalibration?
+    private var calibrating = false
+    private var calibrationFocusCommand: Kernel.FocusCameraCommand?
     private var referenceLocation: CLLocation?
-    private var previousCameraFocusRingValue: Double? = nil
-    private var previousCameraBusyFocused = false
     private var cameraFocusRingValues: [Double] = []
+    private func cameraFocusRingValuesInRange(calibration: Kernel.CameraFocusCalibration, cameraState: CameraStateAdapter, focusRingMax: Double) -> [Double] {
+        if cameraFocusRingValues.count == 0 {
+            return []
+        }
+        
+        let median = cameraFocusRingValues[Int((Double(cameraFocusRingValues.count) / 2.0) - 0.5)] / focusRingMax
+        return cameraFocusRingValues.filter { value in
+            return abs(median - (value / focusRingMax)) <= calibration.ringValueRange
+        }
+    }
+    private let buttonHeight = 32
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -102,8 +115,8 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
             make.top.equalTo(titleImageView.snp.top)
         }
         
-        typeSegmentedControl.insertSegment(withTitle: "CameraFocusCalibrationWidget.type.distance".localized, at: 0, animated: false)
-        typeSegmentedControl.insertSegment(withTitle: "CameraFocusCalibrationWidget.type.altitude".localized, at: 1, animated: false)
+        typeSegmentedControl.insertSegment(withTitle: "CameraFocusCalibrationWidget.type.altitude".localized, at: 0, animated: false)
+        typeSegmentedControl.insertSegment(withTitle: "CameraFocusCalibrationWidget.type.distance".localized, at: 1, animated: false)
         typeSegmentedControl.selectedSegmentIndex = 0
         typeSegmentedControl.addTarget(self, action:  #selector(onTypeChanged(sender:)), for: .valueChanged)
         view.addSubview(typeSegmentedControl)
@@ -114,11 +127,9 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
             make.height.equalTo(28)
         }
         
-        let buttonHeight = 32
-        
         let scheme = MDCContainerScheme()
         scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
-        scheme.colorScheme.primaryColor = UIColor.darkGray
+        scheme.colorScheme.primaryColor = .darkGray
         markReferenceButton.applyContainedTheme(withScheme: scheme)
         markReferenceButton.translatesAutoresizingMaskIntoConstraints = false
         markReferenceButton.setImageTintColor(.white, for: .normal)
@@ -133,14 +144,13 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
             make.height.equalTo(buttonHeight)
         }
         
-        referenceLabel.font = UIFont.boldSystemFont(ofSize: 14)
-        referenceLabel.textColor = UIColor.white
-        referenceLabel.numberOfLines = 1
-        referenceLabel.lineBreakMode = .byTruncatingTail
-        referenceLabel.textAlignment = .center
-        referenceLabel.layer.masksToBounds = true
-        referenceLabel.layer.cornerRadius = 10
-        view.addSubview(referenceLabel)
+        primaryButtonScheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
+        primaryButton.isHidden = true
+        primaryButton.translatesAutoresizingMaskIntoConstraints = false
+        primaryButton.addTarget(self, action: #selector(onPrimary(sender:)), for: .touchUpInside)
+        primaryButton.titleLabel?.numberOfLines = 1
+        primaryButton.titleLabel?.lineBreakMode = .byTruncatingTail
+        view.addSubview(primaryButton)
         
         detailsLabel.font = UIFont.boldSystemFont(ofSize: 14)
         detailsLabel.textColor = UIColor.white
@@ -159,8 +169,8 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
     
     func reset() {
         referenceLocation = nil
-        cameraFocusRingValues.removeAll()
-        try? session?.add(command: Kernel.OrientationGimbalCommand(orientation: Kernel.Orientation3Optional(x: typeSegmentedControl.selectedSegmentIndex == 0 ? 0 : -90.convertDegreesToRadians)))
+        cancelCalibration()
+        try? session?.add(command: Kernel.OrientationGimbalCommand(orientation: Kernel.Orientation3Optional(x: typeSegmentedControl.selectedSegmentIndex == 0 ? -90.convertDegreesToRadians : 0)))
         DispatchQueue.main.async { [weak self] in
             self?.view.setNeedsUpdateConstraints()
         }
@@ -169,9 +179,9 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
     public override func updateViewConstraints() {
         super.updateViewConstraints()
         
-        referenceLabel.snp.remakeConstraints { [weak self] make in
-            make.height.equalTo(28)
-            if typeSegmentedControl.selectedSegmentIndex == 0 {
+        primaryButton.snp.remakeConstraints { [weak self] make in
+            make.height.equalTo(buttonHeight)
+            if typeSegmentedControl.selectedSegmentIndex == 1 && !calibrating {
                 make.left.equalTo(markReferenceButton.snp.right).offset(defaultPadding)
             }
             else {
@@ -183,13 +193,38 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
     }
     
     @objc func onTypeChanged(sender: Any) {
-        markReferenceButton.isHidden = typeSegmentedControl.selectedSegmentIndex == 1
+        markReferenceButton.isHidden = typeSegmentedControl.selectedSegmentIndex == 0
         reset()
     }
     
     @objc func onMarkReference(sender: Any) {
         referenceLocation = session?.state?.value.location
+        cancelCalibration()
+    }
+    
+    @objc func onPrimary(sender: Any) {
+        if !calibrating {
+            if referenceValid {
+                calibrating = true
+                startFocus()
+                DispatchQueue.main.async { [weak self] in
+                    self?.view.setNeedsUpdateConstraints()
+                }
+            }
+            return
+        }
+        
+        cancelCalibration()
+    }
+    
+    private func cancelCalibration() {
+        calibrating = false
+        calibrationFocusCommand = nil
         cameraFocusRingValues.removeAll()
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.view.setNeedsUpdateConstraints()
+        }
     }
     
     @objc func onDismiss() {
@@ -208,15 +243,113 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
         try? session.add(command: Kernel.FocusModeCameraCommand(focusMode: .auto))
     }
     
+    private func startFocus() {
+        calibrationFocusCommand = Kernel.FocusCameraCommand()
+        try? session?.add(command: calibrationFocusCommand!)
+    }
+    
+    public override func onCommandFinished(session: DroneSession, command: KernelCommand, error: Error?) {
+        if command.id == calibrationFocusCommand?.id {
+            calibrationFocusCommand = nil
+            
+            if let error = error {
+                DronelinkUI.shared.showSnackbar(text: error.localizedDescription)
+                cancelCalibration()
+                return
+            }
+            
+            checkCalibrationFinished()
+        }
+    }
+    
+    private func checkCalibrationFinished(attempt: Int = 0) {
+        guard
+            attempt <= 5,
+            var calibration = calibration,
+            let serialNumber = session?.serialNumber,
+            let cameraState = session?.cameraState(channel: 0)?.value,
+            let focusRingValue = cameraState.focusRingValue,
+            let focusRingMax = cameraState.focusRingMax
+        else {
+            cancelCalibration()
+            DronelinkUI.shared.showSnackbar(text: "CameraFocusCalibrationWidget.finish.error".localized)
+            return
+        }
+        
+        if cameraState.isBusy {
+            DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.checkCalibrationFinished(attempt: attempt + 1)
+            }
+            return
+        }
+        
+        cameraFocusRingValues.append(focusRingValue)
+        cameraFocusRingValues.sort()
+        let cameraFocusRingValuesInRange = self.cameraFocusRingValuesInRange(calibration: calibration, cameraState: cameraState, focusRingMax: focusRingMax)
+        if cameraFocusRingValuesInRange.count >= calibration.minRingValues {
+            let ringValue = cameraFocusRingValuesInRange[Int((Double(cameraFocusRingValuesInRange.count) / 2.0) - 0.5)]
+            calibration.ringValue = ringValue
+            calibration.droneSerialNumber = serialNumber
+            Dronelink.shared.update(cameraFocusCalibration: calibration)
+            DronelinkUI.shared.showSnackbar(text: "CameraFocusCalibrationWidget.finished".localized)
+            //DronelinkUI.shared.showSnackbar(text: "\("CameraFocusCalibrationWidget.finished".localized) (\(Int(ringValue)))")
+            return
+        }
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            self?.startFocus()
+        }
+    }
+    
+    private var referenceValid: Bool {
+        guard
+            let calibration = calibration,
+            let gimbalState = session?.gimbalState(channel: 0)?.value
+        else {
+            return false
+        }
+        
+        switch typeSegmentedControl.selectedSegmentIndex {
+        //altitude
+        case 0:
+            guard
+                let takeoffLocation = session?.state?.value.takeoffLocation,
+                let location = session?.state?.value.location,
+                let altitude = session?.state?.value.altitude
+            else {
+                return false
+            }
+            
+            let distance = location.distance(from: takeoffLocation)
+            return distance < 2 && abs(calibration.distance - altitude) < 1 && abs(gimbalState.orientation.pitch - -90.convertDegreesToRadians) < 1.convertDegreesToRadians
+            
+        //distance
+        case 1:
+            guard
+                let location = session?.state?.value.location,
+                let heading = session?.state?.value.orientation.yaw,
+                let referenceLocation = referenceLocation
+            else {
+                return false
+            }
+            
+            let distance = location.distance(from: referenceLocation)
+            return abs(calibration.distance - distance) < 1 &&
+                abs(gimbalState.orientation.pitch) < 1.convertDegreesToRadians &&
+                abs(heading.angleDifferenceSigned(angle: location.coordinate.bearing(to: referenceLocation.coordinate))) < 15.convertDegreesToRadians
+            
+        default:
+            return false
+        }
+    }
+    
     @objc open override func update() {
         super.update()
         
         guard var calibration = calibration else { return }
         
         markReferenceButton.isEnabled = false
-        
-        referenceLabel.text = ""
-        referenceLabel.backgroundColor = UIColor.clear
+        primaryButton.isHidden = true
         guard let session = session else {
             detailsLabel.text = "CameraFocusCalibrationWidget.drone.unavailable".localized
             return
@@ -230,7 +363,6 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
         guard
             let gimbalState = session.gimbalState(channel: 0)?.value,
             let cameraState = session.cameraState(channel: 0)?.value,
-            let focusRingValue = cameraState.focusRingValue,
             let focusRingMax = cameraState.focusRingMax,
             focusRingMax > 0
         else {
@@ -238,9 +370,42 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
             return
         }
         
+        let referenceValid = referenceValid
+        if !referenceValid && calibrating {
+            cancelCalibration()
+        }
+        
         switch typeSegmentedControl.selectedSegmentIndex {
-        //distance
+        //altitude
         case 0:
+            guard
+                let takeoffLocation = session.state?.value.takeoffLocation,
+                let location = session.state?.value.location,
+                let altitude = session.state?.value.altitude
+            else {
+                detailsLabel.text = "CameraFocusCalibrationWidget.location.unavailable".localized
+                return
+            }
+            
+            let distance = location.distance(from: takeoffLocation)
+            primaryButtonScheme.colorScheme.primaryColor = calibrating ? calibratingColor : referenceValid ? referenceValidColor : referenceInvalidColor
+            primaryButton.applyContainedTheme(withScheme: primaryButtonScheme)
+            primaryButton.setTitle(referenceValid ? (calibrating ? "cancel" : "CameraFocusCalibrationWidget.start").localized : [
+                "\("DistanceWidget.prefix".localized) \(Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: ""))",
+                "\("AltitudeWidget.prefix".localized) \(Dronelink.shared.format(formatter: "altitude", value: altitude, defaultValue: ""))",
+                Dronelink.shared.format(formatter: "angle", value: gimbalState.orientation.pitch, extraParams: [false])
+            ].joined(separator: " | "), for: .normal)
+            primaryButton.setTitleColor(.white, for: .normal)
+            primaryButton.isHidden = false
+            
+            if !referenceValid {
+                detailsLabel.text = String(format: "CameraFocusCalibrationWidget.details.move.altitude".localized, Dronelink.shared.format(formatter: "altitude", value: calibration.distance, defaultValue: ""))
+                return
+            }
+            break
+            
+        //distance
+        case 1:
             guard
                 let location = session.state?.value.location,
                 let heading = session.state?.value.orientation.yaw
@@ -257,76 +422,23 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
             }
             
             let distance = location.distance(from: referenceLocation)
-            let referenceValid =
-                abs(calibration.distance - distance) < 1 &&
-                abs(gimbalState.orientation.pitch) < 1.convertDegreesToRadians &&
-                abs(heading.angleDifferenceSigned(angle: location.coordinate.bearing(to: referenceLocation.coordinate))) < 15.convertDegreesToRadians
-            referenceLabel.text = [Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: ""), Dronelink.shared.format(formatter: "angle", value: gimbalState.orientation.pitch, extraParams: [false])].joined(separator: " | ")
-            referenceLabel.backgroundColor = referenceValid ? referenceValidColor : referenceInvalidColor
+            primaryButtonScheme.colorScheme.primaryColor = calibrating ? calibratingColor : referenceValid ? referenceValidColor : referenceInvalidColor
+            primaryButton.applyContainedTheme(withScheme: primaryButtonScheme)
+            primaryButton.setTitle(referenceValid ? (calibrating ? "cancel" : "CameraFocusCalibrationWidget.start").localized : [Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: ""), Dronelink.shared.format(formatter: "angle", value: gimbalState.orientation.pitch, extraParams: [false])].joined(separator: " | "), for: .normal)
+            primaryButton.setTitleColor(.white, for: .normal)
+            primaryButton.isHidden = false
             
             if !referenceValid {
                 detailsLabel.text = String(format: "CameraFocusCalibrationWidget.details.move.distance".localized, Dronelink.shared.format(formatter: "distance", value: calibration.distance, defaultValue: ""))
                 return
             }
-            
-            detailsLabel.text = String(format: (cameraState.isBusy ? "CameraFocusCalibrationWidget.details.busy" : "CameraFocusCalibrationWidget.details.focus.distance").localized, cameraFocusRingValues.count > 0 ? "\(cameraFocusRingValues.count)" : "--")
-            break
-            
-        //altitude
-        case 1:
-            guard
-                let takeoffLocation = session.state?.value.takeoffLocation,
-                let location = session.state?.value.location,
-                let altitude = session.state?.value.altitude
-            else {
-                detailsLabel.text = "CameraFocusCalibrationWidget.location.unavailable".localized
-                return
-            }
-            
-            let distance = location.distance(from: takeoffLocation)
-            let referenceValid = distance < 2 && abs(calibration.distance - altitude) < 1 && abs(gimbalState.orientation.pitch - -90.convertDegreesToRadians) < 1.convertDegreesToRadians
-            referenceLabel.text = [
-                "\("DistanceWidget.prefix".localized) \(Dronelink.shared.format(formatter: "distance", value: distance, defaultValue: ""))",
-                "\("AltitudeWidget.prefix".localized) \(Dronelink.shared.format(formatter: "altitude", value: altitude, defaultValue: ""))",
-                Dronelink.shared.format(formatter: "angle", value: gimbalState.orientation.pitch, extraParams: [false])
-            ].joined(separator: " | ")
-            
-            referenceLabel.backgroundColor = referenceValid ? referenceValidColor : referenceInvalidColor
-            
-            if !referenceValid {
-                detailsLabel.text = String(format: "CameraFocusCalibrationWidget.details.move.altitude".localized, Dronelink.shared.format(formatter: "altitude", value: calibration.distance, defaultValue: ""))
-                return
-            }
-            
-            detailsLabel.text = String(format: (cameraState.isBusy ? "CameraFocusCalibrationWidget.details.busy" : "CameraFocusCalibrationWidget.details.focus.altitude").localized, cameraFocusRingValues.count > 0 ? "\(cameraFocusRingValues.count)" : "--")
             break
             
         default:
             break
         }
-    
-        if cameraState.isBusy {
-            previousCameraBusyFocused = previousCameraBusyFocused || previousCameraFocusRingValue != focusRingValue
-        }
-        else {
-            if previousCameraBusyFocused {
-                cameraFocusRingValues.append(focusRingValue)
-                cameraFocusRingValues.sort()
-                let median = cameraFocusRingValues[Int((Double(cameraFocusRingValues.count) / 2.0) - 0.5)] / focusRingMax
-                let cameraFocusRingValuesInRange = cameraFocusRingValues.filter { value in
-                    return abs(median - (value / focusRingMax)) <= calibration.ringValueRange
-                }
-                
-                if cameraFocusRingValuesInRange.count >= calibration.minRingValues {
-                    let ringValue = cameraFocusRingValuesInRange[Int((Double(cameraFocusRingValuesInRange.count) / 2.0) - 0.5)]
-                    calibration.ringValue = ringValue
-                    calibration.droneSerialNumber = serialNumber
-                    Dronelink.shared.update(cameraFocusCalibration: calibration)
-                    DronelinkUI.shared.showSnackbar(text: String(format: "CameraFocusCalibrationWidget.finished".localized, "\(Int(ringValue))"))
-                }
-            }
-            previousCameraFocusRingValue = focusRingValue
-            previousCameraBusyFocused = false
-        }
+        
+        let cameraFocusRingValuesInRange = cameraFocusRingValuesInRange(calibration: calibration, cameraState: cameraState, focusRingMax: focusRingMax)
+        detailsLabel.text = calibrating ? String(format: "CameraFocusCalibrationWidget.details.busy".localized, Dronelink.shared.format(formatter: "percent", value: Double(cameraFocusRingValuesInRange.count) / Double(calibration.minRingValues))) : "CameraFocusCalibrationWidget.details.ready".localized
     }
 }
