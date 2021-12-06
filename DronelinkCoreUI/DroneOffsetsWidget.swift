@@ -13,7 +13,7 @@ import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 
-public class DroneOffsetsWidget: UpdatableWidget {
+public class DroneOffsetsWidget: CameraWidget {
     public enum Style: Int, CaseIterable {
         case altYaw = 0
         case position
@@ -278,7 +278,7 @@ public class DroneOffsetsWidget: UpdatableWidget {
     
     func updateRoll(value: Int) {
         rollValue = value
-        session?.drone.gimbal(channel: 0)?.fineTune(roll: (Double(rollValue) / 10).convertDegreesToRadians)
+        session?.drone.gimbal(channel: channelResolved)?.fineTune(roll: (Double(rollValue) / 10).convertDegreesToRadians)
     }
     
     @objc func onRCInputsToggle(sender: Any) {
@@ -290,22 +290,23 @@ public class DroneOffsetsWidget: UpdatableWidget {
     }
     
     @objc func onMore(sender: Any) {
+        let channel = channelResolved
         let alert = UIAlertController(title: "DroneOffsetsWidget.more".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
         alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.levelGimbal".localized, style: .default , handler:{ [weak self] _ in
-            var command = Kernel.OrientationGimbalCommand()
+            var command = Kernel.OrientationGimbalCommand(channel: channel)
             command.orientation.x = 0
             try? self?.session?.add(command: command)
         }))
         
         alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.nadirGimbal".localized, style: .default , handler:{ [weak self] _ in
-            var command = Kernel.OrientationGimbalCommand()
+            var command = Kernel.OrientationGimbalCommand(channel: channel)
             command.orientation.x = -90.convertDegreesToRadians
             try? self?.session?.add(command: command)
         }))
         
         alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.resetGimbal".localized, style: .default , handler:{ [weak self] _ in
-            self?.session?.drone.gimbal(channel: 0)?.reset()
+            self?.session?.drone.gimbal(channel: channel)?.reset()
         }))
         
         alert.addAction(UIAlertAction(title: "DroneOffsetsWidget.rollTrim".localized, style: .default , handler:{ [weak self] _ in

@@ -26,7 +26,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
     
     public var preferredSize: CGSize {
         if (portrait && tablet) {
-            return CGSize(width: 0, height: layout == .small ? 0 : 80)
+            return CGSize(width: 0, height: layout == .small ? 80 : 0)
         }
         
         if (portrait) {

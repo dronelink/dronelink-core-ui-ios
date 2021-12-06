@@ -11,12 +11,25 @@ import UIKit
 import DronelinkCore
 import SnapKit
     
-public class CameraExposureWidget: Widget {
-    private let cameraIsoWidget = WidgetFactory.shared.createCameraISOWidget()
-    private let cameraShutterWidget = WidgetFactory.shared.createCameraShutterWidget()
-    private let cameraApertureWidget = WidgetFactory.shared.createCameraApertureWidget()
-    private let cameraExposureCompensationWidget = WidgetFactory.shared.createCameraExposureCompensationWidget()
-    private let cameraWhiteBalanceWidget = WidgetFactory.shared.createCameraWhiteBalanceWidget()
+public class CameraExposureWidget: CameraWidget {
+    public override var channel: UInt? {
+        get {
+            super.channel
+        }
+        set {
+            super.channel = newValue
+            cameraIsoWidget?.channel = newValue
+            cameraShutterWidget?.channel = newValue
+            cameraApertureWidget?.channel = newValue
+            cameraExposureCompensationWidget?.channel = newValue
+            cameraWhiteBalanceWidget?.channel = newValue
+        }
+    }
+    private let cameraIsoWidget = WidgetFactory.shared.createCameraISOWidget(channel: nil)
+    private let cameraShutterWidget = WidgetFactory.shared.createCameraShutterWidget(channel: nil)
+    private let cameraApertureWidget = WidgetFactory.shared.createCameraApertureWidget(channel: nil)
+    private let cameraExposureCompensationWidget = WidgetFactory.shared.createCameraExposureCompensationWidget(channel: nil)
+    private let cameraWhiteBalanceWidget = WidgetFactory.shared.createCameraWhiteBalanceWidget(channel: nil)
     public var itemSpacing = 8
     public var itemPadding = 2
     

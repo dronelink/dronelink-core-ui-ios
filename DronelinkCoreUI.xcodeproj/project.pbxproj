@@ -19,6 +19,7 @@
 		2459752F2367A22D008CAB6B /* MapboxMapWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2459752E2367A22D008CAB6B /* MapboxMapWidget.swift */; };
 		2475371D24252FAA00FFC696 /* CameraOffsetsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */; };
 		247E09EA244F407500D002A2 /* MicrosoftMapWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247E09E9244F407500D002A2 /* MicrosoftMapWidget.swift */; };
+		248BC91E27273DA80029AF5B /* CameraVideoStreamSourceWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 248BC91D27273DA80029AF5B /* CameraVideoStreamSourceWidget.swift */; };
 		2490A791257EDBB500253F11 /* RTKSettingsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490A78F257EDBB500253F11 /* RTKSettingsWidget.swift */; };
 		2490A792257EDBB500253F11 /* RTKStatusWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2490A790257EDBB500253F11 /* RTKStatusWidget.swift */; };
 		2492514E257FCACE005F5AC9 /* NumericInstrumentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2492514D257FCACE005F5AC9 /* NumericInstrumentWidget.swift */; };
@@ -59,6 +60,7 @@
 		2459752E2367A22D008CAB6B /* MapboxMapWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapboxMapWidget.swift; sourceTree = "<group>"; };
 		2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOffsetsWidget.swift; sourceTree = "<group>"; };
 		247E09E9244F407500D002A2 /* MicrosoftMapWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrosoftMapWidget.swift; sourceTree = "<group>"; };
+		248BC91D27273DA80029AF5B /* CameraVideoStreamSourceWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraVideoStreamSourceWidget.swift; sourceTree = "<group>"; };
 		2490A78F257EDBB500253F11 /* RTKSettingsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RTKSettingsWidget.swift; sourceTree = "<group>"; };
 		2490A790257EDBB500253F11 /* RTKStatusWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RTKStatusWidget.swift; sourceTree = "<group>"; };
 		2492514D257FCACE005F5AC9 /* NumericInstrumentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumericInstrumentWidget.swift; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 				DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */,
 				E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */,
 				2475371C24252FAA00FFC696 /* CameraOffsetsWidget.swift */,
+				248BC91D27273DA80029AF5B /* CameraVideoStreamSourceWidget.swift */,
 				249F377F2577D01800472A7D /* DashboardWidget.swift */,
 				24D3DC2A26691C650009B9FF /* DebugWidget.swift */,
 				E4AD4F9F258115E000404783 /* DownlinkWidget.swift */,
@@ -289,6 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				248BC91E27273DA80029AF5B /* CameraVideoStreamSourceWidget.swift in Sources */,
 				E4F1FBB925795A3900778068 /* CameraCaptureWidget.swift in Sources */,
 				243CB1FC26739C93002F958C /* IndicatorWidget.swift in Sources */,
 				E4AD50042581547200404783 /* BatteryWidget.swift in Sources */,

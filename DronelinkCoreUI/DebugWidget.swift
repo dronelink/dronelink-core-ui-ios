@@ -53,6 +53,12 @@ public class DebugWidget: UpdatableWidget {
             }
         }
         
+        session?.drone.gimbals?.forEach { gimbal in
+            if let state = session?.gimbalState(channel: gimbal.index) {
+                values.append("Gimbal \(gimbal.index) heading: \(Dronelink.shared.format(formatter: "angle", value: state.value.orientation.yaw))")
+            }
+        }
+        
         if values.count == 0 {
             values.append("Drone disconnected...")
         }

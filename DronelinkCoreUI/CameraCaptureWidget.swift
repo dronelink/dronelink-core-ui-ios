@@ -11,11 +11,8 @@ import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialActivityIndicator
 
-public class CameraCaptureWidget: UpdatableWidget {
+public class CameraCaptureWidget: CameraWidget {
     public override var updateInterval: TimeInterval { 0.1 }
-    
-    public var channel: UInt = 0
-    private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
     
     public let button = UIButton()
     public let activityBackgroundImageView = UIImageView()
@@ -124,7 +121,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     
     @objc func onTapped(_ sender: UIButton) {
         button.isEnabled = false
-        let command: KernelCommand = (cameraState?.isCapturingContinuous ?? false) ? Kernel.StopCaptureCameraCommand() : Kernel.StartCaptureCameraCommand()
+        let command: KernelCommand = (state?.isCapturingContinuous ?? false) ? Kernel.StopCaptureCameraCommand(channel: channelResolved) : Kernel.StartCaptureCameraCommand(channel: channelResolved)
         do {
             try? session?.add(command: command)
             pendingCommand = command
@@ -136,10 +133,10 @@ public class CameraCaptureWidget: UpdatableWidget {
         
         var sound: UInt32?
         
-        if !(cameraState?.isCapturingPhotoInterval ?? false) {
-            if cameraState?.isCapturing ?? false {
+        if !(state?.isCapturingPhotoInterval ?? false) {
+            if state?.isCapturing ?? false {
                 if !previousCapturing {
-                    switch cameraState?.mode ?? .unknown {
+                    switch state?.mode ?? .unknown {
                     case .photo:
                         sound = photoSystemSound
                         break
@@ -155,7 +152,7 @@ public class CameraCaptureWidget: UpdatableWidget {
             }
             else {
                 if previousCapturing {
-                    if cameraState?.mode == .video {
+                    if state?.mode == .video {
                         sound = videoStopSystemSound
                     }
                 }
@@ -166,14 +163,14 @@ public class CameraCaptureWidget: UpdatableWidget {
             AudioServicesPlaySystemSound(sound)
         }
         
-        previousCapturing = cameraState?.isCapturing ?? false
+        previousCapturing = state?.isCapturing ?? false
         
-        button.tintColor = cameraState?.mode == .video ? videoColor : photoColor
-        button.isEnabled = session != nil && pendingCommand == nil && (!(cameraState?.isCapturing ?? false) || cameraState?.isCapturingContinuous ?? false)
-        button.setImage(cameraState?.isCapturingContinuous ?? false ? stopImage : startImage, for: .normal)
+        button.tintColor = state?.mode == .video ? videoColor : photoColor
+        button.isEnabled = session != nil && pendingCommand == nil && (!(state?.isCapturing ?? false) || state?.isCapturingContinuous ?? false)
+        button.setImage(state?.isCapturingContinuous ?? false ? stopImage : startImage, for: .normal)
         
         activityBackgroundImageView.alpha = button.isEnabled ? 1.0 : 0.5
-        if pendingCommand == nil && !(cameraState?.isBusy ?? false) {
+        if pendingCommand == nil && !(state?.isBusy ?? false) {
             if activityIndicator.isAnimating {
                 activityIndicator.stopAnimating()
             }
@@ -187,20 +184,20 @@ public class CameraCaptureWidget: UpdatableWidget {
         var extraImage: UIImage?
         var extraText: String?
         
-        if cameraState?.storageLocation == .sdCard, !(cameraState?.isSDCardInserted ?? true) {
+        if state?.storageLocation == .sdCard, !(state?.isSDCardInserted ?? true) {
             extraImage = sdCardMissing
         }
         
-        if extraImage == nil, cameraState?.mode == .photo {
-            switch cameraState?.photoMode ?? .unknown {
+        if extraImage == nil, state?.mode == .photo {
+            switch state?.photoMode ?? .unknown {
             case .aeb:
                 extraImage = aebModeImage
-                extraText = cameraState?.aebCount?.rawValue
+                extraText = state?.aebCount?.rawValue
                 break
                 
             case .burst:
                 extraImage = burstModeImage
-                extraText = cameraState?.burstCount?.rawValue
+                extraText = state?.burstCount?.rawValue
                 break
                 
             case .ehdr:
@@ -212,9 +209,9 @@ public class CameraCaptureWidget: UpdatableWidget {
                 break
                 
             case .interval:
-                if !(cameraState?.isCapturingPhotoInterval ?? false) {
+                if !(state?.isCapturingPhotoInterval ?? false) {
                     extraImage = timerModeImage
-                    if let interval = cameraState?.photoInterval {
+                    if let interval = state?.photoInterval {
                         extraText = String(interval)
                     }
                 }
@@ -243,7 +240,7 @@ public class CameraCaptureWidget: UpdatableWidget {
             extraLabel.text = extraText
         }
         
-        if let currentVideoTime = cameraState?.currentVideoTime {
+        if let currentVideoTime = state?.currentVideoTime {
             timeLabel.isHidden = false
             timeLabel.text = Dronelink.shared.format(formatter: "timeElapsed", value: currentVideoTime)
         }
@@ -274,7 +271,7 @@ public class CameraCaptureWidget: UpdatableWidget {
     
     public override func onCameraFileGenerated(session: DroneSession, file: CameraFile) {
         super.onCameraFileGenerated(session: session, file: file)
-        if let photoSystemSound = photoSystemSound, cameraState?.mode == .photo, cameraState?.photoMode == .interval {
+        if let photoSystemSound = photoSystemSound, state?.mode == .photo, state?.photoMode == .interval, file.channel == channel {
             DispatchQueue.main.async {
                 AudioServicesPlaySystemSound(photoSystemSound)
             }

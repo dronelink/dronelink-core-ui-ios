@@ -97,7 +97,7 @@ public class MapboxMapWidget: UpdatableWidget {
         if tracking != .none {
             if let state = session?.state?.value,
                let location = state.location {
-                let distance = max(20, state.altitude / 1.5)
+                let distance = max(20, state.altitude / 1.8)
                 
                 set(visibleCoordinates: [
                     location.coordinate.coordinate(bearing: 0, distance: distance),

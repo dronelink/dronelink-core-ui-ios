@@ -8,20 +8,16 @@
 import Foundation
 import DronelinkCore
 
-open class GimbalIndicatorWidget: IndicatorWidget {
-    public var channel: UInt = 0
-    public var gimbalState: GimbalStateAdapter? { session?.gimbalState(channel: channel)?.value }
-}
-
-open class GimbalOrientationWidget: GimbalIndicatorWidget {
+open class GimbalOrientationWidget: GimbalWidget {
     public override var updateInterval: TimeInterval { 0.1 }
+    
+    private let indicatorWidget = IndicatorWidget()
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        titleLabel.text = "GimbalOrientationWidget.title".localized
-        valueGenerator = { [weak self] in
-            guard let orientation = self?.gimbalState?.orientation else {
+        indicatorWidget.setup(parent: view, title: "GimbalOrientationWidget.title".localized) { [weak self] in
+            guard let orientation = self?.state?.orientation else {
                 return "na".localized
             }
             

@@ -13,6 +13,16 @@ open class IndicatorWidget: UpdatableWidget {
     public let valueLabel = UILabel()
     public var valueGenerator: (() -> String?)?
     
+    public func setup(parent: UIView, title: String, valueGenerator: (() -> String?)?) {
+        parent.addSubview(view)
+        view.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        titleLabel.text = title
+        self.valueGenerator = valueGenerator
+    }
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -50,13 +60,28 @@ open class IndicatorWidget: UpdatableWidget {
     }
 }
 
-public class DefaultIndicatorsWidget: Widget {
-    private let gimbalOrientationWidget = WidgetFactory.shared.createGimbalOrientationWidget()
-    private let cameraIsoWidget = WidgetFactory.shared.createCameraISOWidget()
-    private let cameraShutterWidget = WidgetFactory.shared.createCameraShutterWidget()
-    private let cameraApertureWidget = WidgetFactory.shared.createCameraApertureWidget()
-    private let cameraExposureCompensationWidget = WidgetFactory.shared.createCameraExposureCompensationWidget()
-    private let cameraWhiteBalanceWidget = WidgetFactory.shared.createCameraWhiteBalanceWidget()
+public class DefaultIndicatorsWidget: DefaultChannelWidget {
+    public override var channel: UInt? {
+        get {
+            super.channel
+        }
+        set {
+            super.channel = newValue
+            gimbalOrientationWidget?.channel = newValue
+            cameraIsoWidget?.channel = newValue
+            cameraShutterWidget?.channel = newValue
+            cameraApertureWidget?.channel = newValue
+            cameraExposureCompensationWidget?.channel = newValue
+            cameraWhiteBalanceWidget?.channel = newValue
+        }
+    }
+    
+    private let gimbalOrientationWidget = WidgetFactory.shared.createGimbalOrientationWidget(channel: nil)
+    private let cameraIsoWidget = WidgetFactory.shared.createCameraISOWidget(channel: nil)
+    private let cameraShutterWidget = WidgetFactory.shared.createCameraShutterWidget(channel: nil)
+    private let cameraApertureWidget = WidgetFactory.shared.createCameraApertureWidget(channel: nil)
+    private let cameraExposureCompensationWidget = WidgetFactory.shared.createCameraExposureCompensationWidget(channel: nil)
+    private let cameraWhiteBalanceWidget = WidgetFactory.shared.createCameraWhiteBalanceWidget(channel: nil)
     public var itemSpacing = 8
     public var itemPadding = 2
     

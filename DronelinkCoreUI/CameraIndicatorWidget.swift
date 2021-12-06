@@ -11,21 +11,17 @@ import UIKit
 import DronelinkCore
 import SnapKit
 
-open class CameraIndicatorWidget: IndicatorWidget {
-    public var channel: UInt = 0
-    public var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
-}
-
-open class CameraFocusRingWidget: CameraIndicatorWidget {
+open class CameraFocusRingWidget: CameraWidget {
+    private let indicatorWidget = IndicatorWidget()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         
-        titleLabel.text = "CameraIndicatorWidget.focusring.title".localized
-        valueGenerator = { [weak self] in
+        indicatorWidget.setup(parent: view, title: "CameraIndicatorWidget.focusring.title".localized) { [weak self] in
             guard
-                let focusRingValue = self?.cameraState?.focusRingValue,
-                let focusRingMax = self?.cameraState?.focusRingMax
+                let focusRingValue = self?.state?.focusRingValue,
+                let focusRingMax = self?.state?.focusRingMax
             else {
                 return "na".localized
             }
@@ -35,16 +31,18 @@ open class CameraFocusRingWidget: CameraIndicatorWidget {
     }
 }
 
-open class CameraISOWidget: CameraIndicatorWidget {
+open class CameraISOWidget: CameraWidget {
+    private let indicatorWidget = IndicatorWidget()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "CameraExposureWidget.iso.title".localized
-        valueGenerator = { [weak self] in
-            guard let iso = self?.cameraState?.iso else {
+        
+        indicatorWidget.setup(parent: view, title: "CameraExposureWidget.iso.title".localized) { [weak self] in
+            guard let iso = self?.state?.iso else {
                 return "na".localized
             }
             
-            if iso == .auto, let isoSensitivity = self?.cameraState?.isoSensitivity {
+            if iso == .auto, let isoSensitivity = self?.state?.isoSensitivity {
                 return "\(isoSensitivity)"
             }
             return Dronelink.shared.formatEnum(name: "CameraISO",
@@ -55,21 +53,23 @@ open class CameraISOWidget: CameraIndicatorWidget {
     
     open override func update() {
         super.update()
-        guard let iso = cameraState?.iso else { return }
+        guard let iso = state?.iso else { return }
         if iso == .auto {
-            titleLabel.text = "CameraExposureWidget.autoiso.title".localized
+            indicatorWidget.titleLabel.text = "CameraExposureWidget.autoiso.title".localized
         } else {
-            titleLabel.text = "CameraExposureWidget.iso.title".localized
+            indicatorWidget.titleLabel.text = "CameraExposureWidget.iso.title".localized
         }
     }
 }
 
-open class CameraShutterWidget: CameraIndicatorWidget {
+open class CameraShutterWidget: CameraWidget {
+    private let indicatorWidget = IndicatorWidget()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "CameraExposureWidget.shutter.title".localized
-        valueGenerator = { [weak self] in
-            guard let shutter = self?.cameraState?.shutterSpeed else {
+        
+        indicatorWidget.setup(parent: view, title: "CameraExposureWidget.shutter.title".localized) { [weak self] in
+            guard let shutter = self?.state?.shutterSpeed else {
                 return "na".localized
             }
             
@@ -80,12 +80,14 @@ open class CameraShutterWidget: CameraIndicatorWidget {
     }
 }
 
-open class CameraApertureWidget: CameraIndicatorWidget {
+open class CameraApertureWidget: CameraWidget {
+    private let indicatorWidget = IndicatorWidget()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "CameraExposureWidget.fstop.title".localized
-        valueGenerator = { [weak self] in
-            guard let aperture = self?.cameraState?.aperture else {
+        
+        indicatorWidget.setup(parent: view, title: "CameraExposureWidget.fstop.title".localized) { [weak self] in
+            guard let aperture = self?.state?.aperture else {
                 return "na".localized
             }
             
@@ -96,12 +98,14 @@ open class CameraApertureWidget: CameraIndicatorWidget {
     }
 }
 
-open class CameraExposureCompensationWidget: CameraIndicatorWidget {
+open class CameraExposureCompensationWidget: CameraWidget {
+    private let indicatorWidget = IndicatorWidget()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "CameraExposureWidget.ev.title".localized
-        valueGenerator = { [weak self] in
-            guard let ev = self?.cameraState?.exposureCompensation else {
+        
+        indicatorWidget.setup(parent: view, title: "CameraExposureWidget.ev.title".localized) { [weak self] in
+            guard let ev = self?.state?.exposureCompensation else {
                 return "na".localized
             }
             
@@ -112,16 +116,18 @@ open class CameraExposureCompensationWidget: CameraIndicatorWidget {
     }
 }
 
-open class CameraWhiteBalanceWidget: CameraIndicatorWidget {
+open class CameraWhiteBalanceWidget: CameraWidget {
+    private let indicatorWidget = IndicatorWidget()
+    
     public override func viewDidLoad() {
         super.viewDidLoad()
-        titleLabel.text = "CameraExposureWidget.wb.title".localized
-        valueGenerator = { [weak self] in
-            guard let wb = self?.cameraState?.whiteBalancePreset else {
+        
+        indicatorWidget.setup(parent: view, title: "CameraExposureWidget.wb.title".localized) { [weak self] in
+            guard let wb = self?.state?.whiteBalancePreset else {
                 return "na".localized
             }
             
-            if wb == .custom, let whiteBalanceColorTemperature = self?.cameraState?.whiteBalanceColorTemperature {
+            if wb == .custom, let whiteBalanceColorTemperature = self?.state?.whiteBalanceColorTemperature {
                 return Dronelink.shared.format(formatter: "absoluteTemperature",
                                                value: whiteBalanceColorTemperature,
                                                defaultValue: "na".localized)

@@ -12,30 +12,28 @@ import SwiftyUserDefaults
 import MaterialComponents
 
 extension DefaultsKeys {
-    var dronelinkDashboardWidgetLegacyDeviceWarningViewed: DefaultsKey<Bool> { .init("dronelinkDashboardWidget.legacyDeviceWarningViewed", defaultValue: false) }
-    var dronelinkDashboardWidgetLegacyDeviceWarningDismissed: DefaultsKey<Bool> { .init("dronelinkDashboardWidget.legacyDeviceWarningDismissed", defaultValue: false) }
-    var dronelinkDashboardWidgetContentLayout: DefaultsKey<String> { .init("dronelinkDashboardWidget.contentLayout", defaultValue: ContentLayout.cameraFeedMap.rawValue) }
+    var dronelinkDashboardWidgetContentView1Source: DefaultsKey<String> { .init("dronelinkDashboardWidget.contentView1.source", defaultValue: ContentViewSource.videoFeed0.rawValue) }
+    var dronelinkDashboardWidgetContentView2Source: DefaultsKey<String> { .init("dronelinkDashboardWidget.contentView2.source", defaultValue: ContentViewSource.map.rawValue) }
+    var dronelinkDashboardWidgetContentView3Source: DefaultsKey<String> { .init("dronelinkDashboardWidget.contentView3.source", defaultValue: ContentViewSource.videoFeed1.rawValue) }
     var dronelinkDashboardWidgetMapStyle: DefaultsKey<String> { .init("dronelinkDashboardWidget.mapStyle", defaultValue: MapStyle.mapbox.rawValue) }
 }
 
 
 extension DashboardWidget {
-    private var legacyDeviceWarningViewed: Bool {
-        get { Defaults[\.dronelinkDashboardWidgetLegacyDeviceWarningViewed] }
-        set { Defaults[\.dronelinkDashboardWidgetLegacyDeviceWarningViewed]  = newValue }
+    private var contentView1Source: ContentViewSource {
+        get { (ContentViewSource(rawValue: Defaults[\.dronelinkDashboardWidgetContentView1Source]) ?? .videoFeed0) }
+        set { Defaults[\.dronelinkDashboardWidgetContentView1Source] = newValue.rawValue }
     }
     
-    private var legacyDeviceWarningDismissed: Bool {
-        get { Defaults[\.dronelinkDashboardWidgetLegacyDeviceWarningDismissed] }
-        set { Defaults[\.dronelinkDashboardWidgetLegacyDeviceWarningDismissed]  = newValue }
+    private var contentView2Source: ContentViewSource {
+        get { (ContentViewSource(rawValue: Defaults[\.dronelinkDashboardWidgetContentView2Source]) ?? .map) }
+        set { Defaults[\.dronelinkDashboardWidgetContentView2Source] = newValue.rawValue }
     }
     
-    private var contentLayout: ContentLayout {
-        get { contentLayoutStatic ? .cameraFeedMap : (ContentLayout(rawValue: Defaults[\.dronelinkDashboardWidgetContentLayout]) ?? .cameraFeed) }
-        set { Defaults[\.dronelinkDashboardWidgetContentLayout] = newValue.rawValue }
+    private var contentView3Source: ContentViewSource {
+        get { (ContentViewSource(rawValue: Defaults[\.dronelinkDashboardWidgetContentView3Source]) ?? .videoFeed1) }
+        set { Defaults[\.dronelinkDashboardWidgetContentView3Source] = newValue.rawValue }
     }
-    
-    private var contentLayoutStatic: Bool { portrait }
     
     private var mapStyle: MapStyle {
         get { MapStyle(rawValue: Defaults[\.dronelinkDashboardWidgetMapStyle]) ?? .mapbox }
@@ -43,32 +41,17 @@ extension DashboardWidget {
     }
 }
 
+private enum ContentViewSource: String {
+    case videoFeed0 = "videoFeed0",
+         videoFeed1 = "videoFeed1",
+         map = "map",
+         none = "none"
+}
 
 private enum MapStyle: String {
     case mapbox = "mapbox",
          microsoft = "microsoft",
          none = "none"
-}
-
-private enum ContentLayout: String {
-    case cameraFeed = "cameraFeed",
-         cameraFeedMap = "cameraFeedMap",
-         mapCameraFeed = "mapCameraFeed"
-    
-    var next: ContentLayout {
-        switch self {
-        case .cameraFeed: return .cameraFeedMap
-        case .cameraFeedMap: return .mapCameraFeed
-        case .mapCameraFeed: return .cameraFeed
-        }
-    }
-    
-    var cameraFeedPrimary: Bool {
-        switch self {
-        case .cameraFeed, .cameraFeedMap: return true
-        case .mapCameraFeed: return false
-        }
-    }
 }
 
 public class DashboardWidget: DelegateWidget {
@@ -87,14 +70,19 @@ public class DashboardWidget: DelegateWidget {
     public var dismissButton: UIButton { _dismissButton }
     
     private let topBarView = UIView()
-    private let contentSettingsButton = UIButton(type: .custom)
-    private let contentLayoutVisibilityButton = UIButton(type: .custom)
-    private let contentLayoutMapHideImage = DronelinkUI.loadImage(named: "eye-off")
-    private let contentLayoutMapShowImage = DronelinkUI.loadImage(named: "baseline_map_white_36pt")
-    private let contentLayoutExpandButton = UIButton(type: .custom)
-    private let primaryContentView = UIView()
     private let reticleImageView = UIImageView()
-    private let secondaryContentView = UIView()
+    private let contentViewHideImage = DronelinkUI.loadImage(named: "eye-off")
+    private let contentView2ShowImage = DronelinkUI.loadImage(named: "baseline_map_white_36pt")
+    private let contentView3ShowImage = DronelinkUI.loadImage(named: "camera-plus-outline")
+    private let contentView2SettingsButton = UIButton(type: .custom)
+    private let contentView2VisibilityButton = UIButton(type: .custom)
+    private let contentView2SourceButton = UIButton(type: .custom)
+    private let contentView3SettingsButton = UIButton(type: .custom)
+    private let contentView3VisibilityButton = UIButton(type: .custom)
+    private let contentView3SourceButton = UIButton(type: .custom)
+    private let contentView1 = UIView()
+    private let contentView2 = UIView()
+    private let contentView3 = UIView()
     private let cameraControlsView = UIView()
     private let cameraMenuButton = UIButton(type: .custom)
     private let cameraExposureMenuButton = UIButton(type: .custom)
@@ -103,15 +91,48 @@ public class DashboardWidget: DelegateWidget {
     private var overlayViewController: UIViewController?
     private let hideOverlayButton = UIButton(type: .custom)
     private let disconnectedImageView = UIImageView()
-    private var cameraFeedWidget: Widget?
-    private var cameraFeedContentView: UIView { contentLayout.cameraFeedPrimary ? primaryContentView : secondaryContentView }
+    private var videoFeed0Widget: Widget?
+    private var videoFeed1Widget: Widget?
     private var mapWidget: Widget?
-    private var mapContentView: UIView? {
-        switch contentLayout {
-        case .cameraFeed: return nil
-        case .cameraFeedMap: return secondaryContentView
-        case .mapCameraFeed: return primaryContentView
+    private var videoFeed0ContentView: UIView? {
+        get {
+            if portrait && contentView1Source == .map {
+                return contentView1
+            }
+            
+            return contentView(source: .videoFeed0)
         }
+    }
+    private var videoFeed1ContentView: UIView? {
+        get {
+            if portrait && contentView1Source == .map {
+                return contentView2
+            }
+            return contentView(source: .videoFeed1)
+        }
+    }
+    private var mapContentView: UIView? { get { portrait ? contentView2 : contentView(source: .map) } }
+    private func contentView(source: ContentViewSource) -> UIView? {
+        if contentView1Source == source {
+            return contentView1
+        }
+        
+        if contentView2Source == source {
+            return contentView2
+        }
+        
+        if contentView3Source == source {
+            return contentView3
+        }
+        
+        return nil
+    }
+    private var cameraChannel: UInt? {
+        if !widgetFactory.videoFeedWidgetEnabled(channel: 1) {
+            return nil
+        }
+        
+        return session?.drone.cameraChannel(videoFeedChannel: contentView(source: .videoFeed1) == contentView1 ? 1 : 0)
     }
     private var statusBackgroundWidget: Widget?
     private var statusForegroundWidget: Widget?
@@ -132,14 +153,14 @@ public class DashboardWidget: DelegateWidget {
         if let widget = batteryWidget { widgets.append((widget: widget, widthRatio: 3.4)) }
         return widgets
     }
-    private var cameraAutoExposureWidget: Widget?
-    private var cameraExposureFocusWidget: Widget?
-    private var cameraFocusModeWidget: Widget?
-    private var cameraFocusRingWidget: Widget?
-    private var cameraStorageWidget: Widget?
-    private var defaultIndicatorsWidget: Widget?
-    private var indicatorWidgets: [(widget: Widget, width: Bool)] {
-        var widgets: [(widget: Widget, width: Bool)] = []
+    private var cameraAutoExposureWidget: ChannelWidget?
+    private var cameraExposureFocusWidget: ChannelWidget?
+    private var cameraFocusModeWidget: ChannelWidget?
+    private var cameraFocusRingWidget: ChannelWidget?
+    private var cameraStorageWidget: ChannelWidget?
+    private var defaultIndicatorsWidget: ChannelWidget?
+    private var indicatorWidgets: [(widget: ChannelWidget, width: Bool)] {
+        var widgets: [(widget: ChannelWidget, width: Bool)] = []
         if let widget = cameraFocusRingWidget { widgets.append((widget: widget, width: false)) }
         if let widget = defaultIndicatorsWidget { widgets.append((widget: widget, width: false)) }
         if let widget = cameraStorageWidget { widgets.append((widget: widget, width: false)) }
@@ -148,12 +169,13 @@ public class DashboardWidget: DelegateWidget {
         if let widget = cameraFocusModeWidget { widgets.append((widget: widget, width: true)) }
         return widgets
     }
-    private var cameraModeWidget: Widget?
-    private var cameraCaptureWidget: Widget?
+    private var cameraModeWidget: ChannelWidget?
+    private var cameraCaptureWidget: ChannelWidget?
+    private var cameraVideoStreamSourceWidget: ChannelWidget?
     private var compassWidget: Widget?
     private var telemetryWidget: Widget?
     private var executorWidget: ExecutorWidget?
-    private var cameraFocusCalibrationWidget: DynamicSizeWidget?
+    private var cameraFocusCalibrationWidget: (ChannelWidget & DynamicSizeWidget)?
     private var activityWidget: DynamicSizeWidget? { cameraFocusCalibrationWidget ?? executorWidget }
     private var activityWidgetLayout: DynamicSizeWidgetLayout { activityWidget?.layout ?? .small }
     private var droneOffsetsWidget1: Widget?
@@ -177,62 +199,97 @@ public class DashboardWidget: DelegateWidget {
             make.edges.equalToSuperview()
         }
 
-        view.addSubview(primaryContentView)
+        view.addSubview(contentView1)
         
         reticleImageView.isUserInteractionEnabled = false
         reticleImageView.contentMode = .scaleAspectFit
         view.addSubview(reticleImageView)
         reticleImageView.snp.makeConstraints { [weak self] make in
-            make.center.equalTo(primaryContentView)
-            make.height.equalTo(primaryContentView)
+            make.center.equalTo(contentView1)
+            make.height.equalTo(contentView1)
         }
         
-        secondaryContentView.addShadow()
-        view.addSubview(secondaryContentView)
+        contentView2.addShadow()
+        view.addSubview(contentView2)
+        
+        contentView3.addShadow()
+        view.addSubview(contentView3)
         
         disconnectedImageView.setImage(DronelinkUI.loadImage(named: "baseline_usb_white_48pt")!)
         disconnectedImageView.tintColor = UIColor.white
         disconnectedImageView.alpha = 0.5
         disconnectedImageView.contentMode = .center
-        primaryContentView.addSubview(disconnectedImageView)
+        contentView1.addSubview(disconnectedImageView)
         disconnectedImageView.snp.makeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
         
-        contentSettingsButton.addShadow()
-        contentSettingsButton.tintColor = UIColor.white
-        contentSettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_settings_white_36pt"), for: .normal)
-        contentSettingsButton.addTarget(self, action: #selector(onContentSettings(sender:)), for: .touchUpInside)
-        view.addSubview(contentSettingsButton)
-        contentSettingsButton.snp.remakeConstraints { [weak self] make in
-            make.left.equalTo(secondaryContentView.snp.left).offset(8)
-            make.top.equalTo(secondaryContentView.snp.top).offset(8)
+        contentView2SettingsButton.addShadow()
+        contentView2SettingsButton.tintColor = UIColor.white
+        contentView2SettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_settings_white_36pt"), for: .normal)
+        contentView2SettingsButton.addTarget(self, action: #selector(onContentView2Settings(sender:)), for: .touchUpInside)
+        view.addSubview(contentView2SettingsButton)
+        contentView2SettingsButton.snp.remakeConstraints { [weak self] make in
+            make.left.equalTo(contentView2.snp.left).offset(defaultPadding)
+            make.top.equalTo(contentView2.snp.top).offset(defaultPadding)
             make.width.equalTo(30)
-            make.height.equalTo(contentSettingsButton.snp.width)
+            make.height.equalTo(contentView2SettingsButton.snp.width)
         }
 
-        contentLayoutVisibilityButton.addShadow()
-        contentLayoutVisibilityButton.tintColor = UIColor.white
-        contentLayoutVisibilityButton.setImage(contentLayoutMapShowImage, for: .normal)
-        contentLayoutVisibilityButton.addTarget(self, action: #selector(onContentLayoutVisibility(sender:)), for: .touchUpInside)
-        view.addSubview(contentLayoutVisibilityButton)
-        contentLayoutVisibilityButton.snp.remakeConstraints { [weak self] make in
-            make.left.equalTo(secondaryContentView.snp.left).offset(8)
-            make.bottom.equalTo(secondaryContentView.snp.bottom).offset(-8)
+        contentView2VisibilityButton.addShadow()
+        contentView2VisibilityButton.tintColor = UIColor.white
+        contentView2VisibilityButton.setImage(contentView2ShowImage, for: .normal)
+        contentView2VisibilityButton.addTarget(self, action: #selector(onContentView2Visibility(sender:)), for: .touchUpInside)
+        view.addSubview(contentView2VisibilityButton)
+        contentView2VisibilityButton.snp.remakeConstraints { [weak self] make in
+            make.left.equalTo(contentView2.snp.left).offset(defaultPadding)
+            make.bottom.equalTo(contentView2.snp.bottom).offset(-defaultPadding)
             make.width.equalTo(30)
-            make.height.equalTo(contentLayoutVisibilityButton.snp.width)
+            make.height.equalTo(contentView2VisibilityButton.snp.width)
         }
         
-        contentLayoutExpandButton.addShadow()
-        contentLayoutExpandButton.tintColor = UIColor.white
-        contentLayoutExpandButton.setImage(DronelinkUI.loadImage(named: "vector-arrange-below"), for: .normal)
-        contentLayoutExpandButton.addTarget(self, action: #selector(onContentLayoutExpand(sender:)), for: .touchUpInside)
-        view.addSubview(contentLayoutExpandButton)
-        contentLayoutExpandButton.snp.remakeConstraints { [weak self] make in
-            make.right.equalTo(secondaryContentView.snp.right).offset(-8)
-            make.top.equalTo(secondaryContentView.snp.top).offset(8)
+        contentView2SourceButton.addShadow()
+        contentView2SourceButton.tintColor = UIColor.white
+        contentView2SourceButton.setImage(DronelinkUI.loadImage(named: "vector-arrange-below"), for: .normal)
+        contentView2SourceButton.addTarget(self, action: #selector(onContentView2Source(sender:)), for: .touchUpInside)
+        view.addSubview(contentView2SourceButton)
+        contentView2SourceButton.snp.remakeConstraints { [weak self] make in
+            make.right.equalTo(contentView2.snp.right).offset(-defaultPadding)
+            make.top.equalTo(contentView2.snp.top).offset(defaultPadding)
             make.width.equalTo(30)
-            make.height.equalTo(contentLayoutExpandButton.snp.width)
+            make.height.equalTo(contentView2SourceButton.snp.width)
+        }
+
+        view.addSubview(cameraControlsView)
+        
+        contentView3SettingsButton.addShadow()
+        contentView3SettingsButton.tintColor = UIColor.white
+        contentView3SettingsButton.setImage(DronelinkUI.loadImage(named: "baseline_settings_white_36pt"), for: .normal)
+        contentView3SettingsButton.addTarget(self, action: #selector(onContentView3Settings(sender:)), for: .touchUpInside)
+        view.addSubview(contentView3SettingsButton)
+        contentView3SettingsButton.snp.remakeConstraints { [weak self] make in
+            make.right.equalTo(contentView3.snp.right).offset(-defaultPadding)
+            make.top.equalTo(contentView3.snp.top).offset(defaultPadding)
+            make.width.equalTo(30)
+            make.height.equalTo(contentView3SettingsButton.snp.width)
+        }
+
+        contentView3VisibilityButton.addShadow()
+        contentView3VisibilityButton.tintColor = UIColor.white
+        contentView3VisibilityButton.setImage(contentView3ShowImage, for: .normal)
+        contentView3VisibilityButton.addTarget(self, action: #selector(onContentView3Visibility(sender:)), for: .touchUpInside)
+        view.addSubview(contentView3VisibilityButton)
+        
+        contentView3SourceButton.addShadow()
+        contentView3SourceButton.tintColor = UIColor.white
+        contentView3SourceButton.setImage(DronelinkUI.loadImage(named: "vector-arrange-below"), for: .normal)
+        contentView3SourceButton.addTarget(self, action: #selector(onContentView3Source(sender:)), for: .touchUpInside)
+        view.addSubview(contentView3SourceButton)
+        contentView3SourceButton.snp.remakeConstraints { [weak self] make in
+            make.left.equalTo(contentView3.snp.left).offset(defaultPadding)
+            make.top.equalTo(contentView3.snp.top).offset(defaultPadding)
+            make.width.equalTo(30)
+            make.height.equalTo(contentView3SourceButton.snp.width)
         }
 
         view.addSubview(cameraControlsView)
@@ -315,28 +372,6 @@ public class DashboardWidget: DelegateWidget {
             make.width.equalTo(statusWidgetHeight * 1.25)
             make.height.equalTo(statusWidgetHeight)
         }
-        
-        showLegacyDeviceWarning()
-    }
-    
-    func showLegacyDeviceWarning() {
-        if Device.legacy {
-            if !legacyDeviceWarningDismissed {
-                legacyDeviceWarningViewed = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    DronelinkUI.shared.showDialog(
-                        title: "DashboardWidget.device.legacy.title".localized,
-                        details: "DashboardWidget.device.legacy.details".localized,
-                        actions: [
-                            MDCAlertAction(title: "DashboardWidget.device.legacy.confirm".localized, emphasis: .high, handler: { action in
-                            }),
-                            MDCAlertAction(title: "DashboardWidget.device.legacy.confirm.dismiss".localized, emphasis: .low, handler: { [weak self] action in
-                                self?.legacyDeviceWarningDismissed = true
-                            })
-                        ])
-                }
-            }
-        }
     }
     
     var debug = false
@@ -370,7 +405,7 @@ public class DashboardWidget: DelegateWidget {
     
     func onMainMenu() {
         if let widget = widgetFactory.createMainMenuWidget(current: nil) {
-            if let wrapperWidget = widget as? WrapperWidget {
+            if let wrapperWidget = widget as? ViewControllerWidget {
                 wrapperWidget.viewController?.modalPresentationStyle = .formSheet
             }
             present(widget, animated: true, completion: nil)
@@ -378,13 +413,13 @@ public class DashboardWidget: DelegateWidget {
     }
     
     @objc func onCameraMenu(sender: Any) {
-        if let widget = widgetFactory.createCameraMenuWidget(current: nil) {
+        if let widget = widgetFactory.createCameraMenuWidget(channel: cameraChannel) {
             showOverlay(viewController: widget)
         }
     }
     
     @objc func onCameraExposureMenu(sender: Any) {
-        if let widget = widgetFactory.createCameraExposureMenuWidget(current: nil) {
+        if let widget = widgetFactory.createCameraExposureMenuWidget(channel: cameraChannel) {
             showOverlay(viewController: widget)
         }
     }
@@ -432,8 +467,8 @@ public class DashboardWidget: DelegateWidget {
         hideOverlayButton.isHidden = true
     }
     
-    @objc func onContentSettings(sender: Any) {
-        let alert = UIAlertController(title: "DashboardWidget.contentSettings".localized, message: nil, preferredStyle: .actionSheet)
+    @objc func onContentView2Settings(sender: Any) {
+        let alert = UIAlertController(title: "DashboardWidget.contentView2.settings".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
         
         if mapWidget is MicrosoftMapWidget {
@@ -458,14 +493,71 @@ public class DashboardWidget: DelegateWidget {
         present(alert, animated: true)
     }
     
-    @objc func onContentLayoutVisibility(sender: Any) {
-        contentLayout = contentLayout == .cameraFeed ? .cameraFeedMap : .cameraFeed
+    @objc func onContentView2Visibility(sender: Any) {
+        contentView2Source = contentView2Source == .none ? .map : .none
+        if contentView1Source == .map {
+            contentView1Source = contentView3Source == .videoFeed1 ? .videoFeed0 : .videoFeed1
+        }
         view.setNeedsUpdateConstraints()
     }
     
-    @objc func onContentLayoutExpand(sender: Any) {
-        contentLayout = contentLayout.cameraFeedPrimary ? .mapCameraFeed : .cameraFeedMap
+    @objc func onContentView2Source(sender: Any) {
+        if contentView2Source == .map {
+            contentView1Source = .map
+            contentView2Source = .videoFeed0
+            contentView3Source = .videoFeed1
+        }
+        else {
+            contentView1Source = .videoFeed0
+            contentView2Source = .map
+            contentView3Source = .videoFeed1
+        }
         view.setNeedsUpdateConstraints()
+    }
+    
+    @objc func onContentView3Settings(sender: Any) {
+        let alert = UIAlertController(title: "DashboardWidget.contentView3.settings".localized, message: nil, preferredStyle: .actionSheet)
+        alert.popoverPresentationController?.sourceView = sender as? UIView
+        
+        (videoFeed1Widget as? ConfigurableWidget)?.configurationActions.forEach { alert.addAction($0) }
+
+        alert.addAction(UIAlertAction(title: "dismiss".localized, style: .cancel, handler: { _ in
+
+        }))
+
+        present(alert, animated: true)
+    }
+    
+    @objc func onContentView3Visibility(sender: Any) {
+        if contentView3Source == .none {
+            contentView3Source = contentView1Source == .videoFeed0 ? .videoFeed1 : .videoFeed0
+        }
+        else {
+            contentView3Source = .none
+        }
+        view.setNeedsUpdateConstraints()
+    }
+    
+    @objc func onContentView3Source(sender: Any) {
+        if contentView1Source == .map {
+            contentView1Source = contentView3Source
+            contentView2Source = .map
+            contentView3Source = contentView1Source == .videoFeed0 ? .videoFeed1 : .videoFeed0
+        }
+        
+        let source1 = contentView1Source
+        let source2 = contentView2Source
+        contentView1Source = contentView3Source
+        if source1 == .map {
+            contentView2Source = .map
+            contentView3Source = source2
+        }
+        else {
+            contentView3Source = source1
+        }
+        view.setNeedsUpdateConstraints()
+        
+        updateRemoteControllerTargetGimbalChannel()
     }
     
     @objc func onDismiss(sender: Any) {
@@ -477,7 +569,7 @@ public class DashboardWidget: DelegateWidget {
         super.onCameraFocusCalibrationRequested(value: value)
         
         DispatchQueue.main.async { [weak self] in
-            self?.cameraFocusCalibrationWidget = self?.refreshWidget(current: self?.cameraFocusCalibrationWidget, next: self?.widgetFactory.createCameraFocusCalibrationWidget(calibration: value)) as? DynamicSizeWidget
+            self?.cameraFocusCalibrationWidget = self?.refreshWidget(current: self?.cameraFocusCalibrationWidget, next: self?.widgetFactory.createCameraFocusCalibrationWidget(channel: self?.cameraChannel, calibration: value)) as? (ChannelWidget & DynamicSizeWidget)
             self?.view.setNeedsUpdateConstraints()
         }
     }
@@ -486,7 +578,7 @@ public class DashboardWidget: DelegateWidget {
         super.onCameraFocusCalibrationUpdated(value: value)
         
         DispatchQueue.main.async { [weak self] in
-            self?.cameraFocusCalibrationWidget = self?.refreshWidget(current: self?.cameraFocusCalibrationWidget, next: nil) as? DynamicSizeWidget
+            self?.cameraFocusCalibrationWidget = self?.refreshWidget(current: self?.cameraFocusCalibrationWidget, next: nil) as? (ChannelWidget & DynamicSizeWidget)
             self?.view.setNeedsUpdateConstraints()
         }
     }
@@ -585,7 +677,7 @@ public class DashboardWidget: DelegateWidget {
         }
     }
     
-    private func refreshWidget(current: Widget? = nil, next: Widget? = nil, subview: UIView? = nil) -> Widget? {
+    private func refreshWidget<W: Widget>(current: W? = nil, next: W? = nil, subview: UIView? = nil) -> W? {
         let subview: UIView = subview ?? view
         if current != next {
             current?.uninstallFromParent()
@@ -621,12 +713,17 @@ public class DashboardWidget: DelegateWidget {
     }
     
     private func refreshWidgets() {
-        cameraFeedWidget = refreshWidget(current: cameraFeedWidget, next: widgetFactory.createCameraFeedWidget(current: cameraFeedWidget, primary: contentLayout.cameraFeedPrimary), subview: cameraFeedContentView)
-        cameraFeedWidget?.view.snp.remakeConstraints { [weak self] make in
+        if let videoFeed0ContentView = videoFeed0ContentView {
+            videoFeed0Widget = refreshWidget(current: videoFeed0Widget, next: widgetFactory.createVideoFeedWidget(channel: 0, current: videoFeed0Widget), subview: videoFeed0ContentView)
+        }
+        else {
+            videoFeed0Widget = refreshWidget(current: videoFeed0Widget, next: nil)
+        }
+        videoFeed0Widget?.view.snp.remakeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
-
-        if let _ = mapContentView, mapStyle != .none {
+        
+        if let mapContentView = mapContentView, mapStyle != .none {
             switch mapStyle {
             case .mapbox:
                 mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MapboxMapWidget) ?? MapboxMapWidget(), subview: mapContentView)
@@ -647,12 +744,22 @@ public class DashboardWidget: DelegateWidget {
         mapWidget?.view.snp.remakeConstraints { [weak self] make in
             make.edges.equalToSuperview()
         }
+        
+        if let videoFeed1ContentView = videoFeed1ContentView {
+            videoFeed1Widget = refreshWidget(current: videoFeed1Widget, next: widgetFactory.createVideoFeedWidget(channel: 1, current: videoFeed1Widget), subview: videoFeed1ContentView)
+        }
+        else {
+            videoFeed1Widget = refreshWidget(current: videoFeed1Widget, next: nil)
+        }
+        videoFeed1Widget?.view.snp.remakeConstraints { [weak self] make in
+            make.edges.equalToSuperview()
+        }
 
         remainingFlightTimeWidget = refreshWidget(current: remainingFlightTimeWidget, next: widgetFactory.createRemainingFlightTimeWidget(current: remainingFlightTimeWidget))
         remainingFlightTimeWidget?.view.snp.remakeConstraints { [weak self] make in
             let topOffset = -9
-            if portrait, !tablet, let cameraFeedView = cameraFeedWidget?.view {
-                make.top.equalTo(cameraFeedView.snp.top).offset(topOffset)
+            if portrait, !tablet, let videoFeedView = videoFeed0Widget?.view {
+                make.top.equalTo(videoFeedView.snp.top).offset(topOffset)
             }
             else {
                 make.top.equalTo(topBarView.snp.bottom).offset(topOffset)
@@ -708,21 +815,21 @@ public class DashboardWidget: DelegateWidget {
         }
         (statusForegroundWidget as? StatusLabelWidget)?.onTapped = { [weak self] in self?.onMainMenu() }
         
-        //cameraFocusRingWidget = refreshWidget(current: cameraFocusRingWidget, next: widgetFactory.createCameraFocusRingWidget(current: cameraFocusRingWidget))
+        //cameraFocusRingWidget = refreshWidget(current: cameraFocusRingWidget, next: widgetFactory.createCameraFocusRingWidget(channel: cameraChannel, current: cameraFocusRingWidget)) as? ChannelWidget
         
-        defaultIndicatorsWidget = refreshWidget(current: defaultIndicatorsWidget, next: widgetFactory.createDefaultIndicatorsWidget(current: defaultIndicatorsWidget))
+        defaultIndicatorsWidget = refreshWidget(current: defaultIndicatorsWidget, next: widgetFactory.createDefaultIndicatorsWidget(channel: cameraChannel, current: defaultIndicatorsWidget)) as? ChannelWidget
         
-        cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: widgetFactory.createCameraStorageWidget(current: cameraStorageWidget))
+        cameraStorageWidget = refreshWidget(current: cameraStorageWidget, next: widgetFactory.createCameraStorageWidget(channel: cameraChannel, current: cameraStorageWidget)) as? ChannelWidget
         
-        cameraAutoExposureWidget = refreshWidget(current: cameraAutoExposureWidget, next: widgetFactory.createCameraAutoExposureWidget(current: cameraAutoExposureWidget))
+        cameraAutoExposureWidget = refreshWidget(current: cameraAutoExposureWidget, next: widgetFactory.createCameraAutoExposureWidget(channel: cameraChannel, current: cameraAutoExposureWidget)) as? ChannelWidget
         
-        cameraExposureFocusWidget = refreshWidget(current: cameraExposureFocusWidget, next: widgetFactory.createCameraExposureFocusWidget(current: cameraExposureFocusWidget))
+        cameraExposureFocusWidget = refreshWidget(current: cameraExposureFocusWidget, next: widgetFactory.createCameraExposureFocusWidget(channel: cameraChannel, current: cameraExposureFocusWidget)) as? ChannelWidget
         
-        cameraFocusModeWidget = refreshWidget(current: cameraFocusModeWidget, next: widgetFactory.createCameraFocusModeWidget(current: cameraFocusModeWidget))
+        cameraFocusModeWidget = refreshWidget(current: cameraFocusModeWidget, next: widgetFactory.createCameraFocusModeWidget(channel: cameraChannel, current: cameraFocusModeWidget)) as? ChannelWidget
         
         let cameraWidgetSize = statusWidgetHeight * 0.65
         var indicatorWidgetPrevious: Widget?
-       indicatorWidgets.reversed().forEach { item in
+        indicatorWidgets.reversed().forEach { item in
             item.widget.view.snp.remakeConstraints {  [weak self] make in
                 if let previousWidget = indicatorWidgetPrevious {
                     make.top.equalTo(previousWidget.view.snp.top)
@@ -741,7 +848,7 @@ public class DashboardWidget: DelegateWidget {
             indicatorWidgetPrevious = item.widget
         }
         
-        cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(current: cameraModeWidget), subview: cameraControlsView)
+        cameraModeWidget = refreshWidget(current: cameraModeWidget, next: widgetFactory.createCameraModeWidget(channel: cameraChannel, current: cameraModeWidget), subview: cameraControlsView) as? ChannelWidget
         cameraModeWidget?.view.snp.remakeConstraints { [weak self] make in
             make.top.equalTo(cameraMenuButton.snp.bottom).offset(-13)
             make.left.equalToSuperview().offset(3)
@@ -749,12 +856,20 @@ public class DashboardWidget: DelegateWidget {
             make.right.equalToSuperview().offset(-3)
         }
 
-        cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: widgetFactory.createCameraCaptureWidget(current: cameraCaptureWidget), subview: cameraControlsView)
+        cameraCaptureWidget = refreshWidget(current: cameraCaptureWidget, next: widgetFactory.createCameraCaptureWidget(channel: cameraChannel, current: cameraCaptureWidget), subview: cameraControlsView) as? ChannelWidget
         cameraCaptureWidget?.view.snp.remakeConstraints {  [weak self] make in
             make.left.equalToSuperview().offset(defaultPadding)
             make.right.equalToSuperview().offset(-defaultPadding)
             make.height.equalTo(cameraCaptureWidget!.view.snp.width).offset(20)
             make.bottom.equalTo(cameraExposureMenuButton.snp.top).offset(-5)
+        }
+        
+        cameraVideoStreamSourceWidget = refreshWidget(current: cameraVideoStreamSourceWidget, next: widgetFactory.createCameraVideoStreamSourceWidget(channel: cameraChannel, current: cameraVideoStreamSourceWidget)) as? ChannelWidget
+        cameraVideoStreamSourceWidget?.view.snp.remakeConstraints { [weak self] make in
+            make.bottom.equalTo(cameraControlsView.snp.top).offset(4)
+            make.centerX.equalTo(cameraControlsView.snp.centerX)
+            make.height.equalTo(25)
+            make.width.equalTo(25)
         }
 
         compassWidget = refreshWidget(current: compassWidget, next: widgetFactory.createCompassWidget(current: compassWidget))
@@ -769,8 +884,14 @@ public class DashboardWidget: DelegateWidget {
         
         rtkStatusWidget = refreshWidget(current: rtkStatusWidget, next: widgetFactory.createRTKStatusWidget(current: rtkStatusWidget))
         rtkStatusWidget?.view.snp.remakeConstraints { [weak self] make in
-            make.bottom.equalTo(cameraControlsView.snp.top).offset(-defaultPadding)
-            make.right.equalTo(cameraControlsView.snp.right)
+            if let telemetryWidget = telemetryWidget {
+                make.bottom.equalTo(telemetryWidget.view.snp.top).offset(-defaultPadding)
+                make.left.equalTo(telemetryWidget.view.snp.left)
+            }
+            else {
+                make.bottom.equalTo(contentView2.snp.bottom)
+                make.left.equalTo(contentView2.snp.right).offset(defaultPadding)
+            }
             make.height.equalTo(cameraWidgetSize)
             make.width.equalTo(100)
         }
@@ -800,15 +921,11 @@ public class DashboardWidget: DelegateWidget {
         refreshWidgets()
         
         disconnectedImageView.isHidden = true //session != nil
-        contentSettingsButton.isHidden = !contentLayoutStatic && contentLayout == .cameraFeed
-        contentLayoutVisibilityButton.isHidden = contentLayoutStatic
-        contentLayoutVisibilityButton.setImage(contentLayout == .cameraFeed ? contentLayoutMapShowImage : contentLayoutMapHideImage, for: .normal)
-        contentLayoutExpandButton.isHidden = contentLayoutStatic || contentLayout == .cameraFeed
 
         let darkBackground = UIColor(red: 20, green: 20, blue: 20)
         let darkerBackground = UIColor(red: 10, green: 10, blue: 10)
-        primaryContentView.backgroundColor = contentLayout.cameraFeedPrimary ? darkerBackground : darkBackground
-        primaryContentView.snp.remakeConstraints { [weak self] make in
+        contentView1.backgroundColor = contentView1 == mapContentView ? darkBackground : darkerBackground
+        contentView1.snp.remakeConstraints { [weak self] make in
             if (portrait && !tablet) {
                 make.top.equalTo(topBarView.safeAreaLayoutGuide.snp.bottom).offset(statusWidgetHeight * 2)
             }
@@ -828,11 +945,11 @@ public class DashboardWidget: DelegateWidget {
             }
         }
 
-        secondaryContentView.isHidden = contentLayout == .cameraFeed
-        secondaryContentView.backgroundColor = contentLayout.cameraFeedPrimary ? darkBackground : darkerBackground
-        secondaryContentView.snp.remakeConstraints { [weak self] make in
+        contentView2.isHidden = contentView2Source == .none
+        contentView2.backgroundColor = contentView1 == videoFeed0Widget?.view ? darkBackground : darkerBackground
+        contentView2.snp.remakeConstraints { [weak self] make in
             if (portrait) {
-                make.top.equalTo(primaryContentView.snp.bottom).offset(tablet ? 0 : statusWidgetHeight * 2)
+                make.top.equalTo(contentView1.snp.bottom).offset(tablet ? 0 : statusWidgetHeight * 2)
                 make.right.equalToSuperview()
                 make.left.equalToSuperview()
                 make.bottom.equalToSuperview()
@@ -845,7 +962,7 @@ public class DashboardWidget: DelegateWidget {
                     make.width.equalTo(view.snp.width).multipliedBy(activityWidgetLayout == .large ? 0.18 : 0.28)
                 }
 
-                make.height.equalTo(secondaryContentView.snp.width).multipliedBy(0.5)
+                make.height.equalTo(contentView2.snp.width).multipliedBy(0.5)
                 make.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-defaultPadding)
                 if !portrait, activityWidgetLayout == .large, let activityWidget = activityWidget {
                     make.left.equalTo(activityWidget.view.snp.right).offset(defaultPadding)
@@ -856,11 +973,54 @@ public class DashboardWidget: DelegateWidget {
             }
         }
         
-        cameraMenuButton.isHidden = !widgetFactory.cameraMenuWidgetEnabled
-        cameraExposureMenuButton.isHidden = !widgetFactory.cameraExposureMenuWidgetEnabled
+        contentView2SettingsButton.isHidden = contentView2.isHidden || mapContentView != contentView2
+        contentView2VisibilityButton.isHidden = portrait
+        contentView2VisibilityButton.setImage(contentView2Source == .none ? contentView2ShowImage : contentViewHideImage, for: .normal)
+        contentView2SourceButton.isHidden = portrait || contentView2.isHidden
+        
+        contentView3.isHidden = session == nil || contentView3Source == .none || (contentView3Source == .videoFeed1 && !widgetFactory.videoFeedWidgetEnabled(channel: 1))
+        contentView3.backgroundColor = contentView3Source == .videoFeed0 ? darkBackground : darkerBackground
+        contentView3.snp.remakeConstraints { [weak self] make in
+            if (portrait) {
+                make.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-defaultPadding)
+                make.top.equalTo(contentView2.snp.top).offset(defaultPadding)
+                make.height.equalTo(contentView2.snp.height).multipliedBy(0.3)
+            }
+            else {
+                make.bottom.equalTo(contentView2.snp.bottom)
+                make.height.equalTo(contentView2.snp.height).multipliedBy(0.75)
+                if tablet {
+                    make.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-defaultPadding)
+                }
+                else {
+                    make.right.equalTo(cameraExposureMenuButton.snp.left).offset(-defaultPadding)
+                }
+            }
+            make.width.equalTo(contentView3.snp.height).multipliedBy(1.5)
+        }
+        
+        contentView3SettingsButton.isHidden = contentView3.isHidden
+        contentView3VisibilityButton.isHidden = !widgetFactory.videoFeedWidgetEnabled(channel: 1)
+        contentView3VisibilityButton.setImage(contentView3Source == .none ? contentView3ShowImage : contentViewHideImage, for: .normal)
+        contentView3VisibilityButton.snp.remakeConstraints { [weak self] make in
+            if contentView3.isHidden {
+                make.left.equalTo(compassWidget?.view.snp.left ?? view.safeAreaLayoutGuide.snp.left).offset(-20)
+                make.bottom.equalTo(compassWidget?.view.snp.bottom ?? view.safeAreaLayoutGuide.snp.bottom)
+            }
+            else {
+                make.left.equalTo(contentView3.snp.left).offset(defaultPadding)
+                make.bottom.equalTo(contentView3.snp.bottom).offset(-defaultPadding)
+            }
+            make.width.equalTo(30)
+            make.height.equalTo(contentView3VisibilityButton.snp.width)
+        }
+        contentView3SourceButton.isHidden = contentView3.isHidden
+        
+        cameraMenuButton.isHidden = !widgetFactory.videoFeedWidgetEnabled(channel: cameraChannel)
+        cameraExposureMenuButton.isHidden = !widgetFactory.cameraExposureMenuWidgetEnabled(channel: cameraChannel)
 
         cameraControlsView.snp.remakeConstraints { [weak self] make in
-            make.centerY.equalTo(primaryContentView.snp.centerY)
+            make.centerY.equalTo(contentView1.snp.centerY)
             if (portrait || tablet) {
                 make.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-defaultPadding)
             }
@@ -873,24 +1033,36 @@ public class DashboardWidget: DelegateWidget {
 
         compassWidget?.view.snp.remakeConstraints { [weak self] make in
             if (portrait && tablet) {
-                make.bottom.equalTo(secondaryContentView.snp.top).offset(-defaultPadding)
-                make.height.equalTo(primaryContentView.snp.width).multipliedBy(0.15)
+                make.bottom.equalTo(contentView2.snp.top).offset(-defaultPadding)
+                make.height.equalTo(contentView1.snp.width).multipliedBy(0.15)
                 make.right.equalTo(cameraControlsView.snp.right)
                 make.width.equalTo(compassWidget!.view.snp.height)
                 return
             }
 
             if (portrait) {
-                make.bottom.equalTo(secondaryContentView.snp.top).offset(-5)
+                make.bottom.equalTo(contentView2.snp.top).offset(-5)
                 make.height.equalTo(compassWidget!.view.snp.width)
                 make.centerX.equalTo(cameraControlsView.snp.centerX)
                 make.width.equalTo(cameraControlsView.snp.width)
                 return
             }
-
-            make.bottom.equalTo(secondaryContentView.snp.bottom)
-            make.height.equalTo(primaryContentView.snp.width).multipliedBy(tablet ? 0.12 : 0.09)
-            make.right.equalTo(tablet ? cameraControlsView.snp.right : cameraControlsView.snp.left).offset(tablet ? 0 : -defaultPadding)
+            
+            if contentView3.isHidden {
+                make.bottom.equalTo(contentView2.snp.bottom)
+                make.right.equalTo(tablet ? cameraControlsView.snp.right : cameraControlsView.snp.left)
+            }
+            else {
+                make.bottom.equalTo(contentView3.snp.top).offset(-defaultPadding)
+                if tablet {
+                    make.right.equalTo(offsetsButton.snp.left).offset(-defaultPadding / 2)
+                }
+                else {
+                    make.right.equalTo(cameraControlsView.snp.left)
+                }
+            }
+            
+            make.height.equalTo(contentView1.snp.width).multipliedBy(!contentView3.isHidden ? 0.07 : tablet ? 0.12 : 0.09)
             make.width.equalTo(compassWidget!.view.snp.height)
         }
         
@@ -899,12 +1071,12 @@ public class DashboardWidget: DelegateWidget {
         
         telemetryWidget?.view.snp.remakeConstraints { [weak self] make in
             if (portrait) {
-                make.bottom.equalTo(secondaryContentView.snp.top).offset(tablet ? -defaultPadding : -2)
+                make.bottom.equalTo(contentView2.snp.top).offset(tablet ? -defaultPadding : -2)
                 make.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(defaultPadding)
             }
             else {
-                make.bottom.equalTo(secondaryContentView.snp.bottom)
-                make.left.equalTo((secondaryContentView.isHidden ? contentLayoutVisibilityButton : secondaryContentView).snp.right).offset(defaultPadding)
+                make.bottom.equalTo(contentView2.snp.bottom)
+                make.left.equalTo((contentView2.isHidden ? contentView2VisibilityButton : contentView2).snp.right).offset(defaultPadding)
             }
             make.height.equalTo(tablet ? 85 : 75)
             make.width.equalTo(tablet ? 350 : 275)
@@ -915,7 +1087,7 @@ public class DashboardWidget: DelegateWidget {
                 make.width.equalTo(telemetryWidget.view.snp.width)
                 make.height.equalTo(100)
                 make.left.equalTo(telemetryWidget.view.snp.left)
-                make.bottom.equalTo(telemetryWidget.view.snp.top).offset(-8)
+                make.bottom.equalTo(telemetryWidget.view.snp.top).offset(-defaultPadding)
             }
         }
         
@@ -925,7 +1097,7 @@ public class DashboardWidget: DelegateWidget {
                 make.width.equalTo(200)
                 if portrait {
                     make.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-defaultPadding)
-                    make.top.equalTo(secondaryContentView.snp.top).offset(defaultPadding)
+                    make.top.equalTo(contentView2.snp.top).offset(defaultPadding)
                 }
                 else {
                     make.right.equalTo(cameraControlsView.snp.left).offset(-defaultPadding)
@@ -981,7 +1153,7 @@ public class DashboardWidget: DelegateWidget {
                 if (portrait) {
                     make.right.equalToSuperview()
                     make.left.equalToSuperview()
-                    make.top.equalTo(secondaryContentView.snp.top)
+                    make.top.equalTo(contentView2.snp.top)
                     return
                 }
                 
@@ -999,7 +1171,7 @@ public class DashboardWidget: DelegateWidget {
                     make.height.equalTo(preferredSize.height)
                 }
                 else {
-                    make.top.equalTo(secondaryContentView.snp.top).offset(defaultPadding)
+                    make.top.equalTo(contentView2.snp.top).offset(defaultPadding)
                 }
                 return
             }
@@ -1012,7 +1184,7 @@ public class DashboardWidget: DelegateWidget {
                     make.height.equalTo(preferredSize.height)
                 }
                 else {
-                    make.height.equalTo(secondaryContentView.snp.height).multipliedBy(0.5)
+                    make.height.equalTo(contentView2.snp.height).multipliedBy(0.5)
                 }
                 return
             }
@@ -1034,7 +1206,7 @@ public class DashboardWidget: DelegateWidget {
                     make.height.equalTo(preferredSize.height)
                 }
                 else {
-                    make.bottom.equalTo(secondaryContentView.snp.top).offset(-Double(defaultPadding) * 1.5)
+                    make.bottom.equalTo(contentView2.snp.top).offset(-Double(defaultPadding) * 1.5)
                 }
             }
         }
@@ -1045,4 +1217,16 @@ public class DashboardWidget: DelegateWidget {
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {}
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
     override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    
+    public override func onVideoFeedSourceUpdated(session: DroneSession, channel: UInt?) {
+        DispatchQueue.main.async { [weak self] in
+            self?.updateViewConstraints()
+        }
+        
+        updateRemoteControllerTargetGimbalChannel()
+    }
+    
+    private func updateRemoteControllerTargetGimbalChannel() {
+        try? session?.add(command: Kernel.TargetGimbalChannelRemoteControllerCommand(channel: 0, targetGimbalChannel: cameraChannel ?? session?.drone.cameraChannel(videoFeedChannel: nil) ?? 0))
+    }
 }

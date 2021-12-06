@@ -27,12 +27,12 @@ open class Widget: UIViewController {
 }
 
 open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegate, DroneSessionDelegate, MissionExecutorDelegate, ModeExecutorDelegate, FuncExecutorDelegate {
-    public override func viewWillAppear(_ animated: Bool) {
+    open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Dronelink.shared.add(delegate: self)
     }
     
-    override public func viewDidDisappear(_ animated: Bool) {
+    override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         Dronelink.shared.remove(delegate: self)
         Dronelink.shared.missionExecutor?.remove(delegate: self)
@@ -98,6 +98,8 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     
     open func onCameraFileGenerated(session: DroneSession, file: CameraFile) {}
     
+    open func onVideoFeedSourceUpdated(session: DroneSession, channel: UInt?) {}
+    
     open func onMissionEstimating(executor: MissionExecutor) {}
     
     open func onMissionEstimated(executor: MissionExecutor, estimate: MissionExecutor.Estimate) {}
@@ -143,9 +145,24 @@ extension UIView {
         
         return widget
     }
+    
+    public func createWidget(shadow: Bool = false, channel: UInt?) -> ChannelWidget {
+        let widget = DefaultChannelWidget()
+        widget.channel = channel
+        widget.view.addSubview(self)
+        snp.makeConstraints { [weak self] make in
+            make.edges.equalToSuperview()
+        }
+        
+        if shadow {
+            widget.view.addShadow()
+        }
+        
+        return widget
+    }
 }
 
-open class WrapperWidget: Widget {
+open class ViewControllerWidget: Widget {
     private var _viewController: UIViewController?
     
     public var viewController: UIViewController? {
@@ -166,10 +183,23 @@ open class WrapperWidget: Widget {
     }
 }
 
+open class ChannelViewControllerWidget: ViewControllerWidget, ChannelWidget {
+    public var channel: UInt? { get { _channel } set { _channel = newValue } }
+    private var _channel: UInt?
+    public var channelResolved: UInt { channel ?? session?.drone.cameraChannel(videoFeedChannel: nil) ?? 0 }
+}
+
 extension UIViewController {
-    public func createWidget() -> WrapperWidget {
-        let widget = WrapperWidget()
+    public func createWidget() -> ViewControllerWidget {
+        let widget = ViewControllerWidget()
         widget.viewController = self
+        return widget
+    }
+    
+    public func createWidget(channel: UInt?) -> ChannelViewControllerWidget {
+        let widget = ChannelViewControllerWidget()
+        widget.viewController = self
+        widget.channel = channel
         return widget
     }
 }
@@ -196,6 +226,31 @@ open class UpdatableWidget: DelegateWidget {
     }
     
     @objc open func update() {}
+}
+
+public protocol ChannelWidget: Widget {
+    var channel: UInt? { get set }
+    var channelResolved: UInt { get }
+}
+
+open class DefaultChannelWidget: Widget, ChannelWidget {
+    public var channel: UInt? { get { _channel } set { _channel = newValue } }
+    private var _channel: UInt?
+    public var channelResolved: UInt { channel ?? session?.drone.cameraChannel(videoFeedChannel: nil) ?? 0 }
+}
+
+open class UpdatableChannelWidget: UpdatableWidget, ChannelWidget {
+    public var channel: UInt? { get { _channel } set { _channel = newValue } }
+    private var _channel: UInt?
+    public var channelResolved: UInt { channel ?? session?.drone.cameraChannel(videoFeedChannel: nil) ?? 0 }
+}
+
+open class CameraWidget: UpdatableChannelWidget {
+    public var state: CameraStateAdapter? { session?.cameraState(channel: channelResolved)?.value }
+}
+
+open class GimbalWidget: UpdatableChannelWidget {
+    public var state: GimbalStateAdapter? { session?.gimbalState(channel: channelResolved)?.value }
 }
 
 public enum DynamicSizeWidgetLayout: String {
@@ -243,8 +298,9 @@ open class WidgetFactory {
         
         return nil
     }
+    open func videoFeedWidgetEnabled(channel: UInt?) -> Bool { false }
+    open func createVideoFeedWidget(channel: UInt? = nil, current: Widget? = nil) -> Widget? { nil }
     open func createMainMenuWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraFeedWidget(current: Widget? = nil, primary: Bool = true) -> Widget? { nil }
     open func createStatusBackgroundWidget(current: Widget? = nil) -> Widget? { (current as? StatusGradientWidget) ?? StatusGradientWidget() }
     open func createStatusForegroundWidget(current: Widget? = nil) -> Widget?  { (current as? StatusLabelWidget) ?? StatusLabelWidget() }
     open func createRemainingFlightTimeWidget(current: Widget? = nil) -> Widget? { nil }
@@ -261,23 +317,24 @@ open class WidgetFactory {
     open func createHorizontalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? HorizontalSpeedWidget) ?? HorizontalSpeedWidget() }
     open func createVerticalSpeedWidget(current: Widget? = nil) -> Widget? { (current as? VerticalSpeedWidget) ?? VerticalSpeedWidget() }
     open func createTelemetryWidget(current: Widget? = nil) -> Widget? { (current as? TelemetryWidget) ?? TelemetryWidget() }
-    open var cameraMenuWidgetEnabled: Bool { false }
-    open func createDefaultIndicatorsWidget(current: Widget? = nil) -> Widget? { (current as? DefaultIndicatorsWidget) ?? DefaultIndicatorsWidget() }
-    open func createCameraMenuWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraExposureWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureWidget) ?? CameraExposureWidget() }
-    open func createCameraISOWidget(current: Widget? = nil) -> Widget? { (current as? CameraISOWidget) ?? CameraISOWidget()}
-    open func createCameraShutterWidget(current: Widget? = nil) -> Widget? { (current as? CameraShutterWidget) ?? CameraShutterWidget()}
-    open func createCameraApertureWidget(current: Widget? = nil) -> Widget? { (current as? CameraApertureWidget) ?? CameraApertureWidget()}
-    open func createCameraExposureCompensationWidget(current: Widget? = nil) -> Widget? { (current as? CameraExposureCompensationWidget) ?? CameraExposureCompensationWidget()}
-    open func createCameraWhiteBalanceWidget(current: Widget? = nil) -> Widget? { (current as? CameraWhiteBalanceWidget) ?? CameraWhiteBalanceWidget()}
-    open func createCameraFocusRingWidget(current: Widget? = nil) -> Widget? { (current as? CameraFocusRingWidget) ?? CameraFocusRingWidget()}
-    open func createCameraStorageWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraAutoExposureWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraExposureFocusWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraFocusModeWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createCameraModeWidget(current: Widget? = nil) -> Widget? { (current as? CameraModeWidget) ?? CameraModeWidget() }
-    open func createCameraCaptureWidget(current: Widget? = nil) -> Widget?  { (current as? CameraCaptureWidget) ?? CameraCaptureWidget() }
-    open func createCameraFocusCalibrationWidget(current: Widget? = nil, calibration: Kernel.CameraFocusCalibration) -> DynamicSizeWidget? {
+    open func cameraMenuWidgetEnabled(channel: UInt? = nil) -> Bool { false }
+    open func createDefaultIndicatorsWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? DefaultIndicatorsWidget) ?? DefaultIndicatorsWidget()) }
+    open func createCameraMenuWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
+    open func createCameraExposureWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraExposureWidget) ?? CameraExposureWidget()) }
+    open func createCameraISOWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraISOWidget) ?? CameraISOWidget()) }
+    open func createCameraShutterWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraShutterWidget) ?? CameraShutterWidget()) }
+    open func createCameraApertureWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraApertureWidget) ?? CameraApertureWidget()) }
+    open func createCameraExposureCompensationWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraExposureCompensationWidget) ?? CameraExposureCompensationWidget()) }
+    open func createCameraWhiteBalanceWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraWhiteBalanceWidget) ?? CameraWhiteBalanceWidget()) }
+    open func createCameraFocusRingWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraFocusRingWidget) ?? CameraFocusRingWidget()) }
+    open func createCameraStorageWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
+    open func createCameraAutoExposureWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
+    open func createCameraExposureFocusWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
+    open func createCameraFocusModeWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
+    open func createCameraModeWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraModeWidget) ?? CameraModeWidget()) }
+    open func createCameraCaptureWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget?  { channelWidget(channel: channel, widget: (current as? CameraCaptureWidget) ?? CameraCaptureWidget()) }
+    open func createCameraVideoStreamSourceWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraVideoStreamSourceWidget) ?? CameraVideoStreamSourceWidget()) }
+    open func createCameraFocusCalibrationWidget(channel: UInt? = nil, current: ChannelWidget? = nil, calibration: Kernel.CameraFocusCalibration) -> ChannelWidget? {
         if let widget = current as? CameraFocusCalibrationWidget {
             return widget
         }
@@ -286,10 +343,15 @@ open class WidgetFactory {
         widget.calibration = calibration
         return widget
     }
-    open var cameraExposureMenuWidgetEnabled: Bool { false }
-    open func createCameraExposureMenuWidget(current: Widget? = nil) -> Widget? { nil }
-    open func createGimbalOrientationWidget(current: Widget? = nil) -> Widget?  { (current as? GimbalOrientationWidget) ?? GimbalOrientationWidget() }
+    open func cameraExposureMenuWidgetEnabled(channel: UInt? = nil) -> Bool { false }
+    open func createCameraExposureMenuWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
+    open func createGimbalOrientationWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? GimbalOrientationWidget) ?? GimbalOrientationWidget()) }
     open func createCompassWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKMenuWidget(current: Widget? = nil) -> Widget? { nil }
+    
+    private func channelWidget(channel: UInt? = nil, widget: ChannelWidget) -> ChannelWidget {
+        widget.channel = channel
+        return widget
+    }
 }

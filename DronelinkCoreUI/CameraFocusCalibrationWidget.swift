@@ -10,7 +10,7 @@ import CoreLocation
 import DronelinkCore
 import MaterialComponents.MaterialButtons
 
-public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
+public class CameraFocusCalibrationWidget: CameraWidget, ExecutorWidget {
     public override var updateInterval: TimeInterval { 0.1 }
     
     public let layout: DynamicSizeWidgetLayout = .medium
@@ -170,7 +170,7 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
     func reset() {
         referenceLocation = nil
         cancelCalibration()
-        try? session?.add(command: Kernel.OrientationGimbalCommand(orientation: Kernel.Orientation3Optional(x: typeSegmentedControl.selectedSegmentIndex == 0 ? -90.convertDegreesToRadians : 0)))
+        try? session?.add(command: Kernel.OrientationGimbalCommand(channel: channelResolved, orientation: Kernel.Orientation3Optional(x: typeSegmentedControl.selectedSegmentIndex == 0 ? -90.convertDegreesToRadians : 0)))
         DispatchQueue.main.async { [weak self] in
             self?.view.setNeedsUpdateConstraints()
         }
@@ -238,13 +238,13 @@ public class CameraFocusCalibrationWidget: UpdatableWidget, ExecutorWidget {
         
         reset()
         
-        try? session.add(command: Kernel.StopCaptureCameraCommand())
-        try? session.add(command: Kernel.ModeCameraCommand(mode: .photo))
-        try? session.add(command: Kernel.FocusModeCameraCommand(focusMode: .auto))
+        try? session.add(command: Kernel.StopCaptureCameraCommand(channel: channelResolved))
+        try? session.add(command: Kernel.ModeCameraCommand(channel: channelResolved, mode: .photo))
+        try? session.add(command: Kernel.FocusModeCameraCommand(channel: channelResolved, focusMode: .auto))
     }
     
     private func startFocus() {
-        calibrationFocusCommand = Kernel.FocusCameraCommand()
+        calibrationFocusCommand = Kernel.FocusCameraCommand(channel: channelResolved)
         try? session?.add(command: calibrationFocusCommand!)
     }
     

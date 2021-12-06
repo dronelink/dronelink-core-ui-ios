@@ -221,7 +221,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
             case .thirdPersonNadir:
                 trackingScene = MSMapScene(
                     location: MSGeopoint(latitude: location.latitude, longitude: location.longitude),
-                    radius: max(20, state.altitude / 1.5))
+                    radius: max(20, state.altitude / 1.8))
                 break
 
             case .thirdPersonOblique:

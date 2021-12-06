@@ -42,6 +42,9 @@
 "CameraExposureWidget.ev.title" = "EV";
 "CameraExposureWidget.wb.title" = "WB";
 
+"CameraVideoStreamSourceWidget.title" = "Video Stream Source";
+"CameraVideoStreamSourceWidget.pip" = "Side-by-Side";
+
 "GimbalOrientationWidget.title" = "Gimbal";
 
 "MissionDisengageReason.user.disengaged" = "Mission Paused";
@@ -98,16 +101,13 @@
 "StatusWidget.ready" = "All Systems Go";
 "StatusWidget.manual" = "Manual Flight";
 
-"DashboardWidget.device.legacy.title" = "Low Performance Device";
-"DashboardWidget.device.legacy.details" = "Using this device may result in poor flight performance or other unexpected issues. Please consider upgrading to a modern device for a safer and more reliable experience.";
-"DashboardWidget.device.legacy.confirm" = "I Understand";
-"DashboardWidget.device.legacy.confirm.dismiss" = "Don't Warn Again";
 "DashboardWidget.camera.noSDCard.title" = "SD Card Missing";
 "DashboardWidget.camera.noSDCard.details" = "Please make sure to insert an SD card before running a mission with data capture.";
 "DashboardWidget.cameraMenu" = "MENU";
-"DashboardWidget.contentSettings" = "Map Options";
+"DashboardWidget.contentView2.settings" = "Map Options";
 "DashboardWidget.map.mapbox" = "2D";
 "DashboardWidget.map.microsoft" = "3D (Beta)";
+"DashboardWidget.contentView3.settings" = "Camera Feed Options";
 
 "MapboxMapWidget.reset" = "Reset";
 "MapboxMapWidget.tracking" = "Follow Drone";

@@ -11,7 +11,7 @@ import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
 
-public class CameraOffsetsWidget: UpdatableWidget {
+public class CameraOffsetsWidget: CameraWidget {
     public override var updateInterval: TimeInterval { 0.25 }
     
     private let c1Image = DronelinkUI.loadImage(named: "baseline_remove_white_24pt")
@@ -136,6 +136,7 @@ public class CameraOffsetsWidget: UpdatableWidget {
             evStepsPending = steps
         }
         
+        let channel = channelResolved
         evStepsTimer = Timer.scheduledTimer(withTimeInterval: 0.75, repeats: false) { [weak self] timer in
             guard let session = self?.session, let steps = self?.evStepsPending else {
                 return
@@ -147,7 +148,7 @@ public class CameraOffsetsWidget: UpdatableWidget {
             }
             
             do {
-                let exposureCommand = Kernel.ExposureCompensationStepCameraCommand(exposureCompensationSteps: steps)
+                let exposureCommand = Kernel.ExposureCompensationStepCameraCommand(channel: channel, exposureCompensationSteps: steps)
                 try? session.add(command: exposureCommand)
                 self?.offsets.cameraExposureCompensationSteps += steps
                 self?.exposureCommand = exposureCommand
@@ -159,7 +160,7 @@ public class CameraOffsetsWidget: UpdatableWidget {
     @objc open override func update() {
         super.update()
         
-        let exposureCompensation = session?.cameraState(channel: 0)?.value.exposureCompensation
+        let exposureCompensation = session?.cameraState(channel: channelResolved)?.value.exposureCompensation
         c1Button.tintColor = exposureCommand == nil ? UIColor.white : DronelinkUI.Constants.secondaryColor
         c1Button.isEnabled = exposureCompensation != nil
         c2Button.tintColor = c1Button.tintColor

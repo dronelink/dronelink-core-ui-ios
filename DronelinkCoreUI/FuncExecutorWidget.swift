@@ -52,7 +52,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     private let cancelImage = DronelinkUI.loadImage(named: "baseline_close_white_36pt")
     private let droneImage = DronelinkUI.loadImage(named: "baseline_navigation_white_36pt")
     
-    private let segmentedMaxOptions = 2
+    private let segmentedMaxOptions = 3
     private var intro = true
     private var inputIndex = 0
     private var last: Bool {

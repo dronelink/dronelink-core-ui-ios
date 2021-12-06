@@ -10,10 +10,7 @@ import Foundation
 import UIKit
 import DronelinkCore
 
-public class CameraModeWidget: UpdatableWidget {
-    public var channel: UInt = 0
-    private var cameraState: CameraStateAdapter? { session?.cameraState(channel: channel)?.value }
-    
+public class CameraModeWidget: CameraWidget {
     public let button = UIButton()
     
     public var photoImage = DronelinkUI.loadImage(named: "cameraPhotoMode")?.withRenderingMode(.alwaysTemplate)
@@ -25,7 +22,7 @@ public class CameraModeWidget: UpdatableWidget {
         super.viewDidLoad()
         
         button.addShadow()
-        button.setImage(cameraState?.mode == .video ? videoImage : photoImage, for: .normal)
+        button.setImage(state?.mode == .video ? videoImage : photoImage, for: .normal)
         button.tintColor = .white
         button.addTarget(self, action: #selector(onTapped(_:)), for: .touchUpInside)
         view.addSubview(button)
@@ -40,7 +37,7 @@ public class CameraModeWidget: UpdatableWidget {
     
     @objc func onTapped(_ sender: UIButton) {
         button.isEnabled = false
-        let command = Kernel.ModeCameraCommand(mode: cameraState?.mode == .photo ? .video : .photo)
+        let command = Kernel.ModeCameraCommand(channel: channelResolved, mode: state?.mode == .photo ? .video : .photo)
         do {
             try? session?.add(command: command)
             pendingCommand = command
@@ -53,7 +50,7 @@ public class CameraModeWidget: UpdatableWidget {
             button.setImage(pendingCommand.mode == .video ? videoImage : photoImage, for: .normal)
         }
         else {
-            button.setImage(cameraState?.mode == .video ? videoImage : photoImage, for: .normal)
+            button.setImage(state?.mode == .video ? videoImage : photoImage, for: .normal)
         }
         button.isEnabled = session != nil && pendingCommand == nil
     }
