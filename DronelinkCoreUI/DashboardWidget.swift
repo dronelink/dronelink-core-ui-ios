@@ -178,9 +178,9 @@ public class DashboardWidget: DelegateWidget {
     private var cameraFocusCalibrationWidget: (ChannelWidget & DynamicSizeWidget)?
     private var activityWidget: DynamicSizeWidget? { cameraFocusCalibrationWidget ?? executorWidget }
     private var activityWidgetLayout: DynamicSizeWidgetLayout { activityWidget?.layout ?? .small }
-    private var droneOffsetsWidget1: Widget?
-    private var droneOffsetsWidget2: Widget?
-    private var cameraOffsetsWidget: Widget?
+    private var droneOffsetsWidget1: DroneOffsetsWidget?
+    private var droneOffsetsWidget2: DroneOffsetsWidget?
+    private var cameraOffsetsWidget: CameraOffsetsWidget?
     private var rtkStatusWidget: Widget?
     private var debugWidget: Widget?
     
@@ -907,6 +907,7 @@ public class DashboardWidget: DelegateWidget {
         }
         
         if let widget = cameraOffsetsWidget {
+            widget.channel = cameraChannel
             view.bringSubviewToFront(widget.view)
         }
     }
