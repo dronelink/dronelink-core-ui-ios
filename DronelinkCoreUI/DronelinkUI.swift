@@ -110,6 +110,7 @@ public class DronelinkUI: NSObject {
             }
             action.title = "dismiss".localized
             message.action = action
+            message.duration = 8.0
             MDCSnackbarManager.default.show(message)
         }
     }

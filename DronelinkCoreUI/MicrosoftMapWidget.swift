@@ -593,9 +593,32 @@ public class MicrosoftMapWidget: UpdatableWidget {
             //mapView.setScene(MSMapScene(locations: positions.map({ MSGeopoint(position: $0) }), heading: 0, pitch: 45), with: .none)
         }
     }
+    
+    private func apply(userInterfaceSettings: Kernel.UserInterfaceSettings?) {
+        if let userInterfaceSettings = userInterfaceSettings {
+            switch userInterfaceSettings.mapTracking {
+            case .noChange:
+                break
+                
+            case .none:
+                tracking = .none
+                break
+                
+            case .droneNorthUp:
+                tracking = .thirdPersonNadir
+                break
+                
+            case .droneHeading:
+                tracking = .thirdPersonNadir
+                break
+            }
+        }
+    }
 
     public override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
+        
+        apply(userInterfaceSettings: executor.userInterfaceSettings)
         
         DispatchQueue.main.async { [weak self] in
             self?.updateScene()
@@ -658,6 +681,8 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
+        
+        apply(userInterfaceSettings: executor.userInterfaceSettings)
         
         DispatchQueue.main.async { [weak self] in
             self?.updateFuncElements()

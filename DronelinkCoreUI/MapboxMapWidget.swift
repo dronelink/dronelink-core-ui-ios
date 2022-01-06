@@ -358,6 +358,27 @@ public class MapboxMapWidget: UpdatableWidget {
         }
     }
     
+    private func apply(userInterfaceSettings: Kernel.UserInterfaceSettings?) {
+        if let userInterfaceSettings = userInterfaceSettings {
+            switch userInterfaceSettings.mapTracking {
+            case .noChange:
+                break
+                
+            case .none:
+                tracking = .none
+                break
+                
+            case .droneNorthUp:
+                tracking = .droneNorthUp
+                break
+                
+            case .droneHeading:
+                tracking = .droneHeading
+                break
+            }
+        }
+    }
+    
     public override func onLocated(session: DroneSession) {
         super.onLocated(session: session)
         
@@ -370,6 +391,8 @@ public class MapboxMapWidget: UpdatableWidget {
 
     public override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
+        
+        apply(userInterfaceSettings: executor.userInterfaceSettings)
         
         DispatchQueue.main.async { [weak self] in
             self?.missionCentered = false
@@ -425,6 +448,8 @@ public class MapboxMapWidget: UpdatableWidget {
     
     public override func onFuncLoaded(executor: FuncExecutor) {
         super.onFuncLoaded(executor: executor)
+        
+        apply(userInterfaceSettings: executor.userInterfaceSettings)
         
         DispatchQueue.main.async { [weak self] in
             self?.updateFuncElements()
