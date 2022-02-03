@@ -333,7 +333,7 @@ open class WidgetFactory {
     open func createCameraFocusModeWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
     open func createCameraModeWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraModeWidget) ?? CameraModeWidget()) }
     open func createCameraCaptureWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget?  { channelWidget(channel: channel, widget: (current as? CameraCaptureWidget) ?? CameraCaptureWidget()) }
-    open func createCameraVideoStreamSourceWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { channelWidget(channel: channel, widget: (current as? CameraVideoStreamSourceWidget) ?? CameraVideoStreamSourceWidget()) }
+    open func createCameraVideoStreamSourceWidget(channel: UInt? = nil, current: ChannelWidget? = nil) -> ChannelWidget? { nil }
     open func createCameraFocusCalibrationWidget(channel: UInt? = nil, current: ChannelWidget? = nil, calibration: Kernel.CameraFocusCalibration) -> ChannelWidget? {
         if let widget = current as? CameraFocusCalibrationWidget {
             return widget
@@ -350,7 +350,7 @@ open class WidgetFactory {
     open func createRTKStatusWidget(current: Widget? = nil) -> Widget? { nil }
     open func createRTKMenuWidget(current: Widget? = nil) -> Widget? { nil }
     
-    private func channelWidget(channel: UInt? = nil, widget: ChannelWidget) -> ChannelWidget {
+    open func channelWidget(channel: UInt? = nil, widget: ChannelWidget) -> ChannelWidget {
         widget.channel = channel
         return widget
     }
