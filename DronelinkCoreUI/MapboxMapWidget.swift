@@ -44,6 +44,8 @@ public class MapboxMapWidget: UpdatableWidget {
     private var tracking = Tracking.none
     
     public override func viewDidLoad() {
+        super.viewDidLoad()
+        
         mapView.delegate = self
         mapView.addShadow()
         mapView.styleURL = MGLStyle.satelliteStreetsStyleURL

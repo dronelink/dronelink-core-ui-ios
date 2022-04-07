@@ -66,6 +66,8 @@ public class MicrosoftMapWidget: UpdatableWidget {
     private var trackingPrevious = Tracking.none
 
     public override func viewDidLoad() {
+        super.viewDidLoad()
+        
         mapView.addShadow()
         mapView.clipsToBounds = true
         mapView.addCameraDidChangeHandler {  [weak self] (reason, camera) -> Bool in

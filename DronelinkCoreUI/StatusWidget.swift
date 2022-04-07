@@ -35,7 +35,7 @@ public class StatusWidget: UpdatableWidget {
     
     internal var status: Status {
         let dronelinkStatusMessages = Dronelink.shared.statusMessages
-        if let statusMessage = dronelinkStatusMessages?.filter({ $0.level.compare(to: .warning) > 0 }).first {
+        if let statusMessage = dronelinkStatusMessages.filter({ $0.level.compare(to: .warning) > 0 }).first {
             return statusMessage.status
         }
         
@@ -45,13 +45,15 @@ public class StatusWidget: UpdatableWidget {
             return statuses.disconnected
         }
         
-        if let statusMessage = targetDroneSessionManager?.statusMessages?.sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
+        if let statusMessage = ((targetDroneSessionManager?.statusMessages ?? []) + (session?.state?.value.statusMessages ?? [])).sorted(by: { (l, r) -> Bool in l.level.compare(to: r.level) > 0 }).first {
             return statusMessage.status
         }
         
-        if let statusMessage = dronelinkStatusMessages?.first {
+        if let statusMessage = dronelinkStatusMessages.first {
             return statusMessage.status
         }
+        
+        //FIXME add manual flight and all systems go and session status messages
         
         return state.isFlying ? statuses.manualFlight : statuses.ready
     }
