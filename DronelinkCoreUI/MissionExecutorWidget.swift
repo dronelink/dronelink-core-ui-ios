@@ -331,7 +331,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         if missionExecutor.requiredTakeoffArea == nil,
             let actualTakeoffLocation = session.state?.value.takeoffLocation,
             let suggestedTakeoffLocation = missionExecutor.takeoffCoordinate?.location,
-            actualTakeoffLocation.distance(from: suggestedTakeoffLocation) > 50.convertFeetToMeters {
+            actualTakeoffLocation.distance(from: suggestedTakeoffLocation) > 300.convertFeetToMeters {
             if let deviceLocation = Dronelink.shared.location?.value, deviceLocation.verticalAccuracy >= 0 {
                 missionExecutor.droneTakeoffAltitudeAlternate = deviceLocation.altitude
             }
