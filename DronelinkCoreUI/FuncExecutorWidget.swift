@@ -466,7 +466,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             update()
             funcExecutor.execute(droneSession: session) { [weak self] error in
                 DispatchQueue.main.async {
-                    DronelinkUI.shared.showSnackbar(text: error)
+                    DronelinkUI.shared.showDialog(title: error)
                     self?.executing = false
                     self?.view.setNeedsUpdateConstraints()
                 }
@@ -521,12 +521,12 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     
     @objc func onDroneMark(sender: Any) {
         guard let session = self.session else {
-            DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.drone.unavailable".localized)
+            DronelinkUI.shared.showDialog(title: "FuncExecutorWidget.input.drone.unavailable".localized)
             return
         }
         
         if session.state?.value.location == nil {
-            DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.location.unavailable".localized)
+            DronelinkUI.shared.showDialog(title: "FuncExecutorWidget.input.location.unavailable".localized)
             return
         }
         
@@ -545,7 +545,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     func addNextDynamicInput() {
         funcExecutor?.addNextDynamicInput(droneSession: session) { [weak self] error in
              DispatchQueue.main.async {
-                DronelinkUI.shared.showSnackbar(text: error)
+                DronelinkUI.shared.showDialog(title: error)
                 
                 guard let funcExecutorWidget = self else {
                     return
@@ -611,7 +611,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             case .drone:
                 if next {
                     if funcExecutor?.readValue(inputIndex: inputIndex) == nil && !input.optional {
-                        DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.required".localized)
+                        DronelinkUI.shared.showDialog(title: "FuncExecutorWidget.input.required".localized)
                         return false
                     }
                     return true
@@ -622,7 +622,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         }
         
         if !input.optional && value == nil && input.variable.valueType != .null {
-            DronelinkUI.shared.showSnackbar(text: "FuncExecutorWidget.input.required".localized)
+            DronelinkUI.shared.showDialog(title: "FuncExecutorWidget.input.required".localized)
             return false
         }
         

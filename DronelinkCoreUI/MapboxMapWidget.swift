@@ -51,7 +51,9 @@ public class MapboxMapWidget: UpdatableWidget {
         mapView.styleURL = MGLStyle.satelliteStreetsStyleURL
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         mapView.attributionButtonPosition = .bottomRight
+        mapView.attributionButton.isHidden = true
         mapView.logoViewPosition = .bottomRight
+        mapView.logoView.isHidden = true
         mapView.compassViewPosition = .bottomRight
         mapView.showsUserLocation = true
         mapView.showsScale = false

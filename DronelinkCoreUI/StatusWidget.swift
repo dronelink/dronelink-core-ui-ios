@@ -53,8 +53,6 @@ public class StatusWidget: UpdatableWidget {
             return statusMessage.status
         }
         
-        //FIXME add manual flight and all systems go and session status messages
-        
         return state.isFlying ? statuses.manualFlight : statuses.ready
     }
     
