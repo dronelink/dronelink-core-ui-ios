@@ -42,8 +42,8 @@ open class CameraISOWidget: CameraWidget {
                 return "na".localized
             }
             
-            if iso == .auto, let isoSensitivity = self?.state?.isoSensitivity {
-                return "\(isoSensitivity)"
+            if iso == .auto, let isoActual = self?.state?.isoActual {
+                return "\(isoActual)"
             }
             return Dronelink.shared.formatEnum(name: "CameraISO",
                                                value: iso.rawValue,
