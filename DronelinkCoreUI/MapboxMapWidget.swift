@@ -396,6 +396,7 @@ public class MapboxMapWidget: UpdatableWidget {
     public override func onMissionLoaded(executor: MissionExecutor) {
         super.onMissionLoaded(executor: executor)
         
+        currentMissionEstimateID = nil
         apply(userInterfaceSettings: executor.userInterfaceSettings)
         
         DispatchQueue.main.async { [weak self] in

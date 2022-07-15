@@ -98,7 +98,7 @@
 "VerticalSpeedWidget.prefix" = "V/S";
 
 "StatusWidget.disconnected" = "Disconnected";
-"StatusWidget.ready" = "All Systems Go";
+"StatusWidget.ready" = "Ready To Go";
 "StatusWidget.manual" = "Manual Flight";
 
 "DashboardWidget.camera.noSDCard.title" = "SD Card Missing";
