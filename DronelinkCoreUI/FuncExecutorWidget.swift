@@ -545,21 +545,23 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     func addNextDynamicInput() {
         funcExecutor?.addNextDynamicInput(droneSession: session) { [weak self] error in
              DispatchQueue.main.async {
-                DronelinkUI.shared.showDialog(title: error)
-                
-                guard let funcExecutorWidget = self else {
-                    return
-                }
-                
-                funcExecutorWidget.inputIndex -= 1
-                if funcExecutorWidget.inputIndex < 0 {
-                    funcExecutorWidget.inputIndex = 0
-                    funcExecutorWidget.intro = true
-                }
-                else {
-                    funcExecutorWidget.readValue()
-                }
-                funcExecutorWidget.view.setNeedsUpdateConstraints()
+                 if let error = error {
+                    DronelinkUI.shared.showDialog(title: error)
+                    
+                    guard let funcExecutorWidget = self else {
+                        return
+                    }
+                    
+                    funcExecutorWidget.inputIndex -= 1
+                    if funcExecutorWidget.inputIndex < 0 {
+                        funcExecutorWidget.inputIndex = 0
+                        funcExecutorWidget.intro = true
+                    }
+                    else {
+                        funcExecutorWidget.readValue()
+                    }
+                    funcExecutorWidget.view.setNeedsUpdateConstraints()
+                 }
             }
         }
     }
