@@ -325,10 +325,7 @@ public class MapboxMapWidget: UpdatableWidget {
         }
         funcMapOverlayAnnotations.removeAll()
 
-        if let mapOverlays = funcExecutor?.mapOverlays(droneSession: session, error: { error in
-            DispatchQueue.main.async {
-               DronelinkUI.shared.showSnackbar(text: error)
-           }
+        if let mapOverlays = funcExecutor?.mapOverlays(droneSession: session, error: { _ in
         }) {
             mapOverlays.enumerated().forEach {
                 let mapOverlay = $0.element
