@@ -27,6 +27,8 @@ public class MapboxMapWidget: UpdatableWidget {
     private let droneAnnotation = MGLPointAnnotation()
     private var droneAnnotationView: MGLAnnotationView?
     private var userDroneAnnotation: MGLAnnotation?
+    private var missionReferenceAnnotation: MGLPointAnnotation?
+    private var missionReferenceAnnotationView: MGLAnnotationView?
     private var missionRequiredTakeoffAreaAnnotation: MGLAnnotation?
     private var missionRestrictionZoneAnnotations: [(annotation: MGLPolygon, color: UIColor?)] = []
     private var missionEstimateBackgroundAnnotation: MGLAnnotation?
@@ -397,6 +399,12 @@ public class MapboxMapWidget: UpdatableWidget {
         apply(userInterfaceSettings: executor.userInterfaceSettings)
         
         DispatchQueue.main.async { [weak self] in
+            if (executor.userInterfaceSettings?.droneOffsetsVisible ?? false) {
+                let missionReferenceAnnotation = MGLPointAnnotation()
+                self?.missionReferenceAnnotation = missionReferenceAnnotation
+                missionReferenceAnnotation.coordinate = executor.referenceCoordinate.coordinate
+                self?.mapView.addAnnotation(missionReferenceAnnotation)
+            }
             self?.missionCentered = false
             self?.updateMissionRequiredTakeoffArea()
             self?.updateMissionRestrictionZones()
@@ -410,6 +418,9 @@ public class MapboxMapWidget: UpdatableWidget {
         super.onMissionUnloaded(executor: executor)
         
         DispatchQueue.main.async { [weak self] in
+            if let missionReferenceAnnotation = self?.missionReferenceAnnotation {
+                self?.mapView.removeAnnotation(missionReferenceAnnotation)
+            }
             self?.missionCentered = false
             self?.updateMissionRequiredTakeoffArea()
             self?.updateMissionRestrictionZones()
@@ -517,12 +528,29 @@ extension MapboxMapWidget: MGLMapViewDelegate {
             return drone
         }
         
+        if (annotation === missionReferenceAnnotation) {
+            var missionReference = mapView.dequeueReusableAnnotationView(withIdentifier: "mission-reference")
+            if missionReference == nil {
+                missionReference = MGLAnnotationView(reuseIdentifier: "mission-reference")
+                let imageView = UIImageView(image: DronelinkUI.loadImage(named: "mission-reference", renderingMode: .alwaysOriginal))
+                imageView.frame = CGRect(x: 0, y: 0, width: 38, height: 38)
+                missionReference?.addSubview(imageView)
+                missionReference?.frame = imageView.frame
+                missionReferenceAnnotationView = missionReference
+                missionReferenceAnnotationView?.centerOffset = CGVector(dx: 0, dy: -19)
+            }
+
+            return missionReference
+        }
+        
         if (annotation === missionReengagementDroneAnnotation) {
             var droneReengagement = mapView.dequeueReusableAnnotationView(withIdentifier: "drone-reengagement")
             if droneReengagement == nil {
                 droneReengagement = MGLAnnotationView(reuseIdentifier: "drone-reengagement")
-                droneReengagement?.addSubview(UIImageView(image: DronelinkUI.loadImage(named: "drone-reengagement", renderingMode: .alwaysOriginal)))
-                droneReengagement?.frame = CGRect(x: 0, y: 0, width: 15, height: 15)
+                let imageView = UIImageView(image: DronelinkUI.loadImage(named: "drone-reengagement", renderingMode: .alwaysOriginal))
+                imageView.frame = CGRect(x: 0, y: 0, width: 22, height: 22)
+                droneReengagement?.addSubview(imageView)
+                droneReengagement?.frame = imageView.frame
                 missionReengagementDroneAnnotationView = droneReengagement
             }
 

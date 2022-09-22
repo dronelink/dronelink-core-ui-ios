@@ -299,7 +299,7 @@ open class WidgetFactory {
         return nil
     }
     open func videoFeedWidgetEnabled(channel: UInt?) -> Bool { false }
-    open func createVideoFeedWidget(channel: UInt? = nil, current: Widget? = nil) -> Widget? { nil }
+    open func createVideoFeedWidget(channel: UInt? = nil, current: Widget? = nil, overlays: Bool = true) -> Widget? { nil }
     open func createMainMenuWidget(current: Widget? = nil) -> Widget? { nil }
     open func createStatusBackgroundWidget(current: Widget? = nil) -> Widget? { (current as? StatusGradientWidget) ?? StatusGradientWidget() }
     open func createStatusForegroundWidget(current: Widget? = nil) -> Widget?  { (current as? StatusLabelWidget) ?? StatusLabelWidget() }
