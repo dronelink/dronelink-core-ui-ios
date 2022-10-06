@@ -1,7 +1,7 @@
 PODS:
-  - Agrume (5.8.0):
+  - Agrume (5.8.4):
     - SwiftyGif
-  - DronelinkCore (4.0.0)
+  - DronelinkCore (4.1.0)
   - IQKeyboardManager (6.5.10)
   - Kingfisher (7.1.2)
   - Mapbox-iOS-SDK (6.4.1):
@@ -164,7 +164,7 @@ PODS:
 
 DEPENDENCIES:
   - Agrume (~> 5.8.0)
-  - DronelinkCore (from `../../private/dronelink-core-ios`)
+  - DronelinkCore (~> 4.1.0)
   - IQKeyboardManager (~> 6.5.6)
   - Kingfisher (~> 7.1.0)
   - Mapbox-iOS-SDK (~> 6.4.0)
@@ -185,6 +185,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - Agrume
+    - DronelinkCore
     - IQKeyboardManager
     - Kingfisher
     - Mapbox-iOS-SDK
@@ -200,13 +201,9 @@ SPEC REPOS:
     - SwiftyGif
     - SwiftyUserDefaults
 
-EXTERNAL SOURCES:
-  DronelinkCore:
-    :path: "../../private/dronelink-core-ios"
-
 SPEC CHECKSUMS:
-  Agrume: 0b1a42b5bfbc3aa9f0801f2857d8df1138cf2951
-  DronelinkCore: cee4bbf2523fea3ef9c1cfdde92b55b50655f027
+  Agrume: 7c726bddf365f92424d38ce90a906cd4cdd49334
+  DronelinkCore: 92e1d5b74327f74665f9e5d23289f27595978718
   IQKeyboardManager: 45a1fa55c1a5b02c61ac0fd7fd5b62bb4ad20d97
   Kingfisher: 44ed6a8504763f27bab46163adfac83f5deb240c
   Mapbox-iOS-SDK: f870f83cbdc7aa4a74afcee143aafb0dae390c82
@@ -222,6 +219,6 @@ SPEC CHECKSUMS:
   SwiftyGif: 6c3eafd0ce693cad58bb63d2b2fb9bacb8552780
   SwiftyUserDefaults: 63f80248cf5bfb3458825d9a78f2eb7e1293a040
 
-PODFILE CHECKSUM: 0c1831f16183ff388a675d8e31d7cae30daba74d
+PODFILE CHECKSUM: 7ee677c56349fd3f020f147719b4169b32cf7c9f
 
 COCOAPODS: 1.11.2
