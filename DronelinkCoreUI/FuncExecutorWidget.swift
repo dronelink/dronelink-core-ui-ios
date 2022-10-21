@@ -814,9 +814,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
         
         self.inputIndex = 0
         self.intro = true
-        if let urls = executor.urls {
-            DronelinkUI.shared.cacheImages(urls: urls)
-        }
+        DronelinkUI.shared.cacheImages(urls: executor.urls)
     }
     
     open override func onFuncExecuted(executor: FuncExecutor) {
