@@ -198,7 +198,7 @@ public class MapboxMapWidget: UpdatableWidget {
             }
         }
     }
-    
+    //test comment
     private func updateMissionEstimate() {
         if missionExecutor?.estimate?.id == currentMissionEstimateID {
             return
