@@ -7,7 +7,6 @@
 //
 import UIKit
 import Foundation
-import Mapbox
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import MicrosoftMaps
