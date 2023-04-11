@@ -30,25 +30,24 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Dronelink.shared.add(delegate: self)
+        Dronelink.shared.droneSessionManagers.forEach {
+            $0.add(delegate: self)
+        }
     }
     
     override open func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         Dronelink.shared.remove(delegate: self)
-        Dronelink.shared.missionExecutor?.remove(delegate: self)
-        Dronelink.shared.modeExecutor?.remove(delegate: self)
-        Dronelink.shared.funcExecutor?.remove(delegate: self)
         Dronelink.shared.droneSessionManagers.forEach {
             $0.remove(delegate: self)
             $0.session?.remove(delegate: self)
         }
+        Dronelink.shared.missionExecutor?.remove(delegate: self)
+        Dronelink.shared.modeExecutor?.remove(delegate: self)
+        Dronelink.shared.funcExecutor?.remove(delegate: self)
     }
 
     open func onRegistered(error: String?) {}
-    
-    open func onDroneSessionManagerAdded(manager: DroneSessionManager) {
-        manager.add(delegate: self)
-    }
     
     open func onMissionLoaded(executor: MissionExecutor) {
         executor.add(delegate: self)
