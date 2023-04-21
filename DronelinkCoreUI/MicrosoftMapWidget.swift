@@ -66,7 +66,7 @@ public class MicrosoftMapWidget: UpdatableWidget {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        
+        mapView.credentialsKey = DronelinkUI.microsoftMapCredentialsKey ?? ""
         mapView.addShadow()
         mapView.clipsToBounds = true
         mapView.addCameraDidChangeHandler {  [weak self] (reason, camera) -> Bool in

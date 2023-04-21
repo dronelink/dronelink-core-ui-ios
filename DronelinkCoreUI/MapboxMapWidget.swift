@@ -37,7 +37,7 @@ public class MapboxMapWidget: UpdatableWidget {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        let resourceOptions = ResourceOptions(accessToken: "pk.eyJ1IjoiZHJvbmVsaW5rIiwiYSI6ImNqcHdvZm12NjE0bTQ0OXBjcHV2bGZmYWYifQ.zpJXSjHjzV_w2reksB6Q7A") //FIXME where should this token live?
+        let resourceOptions = ResourceOptions(accessToken: DronelinkUI.mapboxMapCredentialsKey ?? "")
         let mapInitOptions = MapInitOptions(resourceOptions: resourceOptions, styleURI: .satelliteStreets)
         mapView = MapView(frame: view.bounds, mapInitOptions: mapInitOptions)
         
@@ -102,15 +102,27 @@ public class MapboxMapWidget: UpdatableWidget {
 
             if let droneView = droneView {
                 droneView.subviews.first?.transform = CGAffineTransform(rotationAngle: CGFloat((state.orientation.yaw.convertRadiansToDegrees - mapView.cameraState.bearing).convertDegreesToRadians))
-                    try? mapView.viewAnnotations.update(droneView, options: droneViewOptions) //FIXME what should I do with error from try? leave it ? NSLog?
+                do {
+                    try mapView.viewAnnotations.update(droneView, options: droneViewOptions)
+                } catch let error {
+                    NSLog("MapboxMapWidget Error: \(error)")
+                }
             } else {
-                droneView = createDroneView(yawOrientation: state.orientation.yaw, cameraHeading: mapView.cameraState.bearing, alpha: 1.0)
+                droneView = createUiView(imageName: "drone", viewSize: CGSize(width: 30, height: 30), alpha: 1.0, rotationAngle: CGFloat((state.orientation.yaw.convertRadiansToDegrees - mapView.cameraState.bearing).convertDegreesToRadians))
                 if let droneView = droneView {
-                    try? mapView.viewAnnotations.add(droneView, id: "drone", options: droneViewOptions)
+                    do {
+                        try mapView.viewAnnotations.add(droneView, id: "drone", options: droneViewOptions)
+                    } catch let error {
+                        NSLog("MapboxMapWidget Error: \(error)")
+                    }
                 }
             }
         } else if let droneView = droneView {
-            try? mapView.viewAnnotations.update(droneView, options: ViewAnnotationOptions(visible: false))
+            do {
+                try mapView.viewAnnotations.update(droneView, options: ViewAnnotationOptions(visible: false))
+            } catch let error {
+                NSLog("MapboxMapWidget Error: \(error)")
+            }
         }
         
         if tracking != .none {
@@ -128,28 +140,17 @@ public class MapboxMapWidget: UpdatableWidget {
         }
     }
     
-    private func createDroneView(yawOrientation: Double, cameraHeading: CLLocationDirection, alpha: CGFloat) -> UIView {
-        let droneView = UIView()
-        droneView.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        let droneImageView = UIImageView(image: DronelinkUI.loadImage(named: "drone", renderingMode: .alwaysOriginal))
-        droneImageView.frame = droneView.bounds
-        droneImageView.contentMode = .scaleAspectFit
-        droneImageView.alpha = alpha
-        droneImageView.transform = CGAffineTransform(rotationAngle: CGFloat((yawOrientation.convertRadiansToDegrees - cameraHeading).convertDegreesToRadians))
-        droneView.transform = .identity
-        droneView.addSubview(droneImageView)
-        return droneView
-    }
-    
-    private func createMissionReferenceView() -> UIView {
-        let missionReferenceView = UIView()
-        missionReferenceView.frame = CGRect(x: 0, y: 0, width: 38, height: 38)
-        let missionReferenceImageView = UIImageView(image: DronelinkUI.loadImage(named: "mission-reference", renderingMode: .alwaysOriginal))
-        missionReferenceImageView.frame = missionReferenceView.bounds
-        missionReferenceImageView.contentMode = .scaleAspectFit
-        missionReferenceView.transform = .identity
-        missionReferenceView.addSubview(missionReferenceImageView)
-        return missionReferenceView
+    private func createUiView(imageName: String, viewSize: CGSize, alpha: CGFloat, rotationAngle: CGFloat) -> UIView {
+        let uiView = UIView()
+        uiView.frame = CGRect(x: 0, y: 0, width: viewSize.width, height: viewSize.height)
+        let uiImageView = UIImageView(image: DronelinkUI.loadImage(named: imageName, renderingMode: .alwaysOriginal))
+        uiImageView.frame = uiView.bounds
+        uiImageView.contentMode = .scaleAspectFit
+        uiImageView.alpha = alpha
+        uiImageView.transform = CGAffineTransform(rotationAngle: rotationAngle)
+        uiView.transform = .identity
+        uiView.addSubview(uiImageView)
+        return uiView
     }
 
     private func set(visibleCoordinates: [CLLocationCoordinate2D], direction: CLLocationDirection? = nil) {
@@ -415,7 +416,11 @@ public class MapboxMapWidget: UpdatableWidget {
         
         guard modeExecutor?.engaged ?? false else {
             if let modeTargetView = modeTargetView {
-                try? mapView.viewAnnotations.update(modeTargetView, options: ViewAnnotationOptions(visible: false))
+                do {
+                    try mapView.viewAnnotations.update(modeTargetView, options: ViewAnnotationOptions(visible: false))
+                } catch let error {
+                    NSLog("MapboxMapWidget Error: \(error)")
+                }
             }
             return
         }
@@ -425,16 +430,30 @@ public class MapboxMapWidget: UpdatableWidget {
 
             if let modeTargetView = modeTargetView {
                 modeTargetView.subviews.first?.transform = CGAffineTransform(rotationAngle: CGFloat((modeTarget.orientation.yaw.convertRadiansToDegrees - mapView.cameraState.bearing).convertDegreesToRadians))
-                try? mapView.viewAnnotations.update(modeTargetView, options: modeTargetOptions)
+                do {
+                    try mapView.viewAnnotations.update(modeTargetView, options: modeTargetOptions)
+                } catch let error {
+                    NSLog("MapboxMapWidget Error: \(error)")
+                
+                }
             } else {
-                modeTargetView = createDroneView(yawOrientation: modeTarget.orientation.yaw, cameraHeading: mapView.cameraState.bearing, alpha: 0.5)
+                modeTargetView = createUiView(imageName: "drone", viewSize: CGSize(width: 30, height: 30), alpha: 0.5, rotationAngle: CGFloat((modeTarget.orientation.yaw.convertRadiansToDegrees - mapView.cameraState.bearing).convertDegreesToRadians))
                 if let modeTargetView = modeTargetView {
-                    try? mapView.viewAnnotations.add(modeTargetView, options: modeTargetOptions)
+                    do {
+                        try mapView.viewAnnotations.add(modeTargetView, options: modeTargetOptions)
+                    } catch let error {
+                        NSLog("MapboxMapWidget Error: \(error)")
+                    
+                    }
                 }
             }
             
         } else if let modeTargetView = modeTargetView {
-            try? mapView.viewAnnotations.update(modeTargetView, options: ViewAnnotationOptions(visible: false))
+            do {
+                try mapView.viewAnnotations.update(modeTargetView, options: ViewAnnotationOptions(visible: false))
+            } catch let error {
+                NSLog("MapboxMapWidget Error: \(error)")
+            }
         }
         
         if tracking == .none, let visibleCoordinates = modeExecutor?.visibleCoordinates {
@@ -486,11 +505,19 @@ public class MapboxMapWidget: UpdatableWidget {
                 if let mapView = self?.mapView {
                     let missionReferenceViewOptions = ViewAnnotationOptions(geometry: Point(executor.referenceCoordinate.coordinate), visible: true, offsetY: 19, selected: true)
                     if let missionReferenceView = self?.missionReferenceView {
-                        try? mapView.viewAnnotations.update(missionReferenceView, options: missionReferenceViewOptions)
+                        do {
+                            try mapView.viewAnnotations.update(missionReferenceView, options: missionReferenceViewOptions)
+                        } catch let error {
+                            NSLog("MapboxMapWidget Error: \(error)")
+                        }
                     } else {
-                        self?.missionReferenceView = self?.createMissionReferenceView()
+                        self?.missionReferenceView = self?.createUiView(imageName: "mission-reference", viewSize: CGSize(width: 38, height: 38), alpha: 1, rotationAngle: 0)
                         if let missionReferenceView = self?.missionReferenceView {
-                            try? mapView.viewAnnotations.add(missionReferenceView, id: "mission-reference", options: missionReferenceViewOptions)
+                            do {
+                                try mapView.viewAnnotations.add(missionReferenceView, id: "mission-reference", options: missionReferenceViewOptions)
+                            } catch let error {
+                                NSLog("MapboxMapWidget Error: \(error)")
+                            }
                         }
                     }
                 }
@@ -511,7 +538,11 @@ public class MapboxMapWidget: UpdatableWidget {
         DispatchQueue.main.async { [weak self] in
             
             if let missionReferenceView = self?.missionReferenceView, let mapView = self?.mapView {
-                try? mapView.viewAnnotations.remove(missionReferenceView)
+                do {
+                    try mapView.viewAnnotations.remove(missionReferenceView)
+                } catch let error {
+                    NSLog("MapboxMapWidget Error: \(error)")
+                }
             }
             self?.missionCentered = false
             self?.updateMissionRequiredTakeoffArea()

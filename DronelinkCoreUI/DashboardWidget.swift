@@ -55,16 +55,13 @@ private enum MapStyle: String {
 }
 
 public class DashboardWidget: DelegateWidget {
-    public static func create(microsoftMapCredentialsKey: String? = nil) -> DashboardWidget {
+    public static func create() -> DashboardWidget {
         let dashboardViewController = DashboardWidget()
-        dashboardViewController.microsoftMapCredentialsKey = microsoftMapCredentialsKey
         dashboardViewController.modalPresentationStyle = .fullScreen
         return dashboardViewController
     }
     
     private var statusWidgetHeight: CGFloat { return tablet ? 50 : 40 }
-    
-    private var microsoftMapCredentialsKey: String?
     
     private let _dismissButton = UIButton(type: .custom)
     public var dismissButton: UIButton { _dismissButton }
@@ -731,7 +728,6 @@ public class DashboardWidget: DelegateWidget {
 
             case .microsoft:
                 mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MicrosoftMapWidget) ?? MicrosoftMapWidget(), subview: mapContentView)
-                (mapWidget as? MicrosoftMapWidget)?.mapView.credentialsKey = microsoftMapCredentialsKey ?? ""
                 break
 
             case .none:
