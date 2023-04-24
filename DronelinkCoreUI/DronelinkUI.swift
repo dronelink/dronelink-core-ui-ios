@@ -18,6 +18,8 @@ import Kingfisher
 extension DronelinkUI {
     public static let shared = DronelinkUI()
     public static let bundle = Bundle(for: DronelinkUI.self)
+    public static var mapboxMapCredentialsKey: String?
+    public static var microsoftMapCredentialsKey: String?
     public static func loadImage(named: String, renderingMode: UIImage.RenderingMode = .alwaysTemplate) -> UIImage? {
         return UIImage(named: named, in: DronelinkUI.bundle, compatibleWith: nil)?.withRenderingMode(renderingMode)
     }

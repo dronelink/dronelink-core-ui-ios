@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.dependency "SnapKit", "~> 5.0.1"
   s.dependency "SwiftyUserDefaults", "~> 5.3.0"
   s.dependency "MicrosoftMapsSDK", "~> 1.2.0"
-  s.dependency "Mapbox-iOS-SDK", "~> 6.4.0"
+  s.dependency "MapboxMaps", "~> 10.11.1"
   s.dependency "MaterialComponents/Palettes", "~> 124.2.0"
   s.dependency "MaterialComponents/Buttons", "~> 124.2.0"
   s.dependency "MaterialComponents/Buttons+Theming", "~> 124.2.0"
