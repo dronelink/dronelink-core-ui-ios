@@ -79,7 +79,6 @@ public class MapboxMapWidget: UpdatableWidget {
         }
         
         if let pointAnnotationManager = pointAnnotationManager {
-            //FIXME refactor ids to strings file?
             if let state = session?.state?.value, let droneHomeLocation = state.homeLocation {
                 var droneHomeAnnotation = PointAnnotation(id: "drone-home", coordinate: droneHomeLocation.coordinate)
                 if let droneHomeAnnotationImage = DronelinkUI.loadImage(named: "home", renderingMode: .alwaysOriginal) {
