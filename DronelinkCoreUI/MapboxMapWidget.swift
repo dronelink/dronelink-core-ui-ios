@@ -58,7 +58,6 @@ public class MapboxMapWidget: UpdatableWidget {
             polylineAnnotationManager = mapView.annotations.makePolylineAnnotationManager()
             polygonAnnotationManager = mapView.annotations.makePolygonAnnotationManager()
             pointAnnotationManager = mapView.annotations.makePointAnnotationManager()
-            pointAnnotationManager?.iconAllowOverlap
             
             view.addSubview(mapView)
             
