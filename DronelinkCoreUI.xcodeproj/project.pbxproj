@@ -11,7 +11,6 @@
 		242AC08623870D4C00438D26 /* TelemetryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242AC08523870D4C00438D26 /* TelemetryWidget.swift */; };
 		243CB1FC26739C93002F958C /* IndicatorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243CB1FB26739C93002F958C /* IndicatorWidget.swift */; };
 		243CB1FE26739CFA002F958C /* GimbalIndicatorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 243CB1FD26739CFA002F958C /* GimbalIndicatorWidget.swift */; };
-		2446AF98236A0153001A1C4F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2446AF96236A0153001A1C4F /* Localizable.strings */; };
 		2446AF99236A0153001A1C4F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2446AF97236A0153001A1C4F /* Images.xcassets */; };
 		2459750B23679B8C008CAB6B /* DronelinkUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2459750A23679B8C008CAB6B /* DronelinkUI.swift */; };
 		2459751623679D1F008CAB6B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2459751523679D1F008CAB6B /* Extensions.swift */; };
@@ -32,6 +31,7 @@
 		24D3DC2B26691C650009B9FF /* DebugWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D3DC2A26691C650009B9FF /* DebugWidget.swift */; };
 		24D3DC2F266FBD830009B9FF /* CameraFocusCalibrationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D3DC2E266FBD830009B9FF /* CameraFocusCalibrationWidget.swift */; };
 		6D20AECFB161EA080C35F653 /* Pods_DronelinkCoreUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */; };
+		879DB2F92A3B1AA8002CDDCA /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 879DB2F72A3B1AA8002CDDCA /* Localizable.strings */; };
 		DE4E41D425D18DF000F3753D /* CameraExposureWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */; };
 		DE8D795D25D32CB3006C8C26 /* CameraIndicatorWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */; };
 		E4AD4F4C257FEEDC00404783 /* CameraModeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4AD4F4B257FEEDC00404783 /* CameraModeWidget.swift */; };
@@ -50,7 +50,6 @@
 		242AC08523870D4C00438D26 /* TelemetryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryWidget.swift; sourceTree = "<group>"; };
 		243CB1FB26739C93002F958C /* IndicatorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndicatorWidget.swift; sourceTree = "<group>"; };
 		243CB1FD26739CFA002F958C /* GimbalIndicatorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GimbalIndicatorWidget.swift; sourceTree = "<group>"; };
-		2446AF96236A0153001A1C4F /* Localizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = Localizable.strings; sourceTree = "<group>"; };
 		2446AF97236A0153001A1C4F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		245974FF23679A9D008CAB6B /* DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2459750323679A9D008CAB6B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -74,6 +73,20 @@
 		24D3DC2A26691C650009B9FF /* DebugWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugWidget.swift; sourceTree = "<group>"; };
 		24D3DC2E266FBD830009B9FF /* CameraFocusCalibrationWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraFocusCalibrationWidget.swift; sourceTree = "<group>"; };
 		63A236EE9A0A840CC5D6A2AD /* Pods-DronelinkCoreUI.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DronelinkCoreUI.debug.xcconfig"; path = "Target Support Files/Pods-DronelinkCoreUI/Pods-DronelinkCoreUI.debug.xcconfig"; sourceTree = "<group>"; };
+		879DB2F82A3B1AA8002CDDCA /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB2FA2A3B1AB3002CDDCA /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB2FB2A3B1ABD002CDDCA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB2FC2A3B1AC8002CDDCA /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB2FD2A3B1AD1002CDDCA /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB2FE2A3B1ADA002CDDCA /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB2FF2A3B1AE4002CDDCA /* id */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = id; path = id.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3002A3B1AEE002CDDCA /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3012A3B1AF9002CDDCA /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3022A3B1B04002CDDCA /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3032A3B1B0F002CDDCA /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3042A3B1B1F002CDDCA /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3052A3B1B29002CDDCA /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		879DB3062A3B1B34002CDDCA /* ur */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ur; path = ur.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8F7D3C265E6BBF786EBE496C /* Pods_DronelinkCoreUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DronelinkCoreUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraExposureWidget.swift; sourceTree = "<group>"; };
 		DE8D795C25D32CB3006C8C26 /* CameraIndicatorWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraIndicatorWidget.swift; sourceTree = "<group>"; };
@@ -102,7 +115,6 @@
 		2446AF95236A0153001A1C4F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				2446AF96236A0153001A1C4F /* Localizable.strings */,
 				2446AF97236A0153001A1C4F /* Images.xcassets */,
 			);
 			path = Resources;
@@ -129,6 +141,7 @@
 		2459750123679A9D008CAB6B /* DronelinkCoreUI */ = {
 			isa = PBXGroup;
 			children = (
+				879DB2F72A3B1AA8002CDDCA /* Localizable.strings */,
 				E4AD50032581547100404783 /* BatteryWidget.swift */,
 				E4F1FBB825795A3900778068 /* CameraCaptureWidget.swift */,
 				DE4E41D325D18DF000F3753D /* CameraExposureWidget.swift */,
@@ -239,6 +252,18 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				es,
+				fr,
+				hi,
+				id,
+				it,
+				pl,
+				pt,
+				ro,
+				ru,
+				sv,
+				ur,
 			);
 			mainGroup = 245974F523679A9D008CAB6B;
 			productRefGroup = 2459750023679A9D008CAB6B /* Products */;
@@ -255,8 +280,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2446AF98236A0153001A1C4F /* Localizable.strings in Resources */,
 				2446AF99236A0153001A1C4F /* Images.xcassets in Resources */,
+				879DB2F92A3B1AA8002CDDCA /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +353,30 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		879DB2F72A3B1AA8002CDDCA /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				879DB2F82A3B1AA8002CDDCA /* Base */,
+				879DB2FA2A3B1AB3002CDDCA /* de */,
+				879DB2FB2A3B1ABD002CDDCA /* en */,
+				879DB2FC2A3B1AC8002CDDCA /* es */,
+				879DB2FD2A3B1AD1002CDDCA /* fr */,
+				879DB2FE2A3B1ADA002CDDCA /* hi */,
+				879DB2FF2A3B1AE4002CDDCA /* id */,
+				879DB3002A3B1AEE002CDDCA /* it */,
+				879DB3012A3B1AF9002CDDCA /* pl */,
+				879DB3022A3B1B04002CDDCA /* pt */,
+				879DB3032A3B1B0F002CDDCA /* ro */,
+				879DB3042A3B1B1F002CDDCA /* ru */,
+				879DB3052A3B1B29002CDDCA /* sv */,
+				879DB3062A3B1B34002CDDCA /* ur */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		2459750523679A9D008CAB6B /* Debug */ = {
