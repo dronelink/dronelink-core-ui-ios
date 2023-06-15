@@ -18,7 +18,7 @@ extension String {
     internal static let LocalizationMissing = "MISSING STRING LOCALIZATION"
     
     var localized: String {
-        if let language = Dronelink.shared.language {
+        if let language = Dronelink.shared.locale {
             // if system language is selected
             if language == "" {
                 let value = DronelinkUI.bundle.localizedString(forKey: self, value: String.LocalizationMissing, table: nil)
