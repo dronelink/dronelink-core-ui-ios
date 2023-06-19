@@ -1,0 +1,383 @@
+# Yes
+yes=da
+
+# No
+no=Nu
+
+# Dismiss
+dismiss=Respingeți
+
+# Continue
+continue=Continua
+
+# Cancel
+cancel=Anulare
+
+# Back
+back=Înapoi
+
+# Next
+next=Următorul
+
+# Resume
+resume=Relua
+
+# Learn More
+learnMore=Află mai multe
+
+# N/A
+na=N / A
+
+# Camera Focus Calibration
+CameraFocusCalibrationWidget.title=Calibrarea focalizării camerei
+
+# Calibration finished.
+CameraFocusCalibrationWidget.finished=Calibrarea sa terminat.
+
+# Distance
+CameraFocusCalibrationWidget.type.distance=Distanţă
+
+# Altitude
+CameraFocusCalibrationWidget.type.altitude=Altitudine
+
+# Mark Reference
+CameraFocusCalibrationWidget.mark.reference.title=Marcați referința
+
+# Waiting for drone...
+CameraFocusCalibrationWidget.drone.unavailable=Astept drona...
+
+# Unable to read drone serial number. Please reconnect the drone.
+CameraFocusCalibrationWidget.serial.number.unavailable=Nu se poate citi numărul de serie al dronei. Vă rugăm să reconectați drona.
+
+# Unable to determine camera focus state...
+CameraFocusCalibrationWidget.camera.unavailable=Nu se poate determina starea de focalizare a camerei...
+
+# Waiting for location...
+CameraFocusCalibrationWidget.location.unavailable=Se așteaptă locația...
+
+# Mark a reference object to focus on.
+CameraFocusCalibrationWidget.details.mark.reference=Marcați un obiect de referință pe care să vă concentrați.
+
+# Move %@ away while pointing at the reference object with the gimbal at 0°.
+CameraFocusCalibrationWidget.details.move.distance=Deplasați %@ în timp ce îndreptați spre obiectul de referință cu cardanul la 0°.
+
+# Fly %@ above your takeoff location with the gimbal at -90°.
+CameraFocusCalibrationWidget.details.move.altitude=Zboară %@ deasupra locației de decolare cu cardanul la -90°.
+
+# Ready to start calibration.
+CameraFocusCalibrationWidget.details.ready=Gata pentru a începe calibrarea.
+
+# Calibrating (%@)...
+CameraFocusCalibrationWidget.details.busy=Se calibrează (%@)...
+
+# Start
+CameraFocusCalibrationWidget.start=start
+
+# Unable to calibrate, please try again.
+CameraFocusCalibrationWidget.finish.error=Nu se poate calibra, vă rugăm să încercați din nou.
+
+# Focus
+CameraIndicatorWidget.focusring.title=Concentrează-te
+
+# ISO
+CameraExposureWidget.iso.title=ISO
+
+# Auto ISO
+CameraExposureWidget.autoiso.title=ISO automat
+
+# Shutter
+CameraExposureWidget.shutter.title=Obturator
+
+# F
+CameraExposureWidget.fstop.title=F
+
+# EV
+CameraExposureWidget.ev.title=EV
+
+# WB
+CameraExposureWidget.wb.title=WB
+
+# Video Stream Source
+CameraVideoStreamSourceWidget.title=Sursa fluxului video
+
+# Side-by-Side
+CameraVideoStreamSourceWidget.pip=Unul langa altul
+
+# Gimbal
+GimbalOrientationWidget.title=Gimbal
+
+# Mission Paused
+MissionDisengageReason.user.disengaged=Misiune întreruptă
+
+# Mode Paused
+ModeDisengageReason.user.disengaged=Modul întrerupt
+
+# Camera Focus Calibration Required
+MissionExecutorWidget.cameraFocusCalibrationsRequired.title=Este necesară calibrarea focalizării camerei
+
+# This mission requires a camera focus calibration before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single=Această misiune necesită o calibrare a focalizării camerei înainte de rulare.
+
+# This mission requires %@ camera focus calibrations before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple=Această misiune necesită calibrarea focalizării %@ înainte de rulare.
+
+# 3D Preview
+MissionExecutorWidget.details=Previzualizare 3D
+
+# You need a network connection for 3D previews.
+MissionExecutorWidget.details.network.error=Aveți nevoie de o conexiune de rețea pentru previzualizări 3D.
+
+# Estimating flight path and time...
+MissionExecutorWidget.estimating=Se estimează traseul și timpul de zbor...
+
+# Confirm Takeoff Location
+MissionExecutorWidget.start.takeoffLocationWarning.title=Confirmați locația de decolare
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available=Locația actuală de decolare este %@ față de locația planificată de decolare, ceea ce poate determina drona să zboare la o deplasare nesigură față de altitudinile planificate. Altitudinea GPS a acestui dispozitiv (%@) va fi utilizată pentru a regla automat altitudinile AGL și MSL.
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable=Locația actuală de decolare este %@ față de locația planificată de decolare, ceea ce poate determina drona să zboare la o deplasare nesigură față de altitudinile planificate.
+
+# Starting Mission
+MissionExecutorWidget.engaging=Misiunea de pornire
+
+# Mission Stopped
+MissionExecutorWidget.disengaged=Misiune oprită
+
+# Waiting for drone...
+ModeExecutorWidget.disconnected=Astept drona...
+
+# Ready to start
+ModeExecutorWidget.ready=Gata de început
+
+# Starting Mode
+ModeExecutorWidget.engaging=Modul de pornire
+
+# Mode Stopped
+ModeExecutorWidget.disengaged=Modul oprit
+
+# Previous Inputs Available
+FuncExecutorWidget.cachedInputs.title=Intrări anterioare disponibile
+
+# Do you want to load the previous inputs or start over?
+FuncExecutorWidget.cachedInputs.message=Doriți să încărcați intrările anterioare sau să o luați de la capăt?
+
+# Start Over
+FuncExecutorWidget.cachedInputs.action.new=Începe de la capăt
+
+# Load Previous
+FuncExecutorWidget.cachedInputs.action.previous=Încărcare anterior
+
+# Get Started
+FuncExecutorWidget.primary.intro=Incepe
+
+# Continue
+FuncExecutorWidget.primary.execute=Continua
+
+# Generating...
+FuncExecutorWidget.primary.executing=Se generează...
+
+# This input is required
+FuncExecutorWidget.input.required=Această intrare este necesară
+
+# Drone location unavailable
+FuncExecutorWidget.input.location.unavailable=Locația dronei nu este disponibilă
+
+# Mark
+FuncExecutorWidget.input.drone=marcă
+
+# Please connect a drone.
+FuncExecutorWidget.input.drone.unavailable=Vă rugăm să conectați o dronă.
+
+# Input Summary
+FuncExecutorWidget.input.summary=Rezumat de intrare
+
+# No Input
+FuncExecutorWidget.input.none=Nicio intrare
+
+# Choose...
+FuncExecutorWidget.input.choose=Alege...
+
+# Starting in %d
+ExecutableWidget.start.countdown=Începând în %d
+
+# Preparing to execute...
+ExecutableWidget.start.engaging=Se pregătește să execute...
+
+# Countdown Stopped
+ExecutableWidget.start.cancelled=Numărătoarea inversă s-a oprit
+
+# Unidentified Drone
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.title=Dronă neidentificată
+
+# Unable to determine the serial number of your drone. Try reconnecting or power-cycling.
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.message=Nu se poate determina numărul de serie al dronei dvs. Încercați să vă reconectați sau să reconectați.
+
+# --:--
+ExecutableWidget.executionDuration.empty=--:--
+
+# --
+NumericInstrumentWidget.empty=--
+
+# D
+DistanceWidget.prefix=D
+
+# A
+AltitudeWidget.prefix=A
+
+# H/S
+HorizontalSpeedWidget.prefix=H/S
+
+# V/S
+VerticalSpeedWidget.prefix=V/S
+
+# Disconnected
+StatusWidget.disconnected=Deconectat
+
+# Ready To Go
+StatusWidget.ready=Gata de plecare
+
+# Manual Flight
+StatusWidget.manual=Zbor manual
+
+# SD Card Missing
+DashboardWidget.camera.noSDCard.title=Card SD lipsește
+
+# Please make sure to insert an SD card before running a mission with data capture.
+DashboardWidget.camera.noSDCard.details=Asigurați-vă că introduceți un card SD înainte de a rula o misiune cu captură de date.
+
+# MENU
+DashboardWidget.cameraMenu=MENIUL
+
+# Map Options
+DashboardWidget.contentView2.settings=Opțiuni pentru hartă
+
+# 2D
+DashboardWidget.map.mapbox=2D
+
+# 3D (Beta)
+DashboardWidget.map.microsoft=3D (Beta)
+
+# Camera Feed Options
+DashboardWidget.contentView3.settings=Opțiuni pentru alimentarea camerei
+
+# Reset
+MapboxMapWidget.reset=Resetați
+
+# Follow Drone
+MapboxMapWidget.tracking=Urmăriți Drone
+
+# Follow (North Up)
+MapboxMapWidget.tracking.north.up=Urmăriți (nord sus)
+
+# Reset
+MicrosoftMapWidget.reset=Resetați
+
+# Follow
+MicrosoftMapWidget.follow=Urma
+
+# Chase Plane (Beta)
+MicrosoftMapWidget.chase.plane=Chase Plane (Beta)
+
+# FPV (Beta)
+MicrosoftMapWidget.fpv=FPV (Beta)
+
+# Satellite
+MicrosoftMapWidget.satellite=Satelit
+
+# Streets & Buildings
+MicrosoftMapWidget.streets=Străzi și clădiri
+
+# YAW/ALT
+DroneOffsetsWidget.altitudeYaw=YAW/ALT
+
+# POSITION
+DroneOffsetsWidget.position=POZIŢIE
+
+# Gimbal Options
+DroneOffsetsWidget.more=Opțiuni de cardan
+
+# Reset
+DroneOffsetsWidget.resetGimbal=Resetați
+
+# 0° (Level)
+DroneOffsetsWidget.levelGimbal=0° (nivel)
+
+# -90° (Nadir)
+DroneOffsetsWidget.nadirGimbal=-90° (Nadir)
+
+# Roll Trim
+DroneOffsetsWidget.rollTrim=Rola Trim
+
+# Clear Focus Calibrations
+DroneOffsetsWidget.clearCameraFocusCalibrations=Calibrări de focalizare clare
+
+# Cleared %@ calibration(s)
+DroneOffsetsWidget.clearCameraFocusCalibrations.finished=Calibrarea(e) %@ a fost eliminată
+
+# Caution: RC sticks enabled
+DroneOffsetsWidget.rc.inputs=Atenție: stick-urile RC sunt activate
+
+# Caution: Auto altitude enabled
+DroneOffsetsWidget.relative.altitude.enabled=Atenție: altitudinea automată este activată
+
+# Auto altitude disabled
+DroneOffsetsWidget.relative.altitude.disabled=Altitudinea automată este dezactivată
+
+# N/A
+NetworkRTKStatus.value.0=N / A
+
+# Disabled
+NetworkRTKStatus.value.1=Dezactivat
+
+# Connecting
+NetworkRTKStatus.value.2=Conectare
+
+# Connected
+NetworkRTKStatus.value.3=Conectat
+
+# Error
+NetworkRTKStatus.value.4=Eroare
+
+# Timeout
+NetworkRTKStatus.value.5=Pauză
+
+# RTK Status
+RTKSettingsWidget.popover.status.heading=Stare RTK
+
+# Network Service
+RTKSettingsWidget.popover.status.channel=Serviciul de rețea
+
+# Configuration Status
+RTKSettingsWidget.popover.status.configuration=Starea configurației
+
+# RTK Network Configuration
+RTKSettingsWidget.popover.configuration.heading=Configurarea rețelei RTK
+
+# Enabled
+RTKSettingsWidget.popover.configuration.enabled=Activat
+
+# Auto connect
+RTKSettingsWidget.popover.configuration.autoconnect=Conectare automata
+
+# Server address
+RTKSettingsWidget.popover.configuration.serveraddress=Adresa serverului
+
+# Port
+RTKSettingsWidget.popover.configuration.port=Port
+
+# Username
+RTKSettingsWidget.popover.configuration.username=Nume de utilizator
+
+# Password
+RTKSettingsWidget.popover.configuration.password=Parola
+
+# Confirm
+RTKSettingsWidget.popover.configuration.confirm=A confirma
+
+# Mount point
+RTKSettingsWidget.popover.configuration.mountpoint=punctul de montare
+
+# Network RTK
+RTKStatusWidget.status.label=Rețea RTK

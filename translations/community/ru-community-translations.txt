@@ -1,0 +1,383 @@
+# Yes
+yes=Да
+
+# No
+no=Нет
+
+# Dismiss
+dismiss=Увольнять
+
+# Continue
+continue=Продолжать
+
+# Cancel
+cancel=Отмена
+
+# Back
+back=Назад
+
+# Next
+next=Следующий
+
+# Resume
+resume=Резюме
+
+# Learn More
+learnMore=Узнать больше
+
+# N/A
+na=Н/Д
+
+# Camera Focus Calibration
+CameraFocusCalibrationWidget.title=Калибровка фокуса камеры
+
+# Calibration finished.
+CameraFocusCalibrationWidget.finished=Калибровка завершена.
+
+# Distance
+CameraFocusCalibrationWidget.type.distance=Расстояние
+
+# Altitude
+CameraFocusCalibrationWidget.type.altitude=Высота
+
+# Mark Reference
+CameraFocusCalibrationWidget.mark.reference.title=Отметить ссылку
+
+# Waiting for drone...
+CameraFocusCalibrationWidget.drone.unavailable=В ожидании дрона...
+
+# Unable to read drone serial number. Please reconnect the drone.
+CameraFocusCalibrationWidget.serial.number.unavailable=Не удалось прочитать серийный номер дрона. Пожалуйста, повторно подключите дрон.
+
+# Unable to determine camera focus state...
+CameraFocusCalibrationWidget.camera.unavailable=Не удалось определить состояние фокусировки камеры...
+
+# Waiting for location...
+CameraFocusCalibrationWidget.location.unavailable=Ожидание местоположения...
+
+# Mark a reference object to focus on.
+CameraFocusCalibrationWidget.details.mark.reference=Отметьте эталонный объект, чтобы сфокусироваться на нем.
+
+# Move %@ away while pointing at the reference object with the gimbal at 0°.
+CameraFocusCalibrationWidget.details.move.distance=Отодвиньте %@, указывая на опорный объект с помощью подвеса в положении 0°.
+
+# Fly %@ above your takeoff location with the gimbal at -90°.
+CameraFocusCalibrationWidget.details.move.altitude=Летите на %@ выше точки взлета с подвесом на -90°.
+
+# Ready to start calibration.
+CameraFocusCalibrationWidget.details.ready=Готов начать калибровку.
+
+# Calibrating (%@)...
+CameraFocusCalibrationWidget.details.busy=Калибровка (%@)...
+
+# Start
+CameraFocusCalibrationWidget.start=Начинать
+
+# Unable to calibrate, please try again.
+CameraFocusCalibrationWidget.finish.error=Не удалось выполнить калибровку. Повторите попытку.
+
+# Focus
+CameraIndicatorWidget.focusring.title=Фокус
+
+# ISO
+CameraExposureWidget.iso.title=ИСО
+
+# Auto ISO
+CameraExposureWidget.autoiso.title=Авто ИСО
+
+# Shutter
+CameraExposureWidget.shutter.title=Затвор
+
+# F
+CameraExposureWidget.fstop.title=Ф
+
+# EV
+CameraExposureWidget.ev.title=электромобиль
+
+# WB
+CameraExposureWidget.wb.title=ВБ
+
+# Video Stream Source
+CameraVideoStreamSourceWidget.title=Источник видеопотока
+
+# Side-by-Side
+CameraVideoStreamSourceWidget.pip=Бок о бок
+
+# Gimbal
+GimbalOrientationWidget.title=подвес
+
+# Mission Paused
+MissionDisengageReason.user.disengaged=Миссия приостановлена
+
+# Mode Paused
+ModeDisengageReason.user.disengaged=Режим приостановлен
+
+# Camera Focus Calibration Required
+MissionExecutorWidget.cameraFocusCalibrationsRequired.title=Требуется калибровка фокуса камеры
+
+# This mission requires a camera focus calibration before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single=Эта миссия требует калибровки фокуса камеры перед запуском.
+
+# This mission requires %@ camera focus calibrations before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple=Эта миссия требует %@ калибровки фокусировки камеры перед запуском.
+
+# 3D Preview
+MissionExecutorWidget.details=3D-просмотр
+
+# You need a network connection for 3D previews.
+MissionExecutorWidget.details.network.error=Вам необходимо подключение к сети для 3D-превью.
+
+# Estimating flight path and time...
+MissionExecutorWidget.estimating=Расчет траектории и времени полета...
+
+# Confirm Takeoff Location
+MissionExecutorWidget.start.takeoffLocationWarning.title=Подтвердить место взлета
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available=Текущее место взлета находится на %@ от запланированного места взлета, что может привести к тому, что дрон будет летать на небезопасном смещении от запланированной высоты. Высота GPS этого устройства (%@) будет использоваться для автоматической настройки высоты AGL и MSL.
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable=Текущее место взлета находится на %@ от запланированного места взлета, что может привести к тому, что дрон будет летать на небезопасном смещении от запланированной высоты.
+
+# Starting Mission
+MissionExecutorWidget.engaging=Начальная миссия
+
+# Mission Stopped
+MissionExecutorWidget.disengaged=Миссия остановлена
+
+# Waiting for drone...
+ModeExecutorWidget.disconnected=В ожидании дрона...
+
+# Ready to start
+ModeExecutorWidget.ready=Готов начать
+
+# Starting Mode
+ModeExecutorWidget.engaging=Стартовый режим
+
+# Mode Stopped
+ModeExecutorWidget.disengaged=Режим остановлен
+
+# Previous Inputs Available
+FuncExecutorWidget.cachedInputs.title=Доступны предыдущие входы
+
+# Do you want to load the previous inputs or start over?
+FuncExecutorWidget.cachedInputs.message=Вы хотите загрузить предыдущие входы или начать сначала?
+
+# Start Over
+FuncExecutorWidget.cachedInputs.action.new=Начать сначала
+
+# Load Previous
+FuncExecutorWidget.cachedInputs.action.previous=Загрузить предыдущий
+
+# Get Started
+FuncExecutorWidget.primary.intro=Начать
+
+# Continue
+FuncExecutorWidget.primary.execute=Продолжать
+
+# Generating...
+FuncExecutorWidget.primary.executing=Создание...
+
+# This input is required
+FuncExecutorWidget.input.required=Этот ввод необходим
+
+# Drone location unavailable
+FuncExecutorWidget.input.location.unavailable=Местоположение дрона недоступно
+
+# Mark
+FuncExecutorWidget.input.drone=Отметка
+
+# Please connect a drone.
+FuncExecutorWidget.input.drone.unavailable=Пожалуйста, подключите дрон.
+
+# Input Summary
+FuncExecutorWidget.input.summary=Сводка ввода
+
+# No Input
+FuncExecutorWidget.input.none=Нет ввода
+
+# Choose...
+FuncExecutorWidget.input.choose=Выбирать...
+
+# Starting in %d
+ExecutableWidget.start.countdown=Начиная с %d
+
+# Preparing to execute...
+ExecutableWidget.start.engaging=Подготовка к выполнению...
+
+# Countdown Stopped
+ExecutableWidget.start.cancelled=Обратный отсчет остановлен
+
+# Unidentified Drone
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.title=Неопознанный дрон
+
+# Unable to determine the serial number of your drone. Try reconnecting or power-cycling.
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.message=Не удалось определить серийный номер вашего дрона. Попробуйте переподключить или выключить питание.
+
+# --:--
+ExecutableWidget.executionDuration.empty=--:--
+
+# --
+NumericInstrumentWidget.empty=--
+
+# D
+DistanceWidget.prefix=Д
+
+# A
+AltitudeWidget.prefix=А
+
+# H/S
+HorizontalSpeedWidget.prefix=Х/С
+
+# V/S
+VerticalSpeedWidget.prefix=ПРОТИВ
+
+# Disconnected
+StatusWidget.disconnected=Отключено
+
+# Ready To Go
+StatusWidget.ready=Готов идти
+
+# Manual Flight
+StatusWidget.manual=Ручной полет
+
+# SD Card Missing
+DashboardWidget.camera.noSDCard.title=SD-карта отсутствует
+
+# Please make sure to insert an SD card before running a mission with data capture.
+DashboardWidget.camera.noSDCard.details=Обязательно вставьте SD-карту перед запуском миссии со сбором данных.
+
+# MENU
+DashboardWidget.cameraMenu=МЕНЮ
+
+# Map Options
+DashboardWidget.contentView2.settings=Параметры карты
+
+# 2D
+DashboardWidget.map.mapbox=2D
+
+# 3D (Beta)
+DashboardWidget.map.microsoft=3D (бета)
+
+# Camera Feed Options
+DashboardWidget.contentView3.settings=Параметры камеры
+
+# Reset
+MapboxMapWidget.reset=Перезагрузить
+
+# Follow Drone
+MapboxMapWidget.tracking=Следуй за дроном
+
+# Follow (North Up)
+MapboxMapWidget.tracking.north.up=Следуйте (север вверху)
+
+# Reset
+MicrosoftMapWidget.reset=Перезагрузить
+
+# Follow
+MicrosoftMapWidget.follow=Следовать
+
+# Chase Plane (Beta)
+MicrosoftMapWidget.chase.plane=Самолет погони (бета)
+
+# FPV (Beta)
+MicrosoftMapWidget.fpv=FPV (бета)
+
+# Satellite
+MicrosoftMapWidget.satellite=спутник
+
+# Streets & Buildings
+MicrosoftMapWidget.streets=Улицы и здания
+
+# YAW/ALT
+DroneOffsetsWidget.altitudeYaw=YAW/ALT
+
+# POSITION
+DroneOffsetsWidget.position=ПОЗИЦИЯ
+
+# Gimbal Options
+DroneOffsetsWidget.more=Варианты подвеса
+
+# Reset
+DroneOffsetsWidget.resetGimbal=Перезагрузить
+
+# 0° (Level)
+DroneOffsetsWidget.levelGimbal=0° (уровень)
+
+# -90° (Nadir)
+DroneOffsetsWidget.nadirGimbal=-90° (надир)
+
+# Roll Trim
+DroneOffsetsWidget.rollTrim=Рулонная отделка
+
+# Clear Focus Calibrations
+DroneOffsetsWidget.clearCameraFocusCalibrations=Очистить калибровку фокуса
+
+# Cleared %@ calibration(s)
+DroneOffsetsWidget.clearCameraFocusCalibrations.finished=Очищено %@ калибровки
+
+# Caution: RC sticks enabled
+DroneOffsetsWidget.rc.inputs=Внимание: джойстики включены
+
+# Caution: Auto altitude enabled
+DroneOffsetsWidget.relative.altitude.enabled=Внимание: включена автоматическая высота над уровнем моря
+
+# Auto altitude disabled
+DroneOffsetsWidget.relative.altitude.disabled=Автоматическая высота отключена
+
+# N/A
+NetworkRTKStatus.value.0=Н/Д
+
+# Disabled
+NetworkRTKStatus.value.1=Неполноценный
+
+# Connecting
+NetworkRTKStatus.value.2=Подключение
+
+# Connected
+NetworkRTKStatus.value.3=Связанный
+
+# Error
+NetworkRTKStatus.value.4=Ошибка
+
+# Timeout
+NetworkRTKStatus.value.5=Тайм-аут
+
+# RTK Status
+RTKSettingsWidget.popover.status.heading=Статус РТК
+
+# Network Service
+RTKSettingsWidget.popover.status.channel=Сетевая служба
+
+# Configuration Status
+RTKSettingsWidget.popover.status.configuration=Статус конфигурации
+
+# RTK Network Configuration
+RTKSettingsWidget.popover.configuration.heading=Конфигурация сети RTK
+
+# Enabled
+RTKSettingsWidget.popover.configuration.enabled=Включено
+
+# Auto connect
+RTKSettingsWidget.popover.configuration.autoconnect=Автоматическое подключение
+
+# Server address
+RTKSettingsWidget.popover.configuration.serveraddress=Адрес сервера
+
+# Port
+RTKSettingsWidget.popover.configuration.port=Порт
+
+# Username
+RTKSettingsWidget.popover.configuration.username=Имя пользователя
+
+# Password
+RTKSettingsWidget.popover.configuration.password=Пароль
+
+# Confirm
+RTKSettingsWidget.popover.configuration.confirm=Подтверждать
+
+# Mount point
+RTKSettingsWidget.popover.configuration.mountpoint=Точка монтирования
+
+# Network RTK
+RTKStatusWidget.status.label=Сеть РТК

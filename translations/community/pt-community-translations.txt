@@ -1,0 +1,383 @@
+# Yes
+yes=Sim
+
+# No
+no=Não
+
+# Dismiss
+dismiss=Liberar
+
+# Continue
+continue=Continuar
+
+# Cancel
+cancel=Cancelar
+
+# Back
+back=Voltar
+
+# Next
+next=Próximo
+
+# Resume
+resume=Retomar
+
+# Learn More
+learnMore=Saber mais
+
+# N/A
+na=N / D
+
+# Camera Focus Calibration
+CameraFocusCalibrationWidget.title=Calibração do foco da câmera
+
+# Calibration finished.
+CameraFocusCalibrationWidget.finished=Calibração finalizada.
+
+# Distance
+CameraFocusCalibrationWidget.type.distance=Distância
+
+# Altitude
+CameraFocusCalibrationWidget.type.altitude=Altitude
+
+# Mark Reference
+CameraFocusCalibrationWidget.mark.reference.title=Marcar Referência
+
+# Waiting for drone...
+CameraFocusCalibrationWidget.drone.unavailable=Aguardando drone...
+
+# Unable to read drone serial number. Please reconnect the drone.
+CameraFocusCalibrationWidget.serial.number.unavailable=Não foi possível ler o número de série do drone. Por favor, reconecte o drone.
+
+# Unable to determine camera focus state...
+CameraFocusCalibrationWidget.camera.unavailable=Não é possível determinar o estado do foco da câmera...
+
+# Waiting for location...
+CameraFocusCalibrationWidget.location.unavailable=Aguardando localização...
+
+# Mark a reference object to focus on.
+CameraFocusCalibrationWidget.details.mark.reference=Marque um objeto de referência para focar.
+
+# Move %@ away while pointing at the reference object with the gimbal at 0°.
+CameraFocusCalibrationWidget.details.move.distance=Afaste %@ enquanto aponta para o objeto de referência com o gimbal em 0°.
+
+# Fly %@ above your takeoff location with the gimbal at -90°.
+CameraFocusCalibrationWidget.details.move.altitude=Voe %@ acima do local de decolagem com o gimbal a -90°.
+
+# Ready to start calibration.
+CameraFocusCalibrationWidget.details.ready=Pronto para iniciar a calibração.
+
+# Calibrating (%@)...
+CameraFocusCalibrationWidget.details.busy=Calibrando (%@)...
+
+# Start
+CameraFocusCalibrationWidget.start=Começar
+
+# Unable to calibrate, please try again.
+CameraFocusCalibrationWidget.finish.error=Não foi possível calibrar, tente novamente.
+
+# Focus
+CameraIndicatorWidget.focusring.title=Foco
+
+# ISO
+CameraExposureWidget.iso.title=ISO
+
+# Auto ISO
+CameraExposureWidget.autoiso.title=ISO automático
+
+# Shutter
+CameraExposureWidget.shutter.title=Obturador
+
+# F
+CameraExposureWidget.fstop.title=F
+
+# EV
+CameraExposureWidget.ev.title=EV
+
+# WB
+CameraExposureWidget.wb.title=WB
+
+# Video Stream Source
+CameraVideoStreamSourceWidget.title=Origem da transmissão de vídeo
+
+# Side-by-Side
+CameraVideoStreamSourceWidget.pip=Lado a lado
+
+# Gimbal
+GimbalOrientationWidget.title=gimbal
+
+# Mission Paused
+MissionDisengageReason.user.disengaged=Missão pausada
+
+# Mode Paused
+ModeDisengageReason.user.disengaged=Modo pausado
+
+# Camera Focus Calibration Required
+MissionExecutorWidget.cameraFocusCalibrationsRequired.title=Calibração de foco da câmera necessária
+
+# This mission requires a camera focus calibration before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single=Esta missão requer uma calibração de foco da câmera antes de executar.
+
+# This mission requires %@ camera focus calibrations before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple=Esta missão requer %@ calibrações de foco da câmera antes de executar.
+
+# 3D Preview
+MissionExecutorWidget.details=Visualização 3D
+
+# You need a network connection for 3D previews.
+MissionExecutorWidget.details.network.error=Você precisa de uma conexão de rede para visualizações 3D.
+
+# Estimating flight path and time...
+MissionExecutorWidget.estimating=Estimando a rota e o tempo de voo...
+
+# Confirm Takeoff Location
+MissionExecutorWidget.start.takeoffLocationWarning.title=Confirmar local de decolagem
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available=O local de decolagem atual é %@ do local de decolagem planejado, o que pode fazer com que o drone voe em um deslocamento inseguro das altitudes planejadas. A altitude GPS deste dispositivo (%@) será usada para ajustar as altitudes AGL e MSL automaticamente.
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable=O local de decolagem atual é %@ do local de decolagem planejado, o que pode fazer com que o drone voe em um deslocamento inseguro das altitudes planejadas.
+
+# Starting Mission
+MissionExecutorWidget.engaging=Missão inicial
+
+# Mission Stopped
+MissionExecutorWidget.disengaged=Missão Interrompida
+
+# Waiting for drone...
+ModeExecutorWidget.disconnected=Aguardando drone...
+
+# Ready to start
+ModeExecutorWidget.ready=Pronto para começar
+
+# Starting Mode
+ModeExecutorWidget.engaging=Modo inicial
+
+# Mode Stopped
+ModeExecutorWidget.disengaged=Modo Parado
+
+# Previous Inputs Available
+FuncExecutorWidget.cachedInputs.title=Entradas anteriores disponíveis
+
+# Do you want to load the previous inputs or start over?
+FuncExecutorWidget.cachedInputs.message=Deseja carregar as entradas anteriores ou recomeçar?
+
+# Start Over
+FuncExecutorWidget.cachedInputs.action.new=Recomeçar
+
+# Load Previous
+FuncExecutorWidget.cachedInputs.action.previous=Carregar anterior
+
+# Get Started
+FuncExecutorWidget.primary.intro=Iniciar
+
+# Continue
+FuncExecutorWidget.primary.execute=Continuar
+
+# Generating...
+FuncExecutorWidget.primary.executing=Gerando...
+
+# This input is required
+FuncExecutorWidget.input.required=Esta entrada é necessária
+
+# Drone location unavailable
+FuncExecutorWidget.input.location.unavailable=Localização do drone indisponível
+
+# Mark
+FuncExecutorWidget.input.drone=Marca
+
+# Please connect a drone.
+FuncExecutorWidget.input.drone.unavailable=Conecte um drone.
+
+# Input Summary
+FuncExecutorWidget.input.summary=Resumo de entrada
+
+# No Input
+FuncExecutorWidget.input.none=Sem entrada
+
+# Choose...
+FuncExecutorWidget.input.choose=Escolher...
+
+# Starting in %d
+ExecutableWidget.start.countdown=Começando em %d
+
+# Preparing to execute...
+ExecutableWidget.start.engaging=Preparando para executar...
+
+# Countdown Stopped
+ExecutableWidget.start.cancelled=Contagem regressiva interrompida
+
+# Unidentified Drone
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.title=drone não identificado
+
+# Unable to determine the serial number of your drone. Try reconnecting or power-cycling.
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.message=Não é possível determinar o número de série do seu drone. Tente reconectar ou ligar e desligar.
+
+# --:--
+ExecutableWidget.executionDuration.empty=--:--
+
+# --
+NumericInstrumentWidget.empty=--
+
+# D
+DistanceWidget.prefix=D
+
+# A
+AltitudeWidget.prefix=A
+
+# H/S
+HorizontalSpeedWidget.prefix=H/S
+
+# V/S
+VerticalSpeedWidget.prefix=V/S
+
+# Disconnected
+StatusWidget.disconnected=Desconectado
+
+# Ready To Go
+StatusWidget.ready=Pronto para ir
+
+# Manual Flight
+StatusWidget.manual=voo manual
+
+# SD Card Missing
+DashboardWidget.camera.noSDCard.title=Cartão SD ausente
+
+# Please make sure to insert an SD card before running a mission with data capture.
+DashboardWidget.camera.noSDCard.details=Certifique-se de inserir um cartão SD antes de executar uma missão com captura de dados.
+
+# MENU
+DashboardWidget.cameraMenu=CARDÁPIO
+
+# Map Options
+DashboardWidget.contentView2.settings=Opções de mapa
+
+# 2D
+DashboardWidget.map.mapbox=2D
+
+# 3D (Beta)
+DashboardWidget.map.microsoft=3D (Beta)
+
+# Camera Feed Options
+DashboardWidget.contentView3.settings=Opções de alimentação da câmera
+
+# Reset
+MapboxMapWidget.reset=Reiniciar
+
+# Follow Drone
+MapboxMapWidget.tracking=Seguir Drone
+
+# Follow (North Up)
+MapboxMapWidget.tracking.north.up=Siga (Norte para cima)
+
+# Reset
+MicrosoftMapWidget.reset=Reiniciar
+
+# Follow
+MicrosoftMapWidget.follow=Seguir
+
+# Chase Plane (Beta)
+MicrosoftMapWidget.chase.plane=Avião de Perseguição (Beta)
+
+# FPV (Beta)
+MicrosoftMapWidget.fpv=FPV (Beta)
+
+# Satellite
+MicrosoftMapWidget.satellite=Satélite
+
+# Streets & Buildings
+MicrosoftMapWidget.streets=Ruas e Edifícios
+
+# YAW/ALT
+DroneOffsetsWidget.altitudeYaw=YAW/ALT
+
+# POSITION
+DroneOffsetsWidget.position=POSIÇÃO
+
+# Gimbal Options
+DroneOffsetsWidget.more=Opções do Gimbal
+
+# Reset
+DroneOffsetsWidget.resetGimbal=Reiniciar
+
+# 0° (Level)
+DroneOffsetsWidget.levelGimbal=0° (Nível)
+
+# -90° (Nadir)
+DroneOffsetsWidget.nadirGimbal=-90° (Nadir)
+
+# Roll Trim
+DroneOffsetsWidget.rollTrim=Roll Trim
+
+# Clear Focus Calibrations
+DroneOffsetsWidget.clearCameraFocusCalibrations=Calibrações de foco claro
+
+# Cleared %@ calibration(s)
+DroneOffsetsWidget.clearCameraFocusCalibrations.finished=%@ calibração(ões) limpa(s)
+
+# Caution: RC sticks enabled
+DroneOffsetsWidget.rc.inputs=Cuidado: sticks RC ativados
+
+# Caution: Auto altitude enabled
+DroneOffsetsWidget.relative.altitude.enabled=Cuidado: Altitude automática habilitada
+
+# Auto altitude disabled
+DroneOffsetsWidget.relative.altitude.disabled=Altitude automática desativada
+
+# N/A
+NetworkRTKStatus.value.0=N / D
+
+# Disabled
+NetworkRTKStatus.value.1=Desabilitado
+
+# Connecting
+NetworkRTKStatus.value.2=Conectando
+
+# Connected
+NetworkRTKStatus.value.3=Conectado
+
+# Error
+NetworkRTKStatus.value.4=Erro
+
+# Timeout
+NetworkRTKStatus.value.5=Tempo esgotado
+
+# RTK Status
+RTKSettingsWidget.popover.status.heading=Status RTK
+
+# Network Service
+RTKSettingsWidget.popover.status.channel=Serviço de rede
+
+# Configuration Status
+RTKSettingsWidget.popover.status.configuration=Status da configuração
+
+# RTK Network Configuration
+RTKSettingsWidget.popover.configuration.heading=Configuração de rede RTK
+
+# Enabled
+RTKSettingsWidget.popover.configuration.enabled=Habilitado
+
+# Auto connect
+RTKSettingsWidget.popover.configuration.autoconnect=Conexão automática
+
+# Server address
+RTKSettingsWidget.popover.configuration.serveraddress=Endereço do servidor
+
+# Port
+RTKSettingsWidget.popover.configuration.port=Porta
+
+# Username
+RTKSettingsWidget.popover.configuration.username=Nome de usuário
+
+# Password
+RTKSettingsWidget.popover.configuration.password=Senha
+
+# Confirm
+RTKSettingsWidget.popover.configuration.confirm=confirme
+
+# Mount point
+RTKSettingsWidget.popover.configuration.mountpoint=ponto de montagem
+
+# Network RTK
+RTKStatusWidget.status.label=Rede RTK

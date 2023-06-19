@@ -1,0 +1,383 @@
+# Yes
+yes=Ja
+
+# No
+no=Nej
+
+# Dismiss
+dismiss=Avfärda
+
+# Continue
+continue=Fortsätta
+
+# Cancel
+cancel=Annullera
+
+# Back
+back=Tillbaka
+
+# Next
+next=Nästa
+
+# Resume
+resume=Återuppta
+
+# Learn More
+learnMore=Läs mer
+
+# N/A
+na=N/A
+
+# Camera Focus Calibration
+CameraFocusCalibrationWidget.title=Kamerafokuskalibrering
+
+# Calibration finished.
+CameraFocusCalibrationWidget.finished=Kalibrering avslutad.
+
+# Distance
+CameraFocusCalibrationWidget.type.distance=Distans
+
+# Altitude
+CameraFocusCalibrationWidget.type.altitude=Höjd över havet
+
+# Mark Reference
+CameraFocusCalibrationWidget.mark.reference.title=Markera referens
+
+# Waiting for drone...
+CameraFocusCalibrationWidget.drone.unavailable=Väntar på drönare...
+
+# Unable to read drone serial number. Please reconnect the drone.
+CameraFocusCalibrationWidget.serial.number.unavailable=Det går inte att läsa drönarens serienummer. Vänligen återanslut drönaren.
+
+# Unable to determine camera focus state...
+CameraFocusCalibrationWidget.camera.unavailable=Det går inte att bestämma kamerans fokusstatus...
+
+# Waiting for location...
+CameraFocusCalibrationWidget.location.unavailable=Väntar på plats...
+
+# Mark a reference object to focus on.
+CameraFocusCalibrationWidget.details.mark.reference=Markera ett referensobjekt att fokusera på.
+
+# Move %@ away while pointing at the reference object with the gimbal at 0°.
+CameraFocusCalibrationWidget.details.move.distance=Flytta %@ bort medan du pekar på referensobjektet med kardanen i 0°.
+
+# Fly %@ above your takeoff location with the gimbal at -90°.
+CameraFocusCalibrationWidget.details.move.altitude=Flyg %@ ovanför din startplats med kardan vid -90°.
+
+# Ready to start calibration.
+CameraFocusCalibrationWidget.details.ready=Klar att starta kalibreringen.
+
+# Calibrating (%@)...
+CameraFocusCalibrationWidget.details.busy=Kalibrerar (%@)...
+
+# Start
+CameraFocusCalibrationWidget.start=Start
+
+# Unable to calibrate, please try again.
+CameraFocusCalibrationWidget.finish.error=Det gick inte att kalibrera, försök igen.
+
+# Focus
+CameraIndicatorWidget.focusring.title=Fokus
+
+# ISO
+CameraExposureWidget.iso.title=ISO
+
+# Auto ISO
+CameraExposureWidget.autoiso.title=Auto ISO
+
+# Shutter
+CameraExposureWidget.shutter.title=Slutare
+
+# F
+CameraExposureWidget.fstop.title=F
+
+# EV
+CameraExposureWidget.ev.title=EV
+
+# WB
+CameraExposureWidget.wb.title=WB
+
+# Video Stream Source
+CameraVideoStreamSourceWidget.title=Videoströmkälla
+
+# Side-by-Side
+CameraVideoStreamSourceWidget.pip=Sida vid sida
+
+# Gimbal
+GimbalOrientationWidget.title=Gimbal
+
+# Mission Paused
+MissionDisengageReason.user.disengaged=Uppdraget pausat
+
+# Mode Paused
+ModeDisengageReason.user.disengaged=Läget pausat
+
+# Camera Focus Calibration Required
+MissionExecutorWidget.cameraFocusCalibrationsRequired.title=Kamerafokuskalibrering krävs
+
+# This mission requires a camera focus calibration before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single=Detta uppdrag kräver en kamerafokuskalibrering innan du kör.
+
+# This mission requires %@ camera focus calibrations before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple=Detta uppdrag kräver %@ kamerafokuskalibreringar innan det körs.
+
+# 3D Preview
+MissionExecutorWidget.details=3D-förhandsvisning
+
+# You need a network connection for 3D previews.
+MissionExecutorWidget.details.network.error=Du behöver en nätverksanslutning för 3D-förhandsvisningar.
+
+# Estimating flight path and time...
+MissionExecutorWidget.estimating=Uppskattar flygväg och tid...
+
+# Confirm Takeoff Location
+MissionExecutorWidget.start.takeoffLocationWarning.title=Bekräfta startplats
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available=Den aktuella startplatsen är %@ från den planerade startplatsen, vilket kan göra att drönaren flyger på en osäker förskjutning från de planerade höjderna. GPS-höjden för den här enheten (%@) kommer att användas för att justera AGL- och MSL-höjder automatiskt.
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable=Den aktuella startplatsen är %@ från den planerade startplatsen, vilket kan göra att drönaren flyger på en osäker förskjutning från de planerade höjderna.
+
+# Starting Mission
+MissionExecutorWidget.engaging=Startuppdrag
+
+# Mission Stopped
+MissionExecutorWidget.disengaged=Uppdraget stoppat
+
+# Waiting for drone...
+ModeExecutorWidget.disconnected=Väntar på drönare...
+
+# Ready to start
+ModeExecutorWidget.ready=Redo att börja
+
+# Starting Mode
+ModeExecutorWidget.engaging=Startläge
+
+# Mode Stopped
+ModeExecutorWidget.disengaged=Läget stoppat
+
+# Previous Inputs Available
+FuncExecutorWidget.cachedInputs.title=Tidigare ingångar tillgängliga
+
+# Do you want to load the previous inputs or start over?
+FuncExecutorWidget.cachedInputs.message=Vill du ladda de tidigare ingångarna eller börja om?
+
+# Start Over
+FuncExecutorWidget.cachedInputs.action.new=Börja om
+
+# Load Previous
+FuncExecutorWidget.cachedInputs.action.previous=Ladda Föregående
+
+# Get Started
+FuncExecutorWidget.primary.intro=Komma igång
+
+# Continue
+FuncExecutorWidget.primary.execute=Fortsätta
+
+# Generating...
+FuncExecutorWidget.primary.executing=Alstrande...
+
+# This input is required
+FuncExecutorWidget.input.required=Denna ingång krävs
+
+# Drone location unavailable
+FuncExecutorWidget.input.location.unavailable=Drönarens plats är inte tillgänglig
+
+# Mark
+FuncExecutorWidget.input.drone=Mark
+
+# Please connect a drone.
+FuncExecutorWidget.input.drone.unavailable=Anslut en drönare.
+
+# Input Summary
+FuncExecutorWidget.input.summary=Inmatningssammanfattning
+
+# No Input
+FuncExecutorWidget.input.none=Ingen ingång
+
+# Choose...
+FuncExecutorWidget.input.choose=Välja...
+
+# Starting in %d
+ExecutableWidget.start.countdown=Börjar om %d
+
+# Preparing to execute...
+ExecutableWidget.start.engaging=Förbereder att köra...
+
+# Countdown Stopped
+ExecutableWidget.start.cancelled=Nedräkning stoppad
+
+# Unidentified Drone
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.title=Oidentifierad drönare
+
+# Unable to determine the serial number of your drone. Try reconnecting or power-cycling.
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.message=Det går inte att bestämma serienumret på din drönare. Försök att ansluta igen eller slå på strömmen.
+
+# --:--
+ExecutableWidget.executionDuration.empty=--:--
+
+# --
+NumericInstrumentWidget.empty=--
+
+# D
+DistanceWidget.prefix=D
+
+# A
+AltitudeWidget.prefix=A
+
+# H/S
+HorizontalSpeedWidget.prefix=H/S
+
+# V/S
+VerticalSpeedWidget.prefix=MOT
+
+# Disconnected
+StatusWidget.disconnected=Osammanhängande
+
+# Ready To Go
+StatusWidget.ready=Redo att gå
+
+# Manual Flight
+StatusWidget.manual=Manuell flygning
+
+# SD Card Missing
+DashboardWidget.camera.noSDCard.title=SD-kort saknas
+
+# Please make sure to insert an SD card before running a mission with data capture.
+DashboardWidget.camera.noSDCard.details=Se till att sätta i ett SD-kort innan du kör ett uppdrag med datafångst.
+
+# MENU
+DashboardWidget.cameraMenu=MENY
+
+# Map Options
+DashboardWidget.contentView2.settings=Kartalternativ
+
+# 2D
+DashboardWidget.map.mapbox=2D
+
+# 3D (Beta)
+DashboardWidget.map.microsoft=3D (beta)
+
+# Camera Feed Options
+DashboardWidget.contentView3.settings=Kameramatningsalternativ
+
+# Reset
+MapboxMapWidget.reset=Återställa
+
+# Follow Drone
+MapboxMapWidget.tracking=Följ Drone
+
+# Follow (North Up)
+MapboxMapWidget.tracking.north.up=Följ (North Up)
+
+# Reset
+MicrosoftMapWidget.reset=Återställa
+
+# Follow
+MicrosoftMapWidget.follow=Följ
+
+# Chase Plane (Beta)
+MicrosoftMapWidget.chase.plane=Chase Plane (beta)
+
+# FPV (Beta)
+MicrosoftMapWidget.fpv=FPV (beta)
+
+# Satellite
+MicrosoftMapWidget.satellite=Satellit
+
+# Streets & Buildings
+MicrosoftMapWidget.streets=Gator och byggnader
+
+# YAW/ALT
+DroneOffsetsWidget.altitudeYaw=YAW/ALT
+
+# POSITION
+DroneOffsetsWidget.position=PLACERA
+
+# Gimbal Options
+DroneOffsetsWidget.more=Kardanalternativ
+
+# Reset
+DroneOffsetsWidget.resetGimbal=Återställa
+
+# 0° (Level)
+DroneOffsetsWidget.levelGimbal=0° (Nivå)
+
+# -90° (Nadir)
+DroneOffsetsWidget.nadirGimbal=-90° (Nadir)
+
+# Roll Trim
+DroneOffsetsWidget.rollTrim=Rulltrim
+
+# Clear Focus Calibrations
+DroneOffsetsWidget.clearCameraFocusCalibrations=Tydliga fokuskalibreringar
+
+# Cleared %@ calibration(s)
+DroneOffsetsWidget.clearCameraFocusCalibrations.finished=Rensade %@ kalibrering(er)
+
+# Caution: RC sticks enabled
+DroneOffsetsWidget.rc.inputs=Varning: RC-spakar aktiverade
+
+# Caution: Auto altitude enabled
+DroneOffsetsWidget.relative.altitude.enabled=Varning: Autohöjd aktiverad
+
+# Auto altitude disabled
+DroneOffsetsWidget.relative.altitude.disabled=Automatisk höjd avaktiverad
+
+# N/A
+NetworkRTKStatus.value.0=N/A
+
+# Disabled
+NetworkRTKStatus.value.1=Inaktiverad
+
+# Connecting
+NetworkRTKStatus.value.2=Ansluter
+
+# Connected
+NetworkRTKStatus.value.3=Ansluten
+
+# Error
+NetworkRTKStatus.value.4=Fel
+
+# Timeout
+NetworkRTKStatus.value.5=Paus
+
+# RTK Status
+RTKSettingsWidget.popover.status.heading=RTK-status
+
+# Network Service
+RTKSettingsWidget.popover.status.channel=Nätverkstjänst
+
+# Configuration Status
+RTKSettingsWidget.popover.status.configuration=Konfigurationsstatus
+
+# RTK Network Configuration
+RTKSettingsWidget.popover.configuration.heading=RTK-nätverkskonfiguration
+
+# Enabled
+RTKSettingsWidget.popover.configuration.enabled=Aktiverad
+
+# Auto connect
+RTKSettingsWidget.popover.configuration.autoconnect=Autoanslut
+
+# Server address
+RTKSettingsWidget.popover.configuration.serveraddress=Server adress
+
+# Port
+RTKSettingsWidget.popover.configuration.port=Hamn
+
+# Username
+RTKSettingsWidget.popover.configuration.username=Användarnamn
+
+# Password
+RTKSettingsWidget.popover.configuration.password=Lösenord
+
+# Confirm
+RTKSettingsWidget.popover.configuration.confirm=Bekräfta
+
+# Mount point
+RTKSettingsWidget.popover.configuration.mountpoint=monteringspunkt
+
+# Network RTK
+RTKStatusWidget.status.label=Nätverk RTK

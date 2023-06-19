@@ -1,0 +1,383 @@
+# Yes
+yes=جی ہاں
+
+# No
+no=نہیں
+
+# Dismiss
+dismiss=برطرف کرنا
+
+# Continue
+continue=جاری رہے
+
+# Cancel
+cancel=منسوخ کریں۔
+
+# Back
+back=پیچھے
+
+# Next
+next=اگلے
+
+# Resume
+resume=دوبارہ شروع کریں۔
+
+# Learn More
+learnMore=اورجانیے
+
+# N/A
+na=N / A
+
+# Camera Focus Calibration
+CameraFocusCalibrationWidget.title=کیمرہ فوکس کیلیبریشن
+
+# Calibration finished.
+CameraFocusCalibrationWidget.finished=کیلیبریشن مکمل ہو گئی۔
+
+# Distance
+CameraFocusCalibrationWidget.type.distance=فاصلے
+
+# Altitude
+CameraFocusCalibrationWidget.type.altitude=اونچائی
+
+# Mark Reference
+CameraFocusCalibrationWidget.mark.reference.title=حوالہ نشان زد کریں۔
+
+# Waiting for drone...
+CameraFocusCalibrationWidget.drone.unavailable=ڈرون کا انتظار...
+
+# Unable to read drone serial number. Please reconnect the drone.
+CameraFocusCalibrationWidget.serial.number.unavailable=ڈرون کا سیریل نمبر پڑھنے سے قاصر ہے۔ براہ کرم ڈرون کو دوبارہ جوڑیں۔
+
+# Unable to determine camera focus state...
+CameraFocusCalibrationWidget.camera.unavailable=کیمرے کی توجہ کی حالت کا تعین کرنے سے قاصر...
+
+# Waiting for location...
+CameraFocusCalibrationWidget.location.unavailable=مقام کا انتظار کر رہا ہے...
+
+# Mark a reference object to focus on.
+CameraFocusCalibrationWidget.details.mark.reference=توجہ مرکوز کرنے کے لیے ایک حوالہ آبجیکٹ کو نشان زد کریں۔
+
+# Move %@ away while pointing at the reference object with the gimbal at 0°.
+CameraFocusCalibrationWidget.details.move.distance=0° پر جیمبل کے ساتھ حوالہ آبجیکٹ کی طرف اشارہ کرتے ہوئے %@ کو دور کریں۔
+
+# Fly %@ above your takeoff location with the gimbal at -90°.
+CameraFocusCalibrationWidget.details.move.altitude=جیمبل کے ساتھ اپنے ٹیک آف کے مقام کے اوپر %@ -90° پر پرواز کریں۔
+
+# Ready to start calibration.
+CameraFocusCalibrationWidget.details.ready=انشانکن شروع کرنے کے لیے تیار ہے۔
+
+# Calibrating (%@)...
+CameraFocusCalibrationWidget.details.busy=کیلیبریٹ کیا جا رہا ہے (%@)...
+
+# Start
+CameraFocusCalibrationWidget.start=شروع کریں۔
+
+# Unable to calibrate, please try again.
+CameraFocusCalibrationWidget.finish.error=کیلیبریٹ کرنے سے قاصر، براہ کرم دوبارہ کوشش کریں۔
+
+# Focus
+CameraIndicatorWidget.focusring.title=فوکس
+
+# ISO
+CameraExposureWidget.iso.title=آئی ایس او
+
+# Auto ISO
+CameraExposureWidget.autoiso.title=آٹو آئی ایس او
+
+# Shutter
+CameraExposureWidget.shutter.title=شٹر
+
+# F
+CameraExposureWidget.fstop.title=ایف
+
+# EV
+CameraExposureWidget.ev.title=ای وی
+
+# WB
+CameraExposureWidget.wb.title=ڈبلیو بی
+
+# Video Stream Source
+CameraVideoStreamSourceWidget.title=ویڈیو سٹریم ماخذ
+
+# Side-by-Side
+CameraVideoStreamSourceWidget.pip=ساتھ ساتھ
+
+# Gimbal
+GimbalOrientationWidget.title=جمبل
+
+# Mission Paused
+MissionDisengageReason.user.disengaged=مشن روک دیا گیا۔
+
+# Mode Paused
+ModeDisengageReason.user.disengaged=موڈ موقوف ہے۔
+
+# Camera Focus Calibration Required
+MissionExecutorWidget.cameraFocusCalibrationsRequired.title=کیمرہ فوکس کیلیبریشن درکار ہے۔
+
+# This mission requires a camera focus calibration before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.single=اس مشن کو چلانے سے پہلے کیمرہ فوکس کیلیبریشن کی ضرورت ہوتی ہے۔
+
+# This mission requires %@ camera focus calibrations before running.
+MissionExecutorWidget.cameraFocusCalibrationsRequired.message.multiple=اس مشن کو چلانے سے پہلے %@ کیمرہ فوکس کیلیبریشن کی ضرورت ہوتی ہے۔
+
+# 3D Preview
+MissionExecutorWidget.details=3D پیش نظارہ
+
+# You need a network connection for 3D previews.
+MissionExecutorWidget.details.network.error=3D پیش نظارہ کے لیے آپ کو نیٹ ورک کنکشن کی ضرورت ہے۔
+
+# Estimating flight path and time...
+MissionExecutorWidget.estimating=پرواز کے راستے اور وقت کا تخمینہ لگایا جا رہا ہے...
+
+# Confirm Takeoff Location
+MissionExecutorWidget.start.takeoffLocationWarning.title=ٹیک آف کے مقام کی تصدیق کریں۔
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes. The GPS altitude of this device (%@) will be used to adjust AGL and MSL altitudes automatically.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.available=موجودہ ٹیک آف کا مقام منصوبہ بند ٹیک آف مقام سے %@ ہے، جس کی وجہ سے ڈرون منصوبہ بند اونچائی سے غیر محفوظ آفسیٹ پر پرواز کر سکتا ہے۔ اس ڈیوائس کی GPS اونچائی (%@) کو AGL اور MSL اونچائی کو خود بخود ایڈجسٹ کرنے کے لیے استعمال کیا جائے گا۔
+
+# The current takeoff location is %@ from the planned takeoff location, which may cause the drone to fly at an unsafe offset from the planned altitudes.
+MissionExecutorWidget.start.takeoffLocationWarning.message.device.altitude.unavailable=موجودہ ٹیک آف کا مقام منصوبہ بند ٹیک آف مقام سے %@ ہے، جس کی وجہ سے ڈرون منصوبہ بند اونچائی سے غیر محفوظ آفسیٹ پر پرواز کر سکتا ہے۔
+
+# Starting Mission
+MissionExecutorWidget.engaging=مشن شروع کرنا
+
+# Mission Stopped
+MissionExecutorWidget.disengaged=مشن رک گیا۔
+
+# Waiting for drone...
+ModeExecutorWidget.disconnected=ڈرون کا انتظار...
+
+# Ready to start
+ModeExecutorWidget.ready=شروع کرنے کے لیے تیار ہیں۔
+
+# Starting Mode
+ModeExecutorWidget.engaging=شروعاتی موڈ
+
+# Mode Stopped
+ModeExecutorWidget.disengaged=موڈ رک گیا۔
+
+# Previous Inputs Available
+FuncExecutorWidget.cachedInputs.title=پچھلے ان پٹ دستیاب ہیں۔
+
+# Do you want to load the previous inputs or start over?
+FuncExecutorWidget.cachedInputs.message=کیا آپ پچھلے ان پٹ کو لوڈ کرنا چاہتے ہیں یا دوبارہ شروع کرنا چاہتے ہیں؟
+
+# Start Over
+FuncExecutorWidget.cachedInputs.action.new=پھر سے شروع
+
+# Load Previous
+FuncExecutorWidget.cachedInputs.action.previous=پچھلا لوڈ کریں۔
+
+# Get Started
+FuncExecutorWidget.primary.intro=شروع کرنے کے
+
+# Continue
+FuncExecutorWidget.primary.execute=جاری رہے
+
+# Generating...
+FuncExecutorWidget.primary.executing=پیدا ہو رہا ہے...
+
+# This input is required
+FuncExecutorWidget.input.required=یہ ان پٹ درکار ہے۔
+
+# Drone location unavailable
+FuncExecutorWidget.input.location.unavailable=ڈرون کا مقام دستیاب نہیں ہے۔
+
+# Mark
+FuncExecutorWidget.input.drone=نشان
+
+# Please connect a drone.
+FuncExecutorWidget.input.drone.unavailable=براہ کرم ڈرون کو جوڑیں۔
+
+# Input Summary
+FuncExecutorWidget.input.summary=ان پٹ کا خلاصہ
+
+# No Input
+FuncExecutorWidget.input.none=کوئی ان پٹ نہیں ہے۔
+
+# Choose...
+FuncExecutorWidget.input.choose=منتخب کریں...
+
+# Starting in %d
+ExecutableWidget.start.countdown=%d میں شروع ہو رہا ہے۔
+
+# Preparing to execute...
+ExecutableWidget.start.engaging=عمل کرنے کی تیاری ہو رہی ہے...
+
+# Countdown Stopped
+ExecutableWidget.start.cancelled=الٹی گنتی رک گئی۔
+
+# Unidentified Drone
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.title=نامعلوم ڈرون
+
+# Unable to determine the serial number of your drone. Try reconnecting or power-cycling.
+ExecutableWidget.start.engage.droneSerialNumberUnavailable.message=آپ کے ڈرون کے سیریل نمبر کا تعین کرنے سے قاصر۔ دوبارہ جڑنے یا پاور سائیکلنگ کی کوشش کریں۔
+
+# --:--
+ExecutableWidget.executionDuration.empty=---:---
+
+# --
+NumericInstrumentWidget.empty=--
+
+# D
+DistanceWidget.prefix=ڈی
+
+# A
+AltitudeWidget.prefix=اے
+
+# H/S
+HorizontalSpeedWidget.prefix=H/S
+
+# V/S
+VerticalSpeedWidget.prefix=V/S
+
+# Disconnected
+StatusWidget.disconnected=منقطع
+
+# Ready To Go
+StatusWidget.ready=جانے کے لیے تیار
+
+# Manual Flight
+StatusWidget.manual=دستی پرواز
+
+# SD Card Missing
+DashboardWidget.camera.noSDCard.title=SD کارڈ غائب ہے۔
+
+# Please make sure to insert an SD card before running a mission with data capture.
+DashboardWidget.camera.noSDCard.details=براہ کرم ڈیٹا کیپچر کے ساتھ مشن چلانے سے پہلے SD کارڈ داخل کرنا یقینی بنائیں۔
+
+# MENU
+DashboardWidget.cameraMenu=مینو
+
+# Map Options
+DashboardWidget.contentView2.settings=نقشہ کے اختیارات
+
+# 2D
+DashboardWidget.map.mapbox=2D
+
+# 3D (Beta)
+DashboardWidget.map.microsoft=3D (بیٹا)
+
+# Camera Feed Options
+DashboardWidget.contentView3.settings=کیمرہ فیڈ کے اختیارات
+
+# Reset
+MapboxMapWidget.reset=دوبارہ ترتیب دیں۔
+
+# Follow Drone
+MapboxMapWidget.tracking=ڈرون کو فالو کریں۔
+
+# Follow (North Up)
+MapboxMapWidget.tracking.north.up=پیروی کریں (شمالی اوپر)
+
+# Reset
+MicrosoftMapWidget.reset=دوبارہ ترتیب دیں۔
+
+# Follow
+MicrosoftMapWidget.follow=پیروی
+
+# Chase Plane (Beta)
+MicrosoftMapWidget.chase.plane=چیس پلین (بی ٹا)
+
+# FPV (Beta)
+MicrosoftMapWidget.fpv=FPV (بیٹا)
+
+# Satellite
+MicrosoftMapWidget.satellite=سیٹلائٹ
+
+# Streets & Buildings
+MicrosoftMapWidget.streets=سڑکیں اور عمارتیں
+
+# YAW/ALT
+DroneOffsetsWidget.altitudeYaw=YAW/ALT
+
+# POSITION
+DroneOffsetsWidget.position=پوزیشن
+
+# Gimbal Options
+DroneOffsetsWidget.more=جمبل کے اختیارات
+
+# Reset
+DroneOffsetsWidget.resetGimbal=دوبارہ ترتیب دیں۔
+
+# 0° (Level)
+DroneOffsetsWidget.levelGimbal=0° (سطح)
+
+# -90° (Nadir)
+DroneOffsetsWidget.nadirGimbal=-90° (نادر)
+
+# Roll Trim
+DroneOffsetsWidget.rollTrim=رول ٹرم
+
+# Clear Focus Calibrations
+DroneOffsetsWidget.clearCameraFocusCalibrations=فوکس کیلیبریشنز کو صاف کریں۔
+
+# Cleared %@ calibration(s)
+DroneOffsetsWidget.clearCameraFocusCalibrations.finished=%@ کیلیبریشن کو صاف کیا گیا
+
+# Caution: RC sticks enabled
+DroneOffsetsWidget.rc.inputs=احتیاط: RC اسٹکس فعال ہیں۔
+
+# Caution: Auto altitude enabled
+DroneOffsetsWidget.relative.altitude.enabled=احتیاط: آٹو اونچائی فعال ہے۔
+
+# Auto altitude disabled
+DroneOffsetsWidget.relative.altitude.disabled=آٹو اونچائی غیر فعال ہے۔
+
+# N/A
+NetworkRTKStatus.value.0=N / A
+
+# Disabled
+NetworkRTKStatus.value.1=معذور
+
+# Connecting
+NetworkRTKStatus.value.2=جڑ رہا ہے۔
+
+# Connected
+NetworkRTKStatus.value.3=جڑا ہوا
+
+# Error
+NetworkRTKStatus.value.4=خرابی
+
+# Timeout
+NetworkRTKStatus.value.5=وقت ختم
+
+# RTK Status
+RTKSettingsWidget.popover.status.heading=RTK اسٹیٹس
+
+# Network Service
+RTKSettingsWidget.popover.status.channel=نیٹ ورک سروس
+
+# Configuration Status
+RTKSettingsWidget.popover.status.configuration=کنفیگریشن سٹیٹس
+
+# RTK Network Configuration
+RTKSettingsWidget.popover.configuration.heading=RTK نیٹ ورک کنفیگریشن
+
+# Enabled
+RTKSettingsWidget.popover.configuration.enabled=فعال
+
+# Auto connect
+RTKSettingsWidget.popover.configuration.autoconnect=آٹو کنیکٹ
+
+# Server address
+RTKSettingsWidget.popover.configuration.serveraddress=سرور کا پتہ
+
+# Port
+RTKSettingsWidget.popover.configuration.port=بندرگاہ
+
+# Username
+RTKSettingsWidget.popover.configuration.username=صارف نام
+
+# Password
+RTKSettingsWidget.popover.configuration.password=پاس ورڈ
+
+# Confirm
+RTKSettingsWidget.popover.configuration.confirm=تصدیق کریں۔
+
+# Mount point
+RTKSettingsWidget.popover.configuration.mountpoint=ماؤنٹ پوائنٹ
+
+# Network RTK
+RTKStatusWidget.status.label=نیٹ ورک RTK
