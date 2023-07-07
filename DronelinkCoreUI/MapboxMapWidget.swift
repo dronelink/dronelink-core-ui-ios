@@ -443,7 +443,6 @@ public class MapboxMapWidget: UpdatableWidget {
                         try mapView.viewAnnotations.add(modeTargetView, options: modeTargetOptions)
                     } catch let error {
                         os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
-
                     }
                 }
             }
