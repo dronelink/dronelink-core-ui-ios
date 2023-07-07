@@ -11,8 +11,10 @@ import MapboxMaps
 import DronelinkCore
 import MaterialComponents.MaterialPalettes
 import CoreLocation
+import os
 
 public class MapboxMapWidget: UpdatableWidget {
+    internal static let log = OSLog(subsystem: "DronelinkCoreUI", category: "MapboxMapWidget")
     public enum Tracking {
         case none
         case droneNorthUp
@@ -103,7 +105,7 @@ public class MapboxMapWidget: UpdatableWidget {
                 do {
                     try mapView.viewAnnotations.update(droneView, options: droneViewOptions)
                 } catch let error {
-                    NSLog("MapboxMapWidget Error: \(error)")
+                    os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
                 }
             } else {
                 droneView = createUiView(imageName: "drone", viewSize: CGSize(width: 30, height: 30), alpha: 1.0, rotationAngle: CGFloat((state.orientation.yaw.convertRadiansToDegrees - mapView.cameraState.bearing).convertDegreesToRadians))
@@ -111,7 +113,7 @@ public class MapboxMapWidget: UpdatableWidget {
                     do {
                         try mapView.viewAnnotations.add(droneView, id: "drone", options: droneViewOptions)
                     } catch let error {
-                        NSLog("MapboxMapWidget Error: \(error)")
+                        os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
                     }
                 }
             }
@@ -119,7 +121,7 @@ public class MapboxMapWidget: UpdatableWidget {
             do {
                 try mapView.viewAnnotations.update(droneView, options: ViewAnnotationOptions(visible: false))
             } catch let error {
-                NSLog("MapboxMapWidget Error: \(error)")
+                os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
             }
         }
         
@@ -417,7 +419,7 @@ public class MapboxMapWidget: UpdatableWidget {
                 do {
                     try mapView.viewAnnotations.update(modeTargetView, options: ViewAnnotationOptions(visible: false))
                 } catch let error {
-                    NSLog("MapboxMapWidget Error: \(error)")
+                    os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
                 }
             }
             return
@@ -431,8 +433,8 @@ public class MapboxMapWidget: UpdatableWidget {
                 do {
                     try mapView.viewAnnotations.update(modeTargetView, options: modeTargetOptions)
                 } catch let error {
-                    NSLog("MapboxMapWidget Error: \(error)")
-                
+                    os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
+
                 }
             } else {
                 modeTargetView = createUiView(imageName: "drone", viewSize: CGSize(width: 30, height: 30), alpha: 0.5, rotationAngle: CGFloat((modeTarget.orientation.yaw.convertRadiansToDegrees - mapView.cameraState.bearing).convertDegreesToRadians))
@@ -440,8 +442,8 @@ public class MapboxMapWidget: UpdatableWidget {
                     do {
                         try mapView.viewAnnotations.add(modeTargetView, options: modeTargetOptions)
                     } catch let error {
-                        NSLog("MapboxMapWidget Error: \(error)")
-                    
+                        os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
+
                     }
                 }
             }
@@ -450,7 +452,7 @@ public class MapboxMapWidget: UpdatableWidget {
             do {
                 try mapView.viewAnnotations.update(modeTargetView, options: ViewAnnotationOptions(visible: false))
             } catch let error {
-                NSLog("MapboxMapWidget Error: \(error)")
+                os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
             }
         }
         
@@ -506,7 +508,7 @@ public class MapboxMapWidget: UpdatableWidget {
                         do {
                             try mapView.viewAnnotations.update(missionReferenceView, options: missionReferenceViewOptions)
                         } catch let error {
-                            NSLog("MapboxMapWidget Error: \(error)")
+                            os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
                         }
                     } else {
                         self?.missionReferenceView = self?.createUiView(imageName: "mission-reference", viewSize: CGSize(width: 38, height: 38), alpha: 1, rotationAngle: 0)
@@ -514,7 +516,7 @@ public class MapboxMapWidget: UpdatableWidget {
                             do {
                                 try mapView.viewAnnotations.add(missionReferenceView, id: "mission-reference", options: missionReferenceViewOptions)
                             } catch let error {
-                                NSLog("MapboxMapWidget Error: \(error)")
+                                os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
                             }
                         }
                     }
@@ -539,7 +541,7 @@ public class MapboxMapWidget: UpdatableWidget {
                 do {
                     try mapView.viewAnnotations.remove(missionReferenceView)
                 } catch let error {
-                    NSLog("MapboxMapWidget Error: \(error)")
+                    os_log(.error, log: MapboxMapWidget.log, "MapboxMapWidget Error: %{public}s", error.localizedDescription)
                 }
             }
             self?.missionCentered = false
