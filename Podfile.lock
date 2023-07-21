@@ -1,13 +1,13 @@
 PODS:
   - Agrume (5.8.4):
     - SwiftyGif
-  - DronelinkCore (4.6.0)
-  - IQKeyboardManager (6.5.11)
+  - DronelinkCore (4.7.0)
+  - IQKeyboardManager (6.5.12)
   - Kingfisher (7.1.2)
   - Mapbox-iOS-SDK (6.4.1):
     - MapboxMobileEvents (~> 0.10.12)
   - MapboxMobileEvents (0.10.14)
-  - MarqueeLabel (4.3.0)
+  - MarqueeLabel (4.3.1)
   - MaterialComponents/ActivityIndicator (124.2.0):
     - MaterialComponents/Palettes
     - MaterialComponents/private/Application
@@ -164,7 +164,7 @@ PODS:
 
 DEPENDENCIES:
   - Agrume (~> 5.8.0)
-  - DronelinkCore (~> 4.6.0)
+  - DronelinkCore (~> 4.7.0)
   - IQKeyboardManager (~> 6.5.6)
   - Kingfisher (~> 7.1.0)
   - Mapbox-iOS-SDK (~> 6.4.0)
@@ -203,12 +203,12 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   Agrume: 7c726bddf365f92424d38ce90a906cd4cdd49334
-  DronelinkCore: 1a6aeb09b097490790fb96beaa5f00a2442e4ba0
-  IQKeyboardManager: ef43ce1ba1e5aaf4adf222c0a46f39761f246879
+  DronelinkCore: aaf16a548b0f8b5a3456d87b2e63dcee2c1702ad
+  IQKeyboardManager: b1fd66ccf7a79095bdcc4a2735231586f744216e
   Kingfisher: 44ed6a8504763f27bab46163adfac83f5deb240c
   Mapbox-iOS-SDK: f870f83cbdc7aa4a74afcee143aafb0dae390c82
   MapboxMobileEvents: 5a172cc9bbf8ac0e45ba86095cbee685ede248cc
-  MarqueeLabel: 02f5ac8fd6877c94564556cb93fa86c70c08baeb
+  MarqueeLabel: da4b9cf619fe70c75d7bab4580b0b4a0b868aa6b
   MaterialComponents: 1a9b2d9d45b1601ae544de85089adc4c464306d4
   MDFInternationalization: d697c55307816222a55685c4ccb1044ffb030c12
   MDFTextAccessibility: f4bb4cc2194286651b59a215fdeaa0e05dc90ba5
@@ -219,6 +219,6 @@ SPEC CHECKSUMS:
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   SwiftyUserDefaults: 63f80248cf5bfb3458825d9a78f2eb7e1293a040
 
-PODFILE CHECKSUM: f5f97b21eda596a14a9bbba334bc1c34f397100f
+PODFILE CHECKSUM: 998bac76051a1b85a0ae69238186877aa6599597
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.12.1
