@@ -46,6 +46,8 @@ open class DelegateWidget: Widget, DronelinkDelegate, DroneSessionManagerDelegat
         Dronelink.shared.modeExecutor?.remove(delegate: self)
         Dronelink.shared.funcExecutor?.remove(delegate: self)
     }
+    
+    open func onDroneSessionManagerAdded(droneSessionManager: DronelinkCore.DroneSessionManager) {}
 
     open func onRegistered(error: String?) {}
     

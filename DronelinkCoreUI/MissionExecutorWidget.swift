@@ -120,18 +120,6 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         messagesTextView.isEditable = false
         view.addSubview(messagesTextView)
         
-        let scheme = MDCContainerScheme()
-        scheme.colorScheme = MDCSemanticColorScheme(defaults: .materialDark201907)
-        scheme.colorScheme.primaryColor = UIColor.white
-        detailsButton.applyOutlinedTheme(withScheme: scheme)
-        detailsButton.translatesAutoresizingMaskIntoConstraints = false
-        detailsButton.setTitle("MissionExecutorWidget.details".localized, for: .normal)
-        detailsButton.setTitleColor(UIColor.white, for: .normal)
-        detailsButton.setBorderColor(UIColor.white.withAlphaComponent(0.75), for: .normal)
-        detailsButton.setBorderColor(UIColor.white.withAlphaComponent(0.25), for: .disabled)
-        detailsButton.addTarget(self, action: #selector(onDetails(sender:)), for: .touchUpInside)
-        view.addSubview(detailsButton)
-        
         layoutToggleButton.addTarget(self, action: #selector(onLayoutToggle), for: .touchUpInside)
         view.addSubview(layoutToggleButton)
         
@@ -269,23 +257,6 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
         }
         
         promptConfirmation()
-    }
-    
-    @objc func onDetails(sender: Any) {
-        guard
-            let detailsURL = missionExecutor?.detailsURL,
-            let url = URL(string: detailsURL) else {
-            return
-        }
-        
-        let embed = EmbedViewController()
-        embed.networkError = "MissionExecutorWidget.details.network.error".localized
-        embed.title = missionExecutor?.descriptors.name
-        let nav = UINavigationController(rootViewController: embed)
-        nav.modalPresentationStyle = .fullScreen
-        present(nav, animated: true) {
-            embed.load(URLRequest(url: url))
-        }
     }
     
     private func promptConfirmation() {
@@ -442,7 +413,7 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
 
         titleLabel.text = missionExecutor.descriptors.display
 
-        let detailsPossible = missionExecutor.detailsURL != nil
+        let detailsPossible = false
         
         if missionExecutor.estimating {
             activityIndicator.isHidden = false
