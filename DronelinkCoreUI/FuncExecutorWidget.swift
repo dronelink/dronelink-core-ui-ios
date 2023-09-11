@@ -633,60 +633,65 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     }
     
     func readValue() {
-        variableTextField.text = ""
-        variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
-        variableSegmentedControl.removeAllSegments()
-        variablePickerView.reloadAllComponents()
-        variableDroneViewController.inputIndex = inputIndex
-        
-        guard let input = input else {
-            self.value = nil
-            update()
-            return
-        }
-        
-        if input.variable.valueType == .boolean {
-            variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
-            variableSegmentedControl.insertSegment(withTitle: "no".localized, at: 1, animated: false)
-            
-        }
-        else if let enumValues = input.enumValues {
-            enumValues.enumerated().forEach { [weak self] (index, enumValue) in
-                self?.variableSegmentedControl.insertSegment(withTitle: enumValue, at: index, animated: false)
-            }
-        }
-        
-        guard let value = funcExecutor?.readValue(inputIndex: inputIndex) else {
-            self.value = nil
-            variableDroneViewController.refresh()
-            update()
-            return
-        }
-        self.value = value
-        update()
-        
-        if input.variable.valueType == .drone {
-            variableDroneViewController.refresh()
-            return
-        }
-        
-        if let valueBoolean = value as? Bool {
-            variableSegmentedControl.selectedSegmentIndex = valueBoolean ? 0 : 1
-        }
-        
-        if let valueDouble = value as? Double {
-            variableTextField.text = "\(valueDouble)"
-        }
-        
-        if let valueString = value as? String {
-            variableTextField.text = valueString
-            input.enumValues?.enumerated().forEach { [weak self] (index, enumValue) in
-                if enumValue == valueString {
-                    self?.variableSegmentedControl.selectedSegmentIndex = index
-                    self?.variablePickerView.selectRow(index + 1, inComponent: 0, animated: false)
-                }
-            }
-        }
+//        variableTextField.text = ""
+//        variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
+//        variableSegmentedControl.removeAllSegments()
+//        variablePickerView.reloadAllComponents()
+//        variableDroneViewController.inputIndex = inputIndex
+//
+//        guard let input = input else {
+//            self.value = nil
+//            update()
+//            return
+//        }
+//
+//        if input.variable.valueType == .boolean {
+//            variableSegmentedControl.insertSegment(withTitle: "yes".localized, at: 0, animated: false)
+//            variableSegmentedControl.insertSegment(withTitle: "no".localized, at: 1, animated: false)
+//
+//        }
+//        else if let enumValues = input.enumValues {
+//            enumValues.enumerated().forEach { [weak self] (index, enumValue) in
+//                if enumValue is String {
+//                    self?.variableSegmentedControl.insertSegment(withTitle: "\(enumValue)", at: index, animated: false)
+//                }
+//                else {
+//                    self?.variableSegmentedControl.insertSegment(withTitle: "\(enumValue)", at: index, animated: false)
+//                }
+//            }
+//        }
+//
+//        guard let value = funcExecutor?.readValue(inputIndex: inputIndex) else {
+//            self.value = nil
+//            variableDroneViewController.refresh()
+//            update()
+//            return
+//        }
+//        self.value = value
+//        update()
+//
+//        if input.variable.valueType == .drone {
+//            variableDroneViewController.refresh()
+//            return
+//        }
+//
+//        if let valueBoolean = value as? Bool {
+//            variableSegmentedControl.selectedSegmentIndex = valueBoolean ? 0 : 1
+//        }
+//
+//        if let valueDouble = value as? Double {
+//            variableTextField.text = "\(valueDouble)"
+//        }
+//
+//        if let valueString = value as? String {
+//            variableTextField.text = valueString
+//            input.enumValues?.enumerated().forEach { [weak self] (index, enumValue) in
+//                if enumValue == valueString {
+//                    self?.variableSegmentedControl.selectedSegmentIndex = index
+//                    self?.variablePickerView.selectRow(index + 1, inComponent: 0, animated: false)
+//                }
+//            }
+//        }
     }
     
     private func update() {
@@ -847,7 +852,8 @@ extension FuncExecutorWidget: UIPickerViewDataSource, UIPickerViewDelegate {
         if row == 0 {
             return "FuncExecutorWidget.input.choose".localized
         }
-        return input.enumValues?[safeIndex: row - 1] ?? ""
+        //return input.enumValues?[safeIndex: row - 1] ?? ""
+        return ""
     }
 }
 
