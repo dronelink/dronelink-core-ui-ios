@@ -633,6 +633,9 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     }
     
     func readValue() {
+        
+        // enumValues has changed to support either Strings or objects. This code is no longer used and updating
+        // it in swift is a PITA. So I'm just commenting it.
 //        variableTextField.text = ""
 //        variableSegmentedControl.selectedSegmentIndex = UISegmentedControl.noSegment
 //        variableSegmentedControl.removeAllSegments()
@@ -852,6 +855,8 @@ extension FuncExecutorWidget: UIPickerViewDataSource, UIPickerViewDelegate {
         if row == 0 {
             return "FuncExecutorWidget.input.choose".localized
         }
+        // enumValues has changed to support either Strings or objects. This code is no longer used and updating
+        // it in swift is a PITA. So I'm just commenting it.
         //return input.enumValues?[safeIndex: row - 1] ?? ""
         return ""
     }
