@@ -36,6 +36,7 @@ public class MapboxMapWidget: UpdatableWidget {
     private var missionCentered = false
     private var currentMissionEstimateID: String?
     private var tracking = Tracking.none
+    private var missionEstimateVisibleCoordinates: [CLLocationCoordinate2D]?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -282,6 +283,7 @@ public class MapboxMapWidget: UpdatableWidget {
         if visibleCoordinates.count > 0 {
             missionCentered = true
             if tracking == .none || session?.state?.value.location == nil {
+                missionEstimateVisibleCoordinates = visibleCoordinates
                 set(visibleCoordinates: visibleCoordinates)
             }
         }
@@ -630,6 +632,9 @@ extension MapboxMapWidget: ConfigurableWidget {
         var actions: [UIAlertAction] = []
         
         actions.append(UIAlertAction(title: "MapboxMapWidget.reset".localized, style: .default, handler: {  [weak self] _ in
+            if let missionEstimateVisibleCoordinates = self?.missionEstimateVisibleCoordinates {
+                self?.set(visibleCoordinates: missionEstimateVisibleCoordinates)
+            }
             self?.tracking = .none
         }))
 
