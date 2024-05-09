@@ -546,6 +546,7 @@ public class MapboxMapWidget: UpdatableWidget {
                 }
             }
             self?.missionCentered = false
+            self?.missionEstimateVisibleCoordinates = nil
             self?.updateMissionRequiredTakeoffArea()
             self?.updateMissionRestrictionZones()
             self?.updateMissionEstimate()
