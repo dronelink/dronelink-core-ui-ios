@@ -40,9 +40,7 @@ public class MapboxMapWidget: UpdatableWidget {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        let resourceOptions = ResourceOptions(accessToken: DronelinkUI.mapboxMapCredentialsKey ?? "")
-        let mapInitOptions = MapInitOptions(resourceOptions: resourceOptions, styleURI: .satelliteStreets)
-        mapView = MapView(frame: view.bounds, mapInitOptions: mapInitOptions)
+        mapView = MapView(frame: view.bounds, mapInitOptions: MapInitOptions(styleURI: .satelliteStreets))
         
         if let mapView = mapView {
             mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]

@@ -1,19 +1,14 @@
 PODS:
-  - Agrume (5.8.4):
-    - SwiftyGif
-  - DronelinkCore (4.7.0)
-  - IQKeyboardManager (6.5.12)
+  - DronelinkCore (5.0.0)
   - Kingfisher (7.6.2)
-  - MapboxCommon (23.3.2)
-  - MapboxCoreMaps (10.11.1):
-    - MapboxCommon (~> 23.3)
-  - MapboxMaps (10.11.1):
-    - MapboxCommon (= 23.3.2)
-    - MapboxCoreMaps (= 10.11.1)
-    - MapboxMobileEvents (= 1.0.10)
-    - Turf (~> 2.0)
-  - MapboxMobileEvents (1.0.10)
-  - MarqueeLabel (4.3.1)
+  - MapboxCommon (24.6.1)
+  - MapboxCoreMaps (11.6.1):
+    - MapboxCommon (~> 24.6)
+  - MapboxMaps (11.6.1):
+    - MapboxCommon (= 24.6.1)
+    - MapboxCoreMaps (= 11.6.1)
+    - Turf (= 2.8.0)
+  - MarqueeLabel (4.3.2)
   - MaterialComponents/ActivityIndicator (124.2.0):
     - MaterialComponents/Palettes
     - MaterialComponents/private/Application
@@ -160,21 +155,17 @@ PODS:
     - MDFTextAccessibility
   - MDFInternationalization (3.0.0)
   - MDFTextAccessibility (2.0.1)
-  - MicrosoftMapsSDK (1.2.0)
   - MotionAnimator (4.0.1):
     - MotionInterchange (~> 3.0)
   - MotionInterchange (3.0.0)
   - SnapKit (5.6.0)
-  - SwiftyGif (5.4.4)
   - SwiftyUserDefaults (5.3.0)
-  - Turf (2.6.1)
+  - Turf (2.8.0)
 
 DEPENDENCIES:
-  - Agrume (~> 5.8.0)
   - DronelinkCore (from `../../private/dronelink-core-ios`)
-  - IQKeyboardManager (~> 6.5.6)
   - Kingfisher (~> 7.6.2)
-  - MapboxMaps (~> 10.11.1)
+  - MapboxMaps (~> 11.6.1)
   - MarqueeLabel (~> 4.3.0)
   - MaterialComponents/ActivityIndicator (~> 124.2.0)
   - MaterialComponents/Buttons (~> 124.2.0)
@@ -185,28 +176,22 @@ DEPENDENCIES:
   - MaterialComponents/ProgressView (~> 124.2.0)
   - MaterialComponents/Snackbar (~> 124.2.0)
   - MaterialComponents/TextFields (~> 124.2.0)
-  - MicrosoftMapsSDK (~> 1.2.0)
   - SnapKit (~> 5.6.0)
   - SwiftyUserDefaults (~> 5.3.0)
 
 SPEC REPOS:
   trunk:
-    - Agrume
-    - IQKeyboardManager
     - Kingfisher
     - MapboxCommon
     - MapboxCoreMaps
     - MapboxMaps
-    - MapboxMobileEvents
     - MarqueeLabel
     - MaterialComponents
     - MDFInternationalization
     - MDFTextAccessibility
-    - MicrosoftMapsSDK
     - MotionAnimator
     - MotionInterchange
     - SnapKit
-    - SwiftyGif
     - SwiftyUserDefaults
     - Turf
 
@@ -215,26 +200,21 @@ EXTERNAL SOURCES:
     :path: "../../private/dronelink-core-ios"
 
 SPEC CHECKSUMS:
-  Agrume: 7c726bddf365f92424d38ce90a906cd4cdd49334
-  DronelinkCore: bf3bb0b9171c111d724853f9ace1903acea5ea93
-  IQKeyboardManager: b1fd66ccf7a79095bdcc4a2735231586f744216e
+  DronelinkCore: 7c8b62ddb8c97dad29dbf1d07300c7b0a8b20b05
   Kingfisher: 6c5449c6450c5239166510ba04afe374a98afc4f
-  MapboxCommon: c3a35f6884b80d898de9f11d88cb28c5caba584a
-  MapboxCoreMaps: 03e7214fabb54d496ff56314ff8159dd264b6093
-  MapboxMaps: 85610575a8871b3f5e98be2a234f0229a33324a7
-  MapboxMobileEvents: de50b3a4de180dd129c326e09cd12c8adaaa46d6
-  MarqueeLabel: da4b9cf619fe70c75d7bab4580b0b4a0b868aa6b
+  MapboxCommon: 38483a3edda397d8292eeb8759d1ea89db33c016
+  MapboxCoreMaps: 7a7d99161e819c1261f7cb84405798a7815d451d
+  MapboxMaps: 3bb2213da7e730f6d09a407b7fb89ee6ea195e40
+  MarqueeLabel: 15e524a6762552bb279cb17438b8a94990269fb9
   MaterialComponents: 1a9b2d9d45b1601ae544de85089adc4c464306d4
   MDFInternationalization: d697c55307816222a55685c4ccb1044ffb030c12
   MDFTextAccessibility: f4bb4cc2194286651b59a215fdeaa0e05dc90ba5
-  MicrosoftMapsSDK: c914b8c87b978d4665a00a5515bd35a43993429d
   MotionAnimator: 5f99d7c9592928c0f28a66283eda9c3b657dc480
   MotionInterchange: 13adae439b377e31d1674cc165539d50e1d1566a
   SnapKit: e01d52ebb8ddbc333eefe2132acf85c8227d9c25
-  SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   SwiftyUserDefaults: 63f80248cf5bfb3458825d9a78f2eb7e1293a040
-  Turf: 469ce2c3d22e5e8e4818d5a3b254699a5c89efa4
+  Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
 
-PODFILE CHECKSUM: 6a48e41d62a3353c0b25ad1cabc7ff3c16b9aa23
+PODFILE CHECKSUM: 836de073ebc3ad8c0cca8f14fda47ba46539734c
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.15.2

@@ -13,7 +13,7 @@ import Foundation
 import CoreLocation
 import UIKit
 import SnapKit
-import Agrume
+//import Agrume
 import MaterialComponents.MaterialPalettes
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialProgressView
@@ -272,18 +272,18 @@ public class MissionExecutorWidget: UpdatableWidget, ExecutorWidget {
                 })
             ]
             
-            if let confirmationInstructionsImageUrl = missionExecutor.reengagementRules.confirmationInstructionsImageUrl {
-                actions.append(MDCAlertAction(title: "learnMore".localized, emphasis: .low, handler: { action in
-                    let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
-                    doneButton.tintColor = .white
-                    let agrume = Agrume(
-                        url: URL(string: confirmationInstructionsImageUrl)!,
-                        background: .blurred(.dark),
-                        dismissal: .withButton(doneButton))
-                    agrume.statusBarStyle = .lightContent
-                    agrume.show(from: self)
-                }))
-            }
+//            if let confirmationInstructionsImageUrl = missionExecutor.reengagementRules.confirmationInstructionsImageUrl {
+//                actions.append(MDCAlertAction(title: "learnMore".localized, emphasis: .low, handler: { action in
+//                    let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
+//                    doneButton.tintColor = .white
+//                    let agrume = Agrume(
+//                        url: URL(string: confirmationInstructionsImageUrl)!,
+//                        background: .blurred(.dark),
+//                        dismissal: .withButton(doneButton))
+//                    agrume.statusBarStyle = .lightContent
+//                    agrume.show(from: self)
+//                }))
+//            }
             
             DronelinkUI.shared.showDialog(
                 title: confirmationMessage.title,

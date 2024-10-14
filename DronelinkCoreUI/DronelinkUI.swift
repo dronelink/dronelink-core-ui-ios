@@ -12,13 +12,12 @@ import MaterialComponents.MaterialDialogs
 import MaterialComponents.MaterialSnackbar
 import MaterialComponents.MaterialPalettes
 import DronelinkCore
-import Agrume
+//import Agrume
 import Kingfisher
 
 extension DronelinkUI {
     public static let shared = DronelinkUI()
     public static let bundle = Bundle(for: DronelinkUI.self)
-    public static var mapboxMapCredentialsKey: String?
     public static var microsoftMapCredentialsKey: String?
     public static func loadImage(named: String, renderingMode: UIImage.RenderingMode = .alwaysTemplate) -> UIImage? {
         return UIImage(named: named, in: DronelinkUI.bundle, compatibleWith: nil)?.withRenderingMode(renderingMode)
@@ -52,18 +51,18 @@ public class DronelinkUI: NSObject {
         NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         
-        AgrumeServiceLocator.shared.setDownloadHandler { url, completion in
-            KingfisherManager.shared.retrieveImage(with: url) {
-                if let image = try? $0.get().image {
-                    completion(image)
-                    return
-                }
-                
-                KingfisherManager.shared.downloader.downloadImage(with: url, options: [], completionHandler:  {
-                    completion(try? $0.get().image)
-                })
-            }
-        }
+//        AgrumeServiceLocator.shared.setDownloadHandler { url, completion in
+//            KingfisherManager.shared.retrieveImage(with: url) {
+//                if let image = try? $0.get().image {
+//                    completion(image)
+//                    return
+//                }
+//                
+//                KingfisherManager.shared.downloader.downloadImage(with: url, options: [], completionHandler:  {
+//                    completion(try? $0.get().image)
+//                })
+//            }
+//        }
     }
     
     @objc func willEnterForeground(_ notification: Notification) {

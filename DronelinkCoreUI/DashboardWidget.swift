@@ -212,7 +212,7 @@ public class DashboardWidget: DelegateWidget {
         contentView3.addShadow()
         view.addSubview(contentView3)
         
-        disconnectedImageView.setImage(DronelinkUI.loadImage(named: "baseline_usb_white_48pt")!)
+        disconnectedImageView.image = DronelinkUI.loadImage(named: "baseline_usb_white_48pt")!
         disconnectedImageView.tintColor = UIColor.white
         disconnectedImageView.alpha = 0.5
         disconnectedImageView.contentMode = .center
@@ -468,13 +468,14 @@ public class DashboardWidget: DelegateWidget {
         let alert = UIAlertController(title: "DashboardWidget.contentView2.settings".localized, message: nil, preferredStyle: .actionSheet)
         alert.popoverPresentationController?.sourceView = sender as? UIView
         
-        if mapWidget is MicrosoftMapWidget {
-            alert.addAction(UIAlertAction(title: "DashboardWidget.map.mapbox".localized, style: .default, handler: { [weak self] _ in
-                self?.mapStyle = .mapbox
-                self?.view.setNeedsUpdateConstraints()
-            }))
-        }
-        else if mapWidget is MapboxMapWidget {
+//        if mapWidget is MicrosoftMapWidget {
+//            alert.addAction(UIAlertAction(title: "DashboardWidget.map.mapbox".localized, style: .default, handler: { [weak self] _ in
+//                self?.mapStyle = .mapbox
+//                self?.view.setNeedsUpdateConstraints()
+//            }))
+//        }
+        
+        if mapWidget is MapboxMapWidget {
             alert.addAction(UIAlertAction(title: "DashboardWidget.map.microsoft".localized, style: .default, handler: { [weak self] _ in
                 self?.mapStyle = .microsoft
                 self?.view.setNeedsUpdateConstraints()
@@ -727,7 +728,8 @@ public class DashboardWidget: DelegateWidget {
                 break
 
             case .microsoft:
-                mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MicrosoftMapWidget) ?? MicrosoftMapWidget(), subview: mapContentView)
+                mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MapboxMapWidget) ?? MapboxMapWidget(), subview: mapContentView)
+                //mapWidget = refreshWidget(current: mapWidget, next: (mapWidget as? MicrosoftMapWidget) ?? MicrosoftMapWidget(), subview: mapContentView)
                 break
 
             case .none:

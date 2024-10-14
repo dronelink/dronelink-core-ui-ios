@@ -12,8 +12,8 @@ import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialButtons_Theming
 import MaterialComponents.MaterialTextFields
 import Kingfisher
-import Agrume
-import IQKeyboardManager
+//import Agrume
+//import IQKeyboardManager
 
 public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     private static var mostRecentExecuted: FuncExecutor?
@@ -74,7 +74,7 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        IQKeyboardManager.shared().isEnabled = true
+        //IQKeyboardManager.shared().isEnabled = true
         
         imagePlaceholder.radius = 20
         imagePlaceholder.strokeWidth = 5
@@ -509,14 +509,14 @@ public class FuncExecutorWidget: DelegateWidget, ExecutorWidget {
             return
         }
 
-        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
-        doneButton.tintColor = .white
-        let agrume = Agrume(
-            url: URL(string: imageUrl)!,
-            background: .blurred(.dark),
-            dismissal: .withButton(doneButton))
-        agrume.statusBarStyle = .lightContent
-        agrume.show(from: self)
+//        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: nil)
+//        doneButton.tintColor = .white
+//        let agrume = Agrume(
+//            url: URL(string: imageUrl)!,
+//            background: .blurred(.dark),
+//            dismissal: .withButton(doneButton))
+//        agrume.statusBarStyle = .lightContent
+//        agrume.show(from: self)
     }
     
     @objc func onDroneMark(sender: Any) {
